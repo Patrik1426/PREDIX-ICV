@@ -1,0 +1,24 @@
+# ============================================================
+# PREDIX-ICV — Plantilla de Variables de Entorno
+# Instituto de Control Vehicular de Nuevo Leon
+# ============================================================
+# Copie este archivo como .env y configure los valores
+
+# -- Base de Datos (OBLIGATORIO) --
+DATABASE_URL=mysql://usuario:contrasena@localhost:3306/icvnl_db
+
+# -- Autenticacion (OBLIGATORIO) --
+JWT_SECRET=genere_una_clave_aleatoria_de_64_caracteres_aqui
+
+# -- Boveda de Secretos (OBLIGATORIO) --
+VAULT_MASTER_KEY=genere_una_clave_hex_de_64_caracteres_aqui
+
+# -- Informacion del Propietario --
+OWNER_OPEN_ID=id_del_propietario
+
+# -- Asistente IA (Opcional, capa gratuita Google AI Studio) --
+GEMINI_API_KEY=
+GEMINI_API_URL=https://generativelanguage.googleapis.com/v1beta/openai
+
+# -- Puerto del Servidor (Opcional) --
+PORT=3000
