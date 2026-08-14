@@ -39,8 +39,6 @@ function NavItem({
   collapsed,
   icon,
   iconColorClass,
-  activeBarClass,
-  activeSoftClass,
   label,
   onNavigate,
 }: {
@@ -49,8 +47,6 @@ function NavItem({
   collapsed: boolean;
   icon: ReactNode;
   iconColorClass?: string;
-  activeBarClass: string;
-  activeSoftClass?: string;
   label: string;
   onNavigate?: () => void;
 }) {
@@ -60,17 +56,16 @@ function NavItem({
       onClick={onNavigate}
       title={collapsed ? label : undefined}
       className={cn(
-        "relative flex items-center gap-3 rounded-lg py-2.5 text-sm font-medium transition-colors",
-        collapsed ? "justify-center px-0" : "px-3",
+        "flex items-center gap-3 rounded-xl py-2 text-sm font-medium transition-all",
+        collapsed ? "justify-center px-0" : "px-2",
         active
-          ? cn("text-sidebar-accent-foreground", activeSoftClass ?? "bg-sidebar-accent")
-          : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
+          ? "bg-sidebar-pill text-sidebar-pill-foreground shadow-sm"
+          : "text-sidebar-foreground/70 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
       )}
     >
-      {active && (
-        <span className={cn("absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-full", activeBarClass)} />
-      )}
-      <span className={cn("shrink-0", iconColorClass)}>{icon}</span>
+      <span className={cn("flex h-7 w-7 shrink-0 items-center justify-center", active && iconColorClass)}>
+        {icon}
+      </span>
       {!collapsed && <span className="min-w-0 flex-1 leading-tight">{label}</span>}
     </Link>
   );
@@ -85,11 +80,21 @@ function NavItem({
   );
 }
 
-function NavContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
+const BRAND_GRADIENT = "linear-gradient(135deg, var(--sidebar-primary), var(--chart-3))";
+
+function NavContent({
+  collapsed,
+  onNavigate,
+  onToggleCollapse,
+}: {
+  collapsed: boolean;
+  onNavigate?: () => void;
+  onToggleCollapse?: () => void;
+}) {
   const [location] = useLocation();
   const { user, logout } = useAuth();
   const { data: profile } = trpc.auth.getUserProfile.useQuery();
-  const { data: accessibleModules } = trpc.auth.getAccessibleModules.useQuery();
+  const { data: accessibleModules, isLoading: modulesLoading } = trpc.auth.getAccessibleModules.useQuery();
 
   const roleLabel = profile?.institutionalRole
     ? INSTITUTIONAL_ROLE_LABELS[profile.institutionalRole] ?? profile.institutionalRole
@@ -102,17 +107,36 @@ function NavContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?
 
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className={cn("flex h-16 items-center gap-3", collapsed ? "justify-center px-2" : "px-5")}>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground font-bold">
-          IC
-        </div>
-        {!collapsed && (
-          <div className="min-w-0">
-            <div className="font-semibold leading-tight">PREDIX-ICV</div>
-            <div className="truncate text-xs text-sidebar-foreground/70 leading-tight">
-              Instituto de Control Vehicular
-            </div>
+      <div
+        className={cn(
+          "flex items-center gap-2",
+          collapsed ? "flex-col justify-center py-3" : "h-16 justify-between px-4"
+        )}
+      >
+        <div className={cn("flex items-center gap-3", collapsed ? "flex-col" : "min-w-0")}>
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sidebar-primary-foreground font-bold"
+            style={{ background: BRAND_GRADIENT }}
+          >
+            IC
           </div>
+          {!collapsed && (
+            <div className="min-w-0">
+              <div className="font-semibold leading-tight">PREDIX-ICV</div>
+              <div className="truncate text-xs text-sidebar-foreground/70 leading-tight">
+                Instituto de Control Vehicular
+              </div>
+            </div>
+          )}
+        </div>
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            title={collapsed ? "Expandir menú" : "Contraer menú"}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sidebar-pill text-sidebar-pill-foreground shadow-sm transition-colors hover:bg-sidebar-accent"
+          >
+            {collapsed ? <PanelLeft className="h-3.5 w-3.5" /> : <PanelLeftClose className="h-3.5 w-3.5" />}
+          </button>
         )}
       </div>
 
@@ -122,7 +146,7 @@ function NavContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?
           active={location === "/"}
           collapsed={collapsed}
           icon={<LayoutGrid className="h-5 w-5" />}
-          activeBarClass="bg-sidebar-primary"
+          iconColorClass="text-primary"
           label="Resumen"
           onNavigate={onNavigate}
         />
@@ -133,6 +157,14 @@ function NavContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?
           </div>
         )}
         {collapsed && <div className="my-2 border-t border-sidebar-border" />}
+
+        {modulesLoading &&
+          Array.from({ length: 2 }).map((_, i) => (
+            <div
+              key={i}
+              className={cn("h-9 animate-pulse rounded-xl bg-sidebar-accent/40", collapsed ? "mx-auto w-9" : "mx-1")}
+            />
+          ))}
 
         {navSlugs.map((slug) => {
           const href = `/modulos/${slug}`;
@@ -146,15 +178,13 @@ function NavContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?
               collapsed={collapsed}
               icon={MODULE_ICONS[slug]}
               iconColorClass={accent.text}
-              activeBarClass={accent.solid}
-              activeSoftClass={accent.soft}
               label={MODULE_LABELS[slug]}
               onNavigate={onNavigate}
             />
           );
         })}
 
-        {navSlugs.length === 0 && !collapsed && (
+        {!modulesLoading && navSlugs.length === 0 && !collapsed && (
           <p className="px-3 py-2 text-xs text-sidebar-foreground/60">
             Tu rol no tiene módulos habilitados todavía.
           </p>
@@ -162,8 +192,10 @@ function NavContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?
       </nav>
 
       <div className={cn("flex items-center gap-3 border-t border-sidebar-border p-4", collapsed && "justify-center px-2")}>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold">
-          {initial}
+        <div className="shrink-0 rounded-full p-[1.5px]" style={{ background: BRAND_GRADIENT }}>
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-sidebar text-xs font-semibold">
+            {initial}
+          </div>
         </div>
         {!collapsed && (
           <>
@@ -193,18 +225,14 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background lg:flex">
-      <aside className={cn("hidden shrink-0 border-r border-sidebar-border transition-[width] duration-200 lg:block", collapsed ? "w-[4.5rem]" : "w-64")}>
-        <div className="sticky top-0 flex h-screen flex-col">
-          <div className="flex-1 overflow-hidden">
-            <NavContent collapsed={collapsed} />
-          </div>
-          <button
-            onClick={() => setCollapsed((c) => !c)}
-            className="flex h-11 shrink-0 items-center justify-center gap-2 border-t border-sidebar-border bg-sidebar text-xs font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-            title={collapsed ? "Expandir menú" : "Contraer menú"}
+      <aside className={cn("hidden shrink-0 transition-[width] duration-200 lg:block", collapsed ? "w-[4.5rem]" : "w-64")}>
+        <div className="sticky top-0 h-screen p-3">
+          <div
+            className="h-full overflow-hidden rounded-2xl ring-1 ring-black/5"
+            style={{ boxShadow: "0 8px 30px -12px oklch(0.55 0.05 55 / 0.35)" }}
           >
-            {collapsed ? <PanelLeft className="h-4 w-4" /> : <><PanelLeftClose className="h-4 w-4" /> Contraer</>}
-          </button>
+            <NavContent collapsed={collapsed} onToggleCollapse={() => setCollapsed((c) => !c)} />
+          </div>
         </div>
       </aside>
 
