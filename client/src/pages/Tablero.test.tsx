@@ -54,4 +54,10 @@ describe("Tablero", () => {
     renderTablero();
     expect(screen.getByRole("link", { name: /Ver propuesta completa/ })).toHaveAttribute("href", "/propuesta");
   });
+
+  it("connects the statewide KPIs to delegaciones en estado saturado, without fabricating a per-delegación breakdown", () => {
+    renderTablero();
+    expect(screen.getByText(/Delegaciones en estado saturado/)).toBeInTheDocument();
+    expect(screen.getByText(/Monterrey Centro \(86%\)/)).toBeInTheDocument();
+  });
 });

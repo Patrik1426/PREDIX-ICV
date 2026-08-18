@@ -29,6 +29,9 @@ const FUENTES_DE_DATOS = [
 
 export default function Tablero() {
   const delegacionTop = [...DEMO_DELEGACIONES].sort((a, b) => b.ocupacion - a.ocupacion)[0];
+  const delegacionesSaturadas = DEMO_DELEGACIONES.filter((d) => d.estado === "saturado").sort(
+    (a, b) => b.ocupacion - a.ocupacion
+  );
   const maxSemana = Math.max(...DEMO_CITAS_SEMANA.map((d) => d.ocupacion));
 
   const reportRows: ReportRow[] = [
@@ -72,6 +75,18 @@ export default function Tablero() {
             </div>
           ))}
         </div>
+        {delegacionesSaturadas.length > 0 && (
+          <p className="border-t pt-3 text-xs text-muted-foreground">
+            Delegaciones en estado saturado (presionan estos indicadores más que el promedio
+            estatal):{" "}
+            {delegacionesSaturadas.map((d, i) => (
+              <span key={d.nombre} className="font-medium text-foreground">
+                {d.nombre} ({Math.round(d.ocupacion * 100)}%)
+                {i < delegacionesSaturadas.length - 1 ? ", " : "."}
+              </span>
+            ))}
+          </p>
+        )}
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
