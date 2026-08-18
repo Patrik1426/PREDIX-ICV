@@ -10,32 +10,62 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { MODULE_LABELS, MODULE_DESCRIPTIONS } from "@/lib/moduleLabels";
 import { INSTITUTIONAL_ROLE_LABELS } from "@/lib/institutionalRoles";
-import { MODULE_ICONS, MODULE_ORDER, MODULE_ACCENT } from "@/lib/moduleIcons";
 import { DEMO_DELEGACIONES, DEMO_DEMANDA_HORARIA, DEMO_KPIS } from "@/lib/demoData";
 import { DIAGNOSTICO, RESULTADOS_ESPERADOS, FASES, ARQUITECTURA_CAPAS, METAS_12_MESES } from "@/lib/proposalData";
 import { CarrilFlujo, DatoEjemplo, MetaDelProyecto, ForecastChart, BulletKpi } from "@/components/demo/DemoVisuals";
 import { Reveal } from "@/components/layout/Reveal";
 import { LineaCarril } from "@/components/layout/LineaCarril";
 import { SectionHeading } from "@/components/layout/SectionHeading";
-import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, ChevronRight, ChevronDown } from "lucide-react";
+import { AlertTriangle, ChevronRight, ChevronDown, TrendingUp, DoorOpen, CalendarClock, Activity, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function Resumen() {
+const PROPUESTA_MODULOS = [
+  {
+    nombre: "Motor de Predicción de Demanda",
+    descripcion: "Anticipa volumen y tipo de trámites por delegación, día y hora.",
+    ruta: "/modulos/prediccion_asignacion",
+    icon: <TrendingUp className="h-5 w-5" />,
+    accent: "text-chart-1",
+  },
+  {
+    nombre: "Asignador Dinámico de Ventanillas",
+    descripcion: "Redistribuye ventanillas en tiempo real según la demanda.",
+    ruta: "/modulos/prediccion_asignacion",
+    icon: <DoorOpen className="h-5 w-5" />,
+    accent: "text-chart-1",
+  },
+  {
+    nombre: "Sistema de Citas Inteligente",
+    descripcion: "Agenda con optimización automática de carga por delegación.",
+    ruta: "/modulos/citas_operacion",
+    icon: <CalendarClock className="h-5 w-5" />,
+    accent: "text-chart-5",
+  },
+  {
+    nombre: "Monitor de Operaciones en Tiempo Real",
+    descripcion: "KPIs operativos y alertas de saturación en tiempo real.",
+    ruta: "/modulos/citas_operacion",
+    icon: <Activity className="h-5 w-5" />,
+    accent: "text-chart-5",
+  },
+  {
+    nombre: "Asistente Virtual",
+    descripcion: "Asistente conversacional para consultas ciudadanas.",
+    ruta: "/modulos/chatbot",
+    icon: <MessageCircle className="h-5 w-5" />,
+    accent: "text-chart-3",
+  },
+] as const;
+
+export default function Propuesta() {
   const [delegacionAbierta, setDelegacionAbierta] = useState<string | null>(null);
   const { user } = useAuth();
   const { data: profile } = trpc.auth.getUserProfile.useQuery();
-  const { data: accessibleModules, isLoading: modulesLoading } =
-    trpc.auth.getAccessibleModules.useQuery();
 
   const roleLabel = profile?.institutionalRole
     ? INSTITUTIONAL_ROLE_LABELS[profile.institutionalRole] ?? profile.institutionalRole
     : "";
-
-  const hasAccess = (slug: string) => accessibleModules?.includes(slug) ?? false;
-  const visibleModules = MODULE_ORDER.filter(hasAccess);
 
   return (
     <div className="container py-10 space-y-14">
@@ -143,56 +173,37 @@ export default function Resumen() {
         </section>
       </Reveal>
 
-      {/* MÓDULOS — índice del pipeline, coherente con el sidebar */}
+      {/* MÓDULOS — los 5 tal como los describe la propuesta original. El
+          producto construido los consolidó en 3 (ver el Tablero). */}
       <Reveal>
         <section className="space-y-4">
-          <SectionHeading eyebrow="Solución" title="5 módulos en cadena">
-            Cuatro módulos en cadena, más un asistente que acompaña al ciudadano en todo momento.
-            Toca uno para ver su vista previa.
+          <SectionHeading eyebrow="Solución" title="5 módulos de la propuesta original">
+            Como se describieron en la propuesta técnica. Toca uno para ver su vista previa
+            en el producto ya consolidado.
           </SectionHeading>
 
-          {modulesLoading && (
-            <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Skeleton key={i} className="h-14 rounded-md" />
-              ))}
-            </div>
-          )}
-
-          {!modulesLoading && visibleModules.length > 0 && (
-            <div className="rounded-lg border">
-              {visibleModules.map((slug, i) => {
-                const accent = MODULE_ACCENT[slug];
-                return (
-                  <Link
-                    key={slug}
-                    href={`/modulos/${slug}`}
-                    className={cn(
-                      "group relative flex items-center gap-4 py-3.5 pl-4 pr-3 transition-colors hover:bg-muted/50",
-                      i !== 0 && "border-t"
-                    )}
-                  >
-                    <span className={cn("absolute inset-y-1.5 left-0 w-0.5 rounded-full opacity-0 transition-opacity group-hover:opacity-100", accent.solid)} />
-                    <span className={cn("w-6 shrink-0 text-sm font-bold tabular-nums", accent.text)}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className={cn("shrink-0", accent.text)}>{MODULE_ICONS[slug]}</span>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate font-semibold leading-tight">{MODULE_LABELS[slug]}</h3>
-                      <p className="truncate text-xs text-muted-foreground">{MODULE_DESCRIPTIONS[slug]}</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-
-          {!modulesLoading && visibleModules.length === 0 && (
-            <p className="text-sm text-muted-foreground">
-              Tu rol no tiene módulos habilitados todavía.
-            </p>
-          )}
+          <div className="rounded-lg border">
+            {PROPUESTA_MODULOS.map((m, i) => (
+              <Link
+                key={m.nombre}
+                href={m.ruta}
+                className={cn(
+                  "group relative flex items-center gap-4 py-3.5 pl-4 pr-3 transition-colors hover:bg-muted/50",
+                  i !== 0 && "border-t"
+                )}
+              >
+                <span className={cn("w-6 shrink-0 text-sm font-bold tabular-nums", m.accent)}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className={cn("shrink-0", m.accent)}>{m.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="truncate font-semibold leading-tight">{m.nombre}</h3>
+                  <p className="truncate text-xs text-muted-foreground">{m.descripcion}</p>
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            ))}
+          </div>
         </section>
       </Reveal>
 
