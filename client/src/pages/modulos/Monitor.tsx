@@ -2,12 +2,23 @@
 // Monitor — vista previa del módulo 04. Kit operativo: ring de estado,
 // KPIs, ventanillas. Corre sobre @/lib/demoData, nunca datos reales del
 // ICVNL.
+//
+// El "Panel de Indicadores Clave" de la sección 3.4 de la propuesta define
+// 8 KPIs; aquí se muestran los 6 que tienen dato demo real y honesto
+// (tiempo de espera, trámites hoy, tiempo de atención — DEMO_ESTADO_FILA.
+// tiempoEstimadoMin, antes sin usar —, trámites completados/hora — suma
+// real de DEMO_VENTANILLAS_MONITOR.atendidos —, ocupación de ventanillas —
+// DEMO_ESTADO_FILA.capacidadPct, mismo valor que ya alimenta el ring — y
+// ciudadanos en fila, ya mostrado en el centro del ring). Los 2 restantes
+// (predicción de saturación, tasa de abandono) y el "mapa de calor
+// operativo" de esa misma sección no tienen dato demo real que respaldarlos
+// — no se fabrican, quedan pendientes hasta tener datos reales del ICVNL.
 // ============================================================
 
 import { useEffect, useState } from "react";
 import { DEMO_ESTADO_FILA, DEMO_KPIS, DEMO_DEMANDA_HORARIA, DEMO_VENTANILLAS_MONITOR } from "@/lib/demoData";
 import { KpiCard, TrendBadge, DataRow, StatusRing, VentanillaCard, SkeletonKpi } from "@/components/dashboard";
-import { AlertTriangle, Timer, Users2 } from "lucide-react";
+import { AlertTriangle, Timer, Users2, Gauge, DoorOpen } from "lucide-react";
 
 export default function PreviewMonitor() {
   const [tick, setTick] = useState(0);
@@ -24,6 +35,7 @@ export default function PreviewMonitor() {
 
   const jitter = Math.sin(tick) * 4;
   const capacidadPct = Math.min(97, Math.max(8, DEMO_ESTADO_FILA.capacidadPct + jitter));
+  const tramitesCompletadosHora = DEMO_VENTANILLAS_MONITOR.reduce((sum, v) => sum + v.atendidos, 0);
 
   return (
     <div className="space-y-5">
@@ -66,6 +78,42 @@ export default function PreviewMonitor() {
             </>
           )}
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+        {loading ? (
+          <>
+            <SkeletonKpi />
+            <SkeletonKpi />
+            <SkeletonKpi />
+          </>
+        ) : (
+          <>
+            <KpiCard
+              icon={<Timer className="h-4 w-4" />}
+              label="Tiempo de atención"
+              value={DEMO_ESTADO_FILA.tiempoEstimadoMin}
+              suffix=" min"
+              colorClassName="text-chart-3"
+              spark={DEMO_DEMANDA_HORARIA}
+            />
+            <KpiCard
+              icon={<DoorOpen className="h-4 w-4" />}
+              label="Trámites completados/hora"
+              value={tramitesCompletadosHora}
+              colorClassName="text-chart-2"
+              spark={DEMO_DEMANDA_HORARIA}
+            />
+            <KpiCard
+              icon={<Gauge className="h-4 w-4" />}
+              label="Ocupación de ventanillas"
+              value={Math.round(DEMO_ESTADO_FILA.capacidadPct)}
+              suffix="%"
+              colorClassName="text-primary"
+              spark={DEMO_DEMANDA_HORARIA}
+            />
+          </>
+        )}
       </div>
 
       <div className="rounded-lg border bg-card p-4">
