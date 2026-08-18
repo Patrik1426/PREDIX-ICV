@@ -133,3 +133,6 @@ docs/
 node_modules/
 preview/
 CLAUDE.md
+
+# Git worktrees for isolated plan execution (superpowers:using-git-worktrees)
+.worktrees/
