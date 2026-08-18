@@ -12,6 +12,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { MODULE_LABELS } from "@/lib/moduleLabels";
 import { INSTITUTIONAL_ROLE_LABELS } from "@/lib/institutionalRoles";
 import { MODULE_ICONS, MODULE_ORDER, MODULE_ACCENT } from "@/lib/moduleIcons";
+import { hasGroupAccess } from "@/lib/moduleGroups";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -99,8 +100,7 @@ function NavContent({
   const roleLabel = profile?.institutionalRole
     ? INSTITUTIONAL_ROLE_LABELS[profile.institutionalRole] ?? profile.institutionalRole
     : "";
-  const hasAccess = (slug: string) => accessibleModules?.includes(slug) ?? false;
-  const navSlugs = [...MODULE_ORDER, "admin"].filter(hasAccess);
+  const navSlugs = [...MODULE_ORDER, "admin"].filter((slug) => hasGroupAccess(slug, accessibleModules));
 
   const displayName = user?.name ?? profile?.name ?? "";
   const initial = displayName.trim().charAt(0).toUpperCase() || "?";
@@ -147,7 +147,7 @@ function NavContent({
           collapsed={collapsed}
           icon={<LayoutGrid className="h-5 w-5" />}
           iconColorClass="text-primary"
-          label="Resumen"
+          label="Tablero"
           onNavigate={onNavigate}
         />
 
