@@ -60,4 +60,15 @@ describe("Tablero", () => {
     expect(screen.getByText(/Delegaciones en estado saturado/)).toBeInTheDocument();
     expect(screen.getByText(/Monterrey Centro \(86%\)/)).toBeInTheDocument();
   });
+
+  it("renders the weekly trend bars as direct children of the fixed-height row (regression: a percentage height needs a sized parent, not an auto-height flex-col wrapper)", () => {
+    renderTablero();
+    const bars = screen.getAllByTestId("tendencia-barra");
+    expect(bars).toHaveLength(6);
+    bars.forEach((bar) => {
+      expect(bar.parentElement).toHaveClass("h-24");
+      expect(bar.style.height).not.toBe("");
+      expect(bar.style.height).not.toBe("0%");
+    });
+  });
 });

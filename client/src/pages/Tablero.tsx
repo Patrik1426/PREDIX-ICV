@@ -112,15 +112,24 @@ export default function Tablero() {
 
         <section className="rounded-lg border bg-card p-5">
           <ModuleHeader eyebrow="Sección 4 — anticipar" title="Tendencia semanal" />
+          {/* Altura en % solo resuelve contra un padre con altura fija — por eso
+              las barras van directas en la fila h-24 (no en un flex-col interno
+              de altura automática); las etiquetas van en su propia fila aparte. */}
           <div className="flex h-24 items-end gap-3">
             {DEMO_CITAS_SEMANA.map((d) => (
-              <div key={d.dia} className="flex flex-1 flex-col items-center gap-1">
-                <div
-                  className="w-full rounded-t-sm bg-chart-2"
-                  style={{ height: `${Math.round((d.ocupacion / maxSemana) * 100)}%` }}
-                />
-                <span className="text-xs text-muted-foreground">{d.dia}</span>
-              </div>
+              <div
+                key={d.dia}
+                data-testid="tendencia-barra"
+                className="w-full flex-1 rounded-t-sm bg-chart-2"
+                style={{ height: `${Math.round((d.ocupacion / maxSemana) * 100)}%` }}
+              />
+            ))}
+          </div>
+          <div className="mt-1 flex gap-3">
+            {DEMO_CITAS_SEMANA.map((d) => (
+              <span key={d.dia} className="flex-1 text-center text-xs text-muted-foreground">
+                {d.dia}
+              </span>
             ))}
           </div>
         </section>
