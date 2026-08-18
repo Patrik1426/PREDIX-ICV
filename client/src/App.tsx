@@ -5,7 +5,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { AppShell } from "@/components/layout/AppShell";
 import Login from "@/pages/Login";
-import Resumen from "@/pages/Resumen";
+import Tablero from "@/pages/Tablero";
+import Propuesta from "@/pages/Propuesta";
 import ModuloDetalle from "@/pages/ModuloDetalle";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -28,7 +29,14 @@ export default function App() {
           <Route path="/">
             <RequireAuth>
               <AppShell>
-                <Resumen />
+                <Tablero />
+              </AppShell>
+            </RequireAuth>
+          </Route>
+          <Route path="/propuesta">
+            <RequireAuth>
+              <AppShell>
+                <Propuesta />
               </AppShell>
             </RequireAuth>
           </Route>
