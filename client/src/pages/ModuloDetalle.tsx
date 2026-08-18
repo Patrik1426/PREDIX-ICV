@@ -14,17 +14,14 @@ import { DatoEjemplo } from "@/components/demo/DemoVisuals";
 import { MODULE_DESARROLLO } from "@/components/demo/ModuloDesarrollo";
 import { ChevronLeft, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PreviewPrediccion from "@/pages/modulos/PrediccionDemanda";
-import PreviewAsignador from "@/pages/modulos/AsignadorVentanillas";
-import PreviewCitas from "@/pages/modulos/Citas";
-import PreviewMonitor from "@/pages/modulos/Monitor";
+import PreviewPrediccionAsignacion from "@/pages/modulos/PrediccionAsignacion";
+import PreviewCitasOperacion from "@/pages/modulos/CitasOperacion";
 import PreviewChatbot from "@/pages/modulos/Chatbot";
+import { hasGroupAccess } from "@/lib/moduleGroups";
 
 const MODULE_PREVIEWS: Record<string, ComponentType> = {
-  prediccion_demanda: PreviewPrediccion,
-  asignador_ventanillas: PreviewAsignador,
-  citas: PreviewCitas,
-  monitor: PreviewMonitor,
+  prediccion_asignacion: PreviewPrediccionAsignacion,
+  citas_operacion: PreviewCitasOperacion,
   chatbot: PreviewChatbot,
 };
 
@@ -39,7 +36,7 @@ export default function ModuloDetalle() {
   const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
 
   if (!slug || !MODULE_LABELS[slug]) return <Redirect to="/" />;
-  if (!isLoading && !(accessibleModules ?? []).includes(slug)) return <Redirect to="/" />;
+  if (!isLoading && !hasGroupAccess(slug, accessibleModules)) return <Redirect to="/" />;
 
   const accent = MODULE_ACCENT[slug];
   const pipelineIndex = MODULE_ORDER.indexOf(slug as (typeof MODULE_ORDER)[number]);
@@ -50,7 +47,7 @@ export default function ModuloDetalle() {
     <div className="container max-w-3xl py-10 space-y-6">
       <Link href="/" className="group inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
         <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" />
-        Resumen
+        Tablero
       </Link>
 
       {pipelineIndex >= 0 && (

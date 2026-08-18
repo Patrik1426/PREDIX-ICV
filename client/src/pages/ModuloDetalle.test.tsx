@@ -1,15 +1,16 @@
+// client/src/pages/ModuloDetalle.test.tsx
 import { act, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Route, Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
 
-let mockAccessibleSlug = "monitor";
+let mockAccessibleModules: string[] = ["monitor"];
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     auth: {
       getAccessibleModules: {
-        useQuery: () => ({ data: [mockAccessibleSlug], isLoading: false }),
+        useQuery: () => ({ data: mockAccessibleModules, isLoading: false }),
       },
     },
   },
@@ -17,53 +18,8 @@ vi.mock("@/lib/trpc", () => ({
 
 import ModuloDetalle from "./ModuloDetalle";
 
-describe("ModuloDetalle — Monitor de Operaciones preview", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("renders the status ring, KPI cards and ventanilla cards", () => {
-    const { hook } = memoryLocation({ path: "/modulos/monitor", static: true });
-    render(
-      <Router hook={hook}>
-        <Route path="/modulos/:slug">
-          <ModuloDetalle />
-        </Route>
-      </Router>
-    );
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
-    expect(screen.getByText("ESPERANDO")).toBeInTheDocument();
-    expect(screen.getByText("Juan P.")).toBeInTheDocument();
-    expect(screen.getByText("Ana R.")).toBeInTheDocument();
-    expect(screen.getByText("Marta G.")).toBeInTheDocument();
-  });
-
-  it("does not show the 'Próximamente' badge or the preview/plan tabs", () => {
-    const { hook } = memoryLocation({ path: "/modulos/monitor", static: true });
-    render(
-      <Router hook={hook}>
-        <Route path="/modulos/:slug">
-          <ModuloDetalle />
-        </Route>
-      </Router>
-    );
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
-    expect(screen.queryByText("Próximamente")).not.toBeInTheDocument();
-    expect(screen.queryByText("Vista previa")).not.toBeInTheDocument();
-    expect(screen.getByText("Detalle técnico")).toBeInTheDocument();
-  });
-});
-
-function renderModulo(slug: string) {
-  mockAccessibleSlug = slug;
+function renderModulo(slug: string, accessibleModules: string[]) {
+  mockAccessibleModules = accessibleModules;
   const { hook } = memoryLocation({ path: `/modulos/${slug}`, static: true });
   render(
     <Router hook={hook}>
@@ -77,69 +33,60 @@ function renderModulo(slug: string) {
   });
 }
 
-describe("ModuloDetalle — Predicción de Demanda preview", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
+beforeEach(() => {
+  vi.useFakeTimers();
+});
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
+afterEach(() => {
+  vi.useRealTimers();
+});
 
-  it("renders the KPI header", () => {
-    renderModulo("prediccion_demanda");
-    expect(screen.getByText("Trámites proyectados hoy")).toBeInTheDocument();
+describe("ModuloDetalle — Predicción y Asignación", () => {
+  it("renders the fused view when the user has both real sub-modules", () => {
+    renderModulo("prediccion_asignacion", ["prediccion_demanda", "asignador_ventanillas"]);
+    expect(screen.getByRole("tab", { name: /Predicción/ })).toBeInTheDocument();
     expect(screen.getByText("Precisión del modelo")).toBeInTheDocument();
-    expect(screen.getByText("91")).toBeInTheDocument();
-  });
-});
-
-describe("ModuloDetalle — Asignador de Ventanillas preview", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
   });
 
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("renders the KPI header", () => {
-    renderModulo("asignador_ventanillas");
+  it("stays on the page (no redirect) when the user has only one of the two real sub-modules", () => {
+    renderModulo("prediccion_asignacion", ["asignador_ventanillas"]);
     expect(screen.getByText("Ventanillas activas")).toBeInTheDocument();
-    expect(screen.getByText("Tiempo de espera actual")).toBeInTheDocument();
   });
 });
 
-describe("ModuloDetalle — Citas preview", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
-  it("renders the KPI header and próximas atenciones list", () => {
-    renderModulo("citas");
-    expect(screen.getByText("Citas hoy")).toBeInTheDocument();
-    expect(screen.getByText("En espera")).toBeInTheDocument();
+describe("ModuloDetalle — Citas y Operación", () => {
+  it("renders the fused view when the user has both real sub-modules", () => {
+    renderModulo("citas_operacion", ["citas", "monitor"]);
+    expect(screen.getByRole("tab", { name: /Citas/ })).toBeInTheDocument();
     expect(screen.getByText("Próximas atenciones")).toBeInTheDocument();
-    expect(screen.getByText("Martínez, Ana Paula — Trámite General")).toBeInTheDocument();
   });
 });
 
-describe("ModuloDetalle — Asistente Virtual preview", () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
+describe("ModuloDetalle — Asistente Virtual", () => {
   it("renders the KPI header", () => {
-    renderModulo("chatbot");
+    renderModulo("chatbot", ["chatbot"]);
     expect(screen.getByText("Consultas resueltas hoy")).toBeInTheDocument();
     expect(screen.getByText("Tiempo de respuesta")).toBeInTheDocument();
+  });
+});
+
+describe("ModuloDetalle — access gate", () => {
+  it("redirects home when the user has none of the real sub-modules for the fused slug", () => {
+    const { hook } = memoryLocation({ path: "/modulos/prediccion_asignacion" });
+    mockAccessibleModules = ["chatbot"];
+    render(
+      <Router hook={hook}>
+        <Route path="/">
+          <p>Tablero (redirigido)</p>
+        </Route>
+        <Route path="/modulos/:slug">
+          <ModuloDetalle />
+        </Route>
+      </Router>
+    );
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
+    expect(screen.getByText("Tablero (redirigido)")).toBeInTheDocument();
   });
 });
