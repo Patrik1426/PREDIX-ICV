@@ -1,22 +1,21 @@
+// client/src/lib/moduleLabels.ts
 /**
  * moduleLabels.ts — etiquetas visibles de los módulos de PREDIX-ICV.
- * Mantener sincronizado con server/_core/infra/permissions.ts → MODULES.
+ * "prediccion_asignacion" y "citas_operacion" son slugs de UI (fusionan 2
+ * módulos RBAC cada uno, ver @/lib/moduleGroups) — no existen como MODULES
+ * en server/_core/infra/permissions.ts, el RBAC real sigue siendo granular.
  */
 
 export const MODULE_LABELS: Record<string, string> = {
-  prediccion_demanda: "Motor de Predicción de Demanda",
-  asignador_ventanillas: "Asignador Dinámico de Ventanillas",
-  citas: "Sistema de Citas Inteligente",
-  monitor: "Monitor de Operaciones en Tiempo Real",
+  prediccion_asignacion: "Predicción y Asignación",
+  citas_operacion: "Citas y Operación",
   chatbot: "Asistente Virtual",
   admin: "Administración",
 };
 
 export const MODULE_DESCRIPTIONS: Record<string, string> = {
-  prediccion_demanda: "Anticipa volumen y tipo de trámites por delegación, día y hora.",
-  asignador_ventanillas: "Redistribuye ventanillas en tiempo real según la demanda.",
-  citas: "Agenda con optimización automática de carga por delegación.",
-  monitor: "KPIs operativos y alertas de saturación en tiempo real.",
+  prediccion_asignacion: "Anticipa la demanda y redistribuye ventanillas en tiempo real.",
+  citas_operacion: "Agenda con optimización automática y monitoreo en vivo por delegación.",
   chatbot: "Asistente conversacional para consultas ciudadanas.",
   admin: "Gestión de usuarios, roles y auditoría del sistema.",
 };
