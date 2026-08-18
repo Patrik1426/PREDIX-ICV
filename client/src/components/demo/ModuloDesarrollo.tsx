@@ -363,10 +363,22 @@ function DesarrolloAdmin() {
 }
 
 export const MODULE_DESARROLLO: Record<string, ReactNode> = {
-  prediccion_demanda: <DesarrolloPrediccion />,
-  asignador_ventanillas: <DesarrolloAsignador />,
-  citas: <DesarrolloCitas />,
-  monitor: <DesarrolloMonitor />,
+  prediccion_asignacion: (
+    <div className="space-y-8">
+      <DesarrolloPrediccion />
+      <div className="border-t pt-8">
+        <DesarrolloAsignador />
+      </div>
+    </div>
+  ),
+  citas_operacion: (
+    <div className="space-y-8">
+      <DesarrolloCitas />
+      <div className="border-t pt-8">
+        <DesarrolloMonitor />
+      </div>
+    </div>
+  ),
   chatbot: <DesarrolloChatbot />,
   admin: <DesarrolloAdmin />,
 };
