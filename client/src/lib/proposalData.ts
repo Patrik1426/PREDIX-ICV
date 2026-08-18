@@ -150,6 +150,31 @@ export const ADMIN_CAPACIDADES = [
   { titulo: "Auditoría", detalle: "Registro de acciones (audit_log) por usuario y módulo" },
 ] as const;
 
+/**
+ * Indicadores de éxito del proyecto — sección 8 de la propuesta, línea base
+ * real → meta a 12 meses. 5 tienen línea base numérica (bullet actual-vs-meta,
+ * mismo patrón que BulletKpi ya usa en el hero de Propuesta.tsx); 2 no tienen
+ * línea base medible ("Sin medición"/"N/A" en el documento original) — se
+ * muestran aparte como solo-meta, sin inventar un valor de partida.
+ *
+ * "Tiempo de espera": la propuesta da un rango ("45-120 min en pico"), no un
+ * solo número — se usa 120 (el extremo "pico" que el documento nombra
+ * explícitamente), no un promedio inventado.
+ */
+export const KPIS_EXITO_PROYECTO = {
+  conBullet: [
+    { label: "Tiempo de espera", actual: 120, meta: 20, max: 140, unidad: " min", menorEsMejor: true },
+    { label: "Trámites con cita previa", actual: 5, meta: 40, max: 60, unidad: "%", menorEsMejor: false },
+    { label: "Tasa de uso digital", actual: 20, meta: 50, max: 70, unidad: "%", menorEsMejor: false },
+    { label: "Tasa de abandono", actual: 15, meta: 5, max: 35, unidad: "%", menorEsMejor: true },
+    { label: "Eficiencia de ventanillas", actual: 60, meta: 80, max: 100, unidad: "%", menorEsMejor: false },
+  ],
+  soloMeta: [
+    { label: "Satisfacción ciudadana", metaTexto: "> 4.2/5.0" },
+    { label: "Precisión de predicción", metaTexto: "> 85% (MAPE < 15%)" },
+  ],
+} as const;
+
 export const STACK_TECNOLOGICO = [
   { capa: "Frontend web", tecnologia: "React 19 + Tailwind CSS 4" },
   { capa: "Backend API", tecnologia: "Node.js + Express + tRPC" },
