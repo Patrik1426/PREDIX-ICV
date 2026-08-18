@@ -2,6 +2,14 @@
 // ReportExporter — exporta el KPI rollup del Tablero a CSV. 100% cliente
 // (Blob + descarga), sin backend nuevo. Los datos vienen del caller
 // — nunca datos reales del ICVNL.
+//
+// NOTA: hoy solo se conecta a las constantes demo del Tablero. Antes de
+// reusar este componente para datos reales respaldados por schema, agregar
+// (a) un gate RBAC `canExport` (la matriz de permisos ya soporta esta acción,
+// ver server/_core/infra/permissions.ts) y (b) escapado a prueba de
+// inyección de fórmulas CSV para celdas que empiecen con `=`, `+`, `@` o `-`
+// (formula injection) — ninguno de los dos existe todavía, no hace falta
+// mientras los datos sean de ejemplo.
 // ============================================================
 
 import { useState } from "react";
@@ -21,11 +29,15 @@ export interface ReportRow {
   valor: string;
 }
 
+// RFC-4180: un campo va entre comillas dobles, y toda comilla doble literal
+// dentro del campo se escapa duplicándola (nunca con backslash).
+function csvField(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`;
+}
+
 export function buildCsv(rows: ReportRow[]): string {
   const header = "Métrica,Valor";
-  const lines = rows.map(
-    (r) => `"${r.metrica.replace(/"/g, '""')}",${JSON.stringify(r.valor)}`
-  );
+  const lines = rows.map((r) => `${csvField(r.metrica)},${csvField(r.valor)}`);
   return [header, ...lines].join("\n");
 }
 
@@ -34,13 +46,23 @@ export default function ReportExporter({ rows }: { rows: ReportRow[] }) {
 
   const handleExport = () => {
     const csv = buildCsv(rows);
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    // BOM UTF-8 al frente: sin esto, Excel en Windows abre el CSV con el
+    // codepage ANSI del sistema por defecto y los acentos (Métrica,
+    // Trámites, Precisión...) se ven como mojibake.
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
     a.download = "predix-icv-kpis-demo.csv";
+    // El ancla debe estar en el DOM para que .click() dispare la descarga de
+    // forma confiable en todos los navegadores (Firefox en particular no
+    // garantiza el disparo de un <a> fuera del documento); revocar la URL
+    // del objeto se difiere un tick para no invalidarla antes de que el
+    // navegador arranque la descarga.
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
     setIsOpen(false);
   };
 

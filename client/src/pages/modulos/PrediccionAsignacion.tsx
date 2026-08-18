@@ -9,16 +9,28 @@
 
 import { trpc } from "@/lib/trpc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmptyState } from "@/components/dashboard";
+import { EmptyState, SkeletonKpi } from "@/components/dashboard";
 import { TrendingUp, DoorOpen } from "lucide-react";
 import PreviewPrediccion from "./PrediccionDemanda";
 import PreviewAsignador from "./AsignadorVentanillas";
+import { MODULE_GROUPS } from "@/lib/moduleGroups";
+
+const [SLUG_PREDICCION, SLUG_ASIGNADOR] = MODULE_GROUPS.prediccion_asignacion;
 
 export default function PreviewPrediccionAsignacion() {
-  const { data: accessibleModules } = trpc.auth.getAccessibleModules.useQuery();
+  const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
   const modules = accessibleModules ?? [];
-  const puedePrediccion = modules.includes("prediccion_demanda");
-  const puedeAsignador = modules.includes("asignador_ventanillas");
+  const puedePrediccion = modules.includes(SLUG_PREDICCION);
+  const puedeAsignador = modules.includes(SLUG_ASIGNADOR);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <SkeletonKpi />
+        <SkeletonKpi />
+      </div>
+    );
+  }
 
   if (!puedePrediccion && !puedeAsignador) {
     return <EmptyState text="Tu rol no tiene permiso para ver Predicción ni Asignación." />;

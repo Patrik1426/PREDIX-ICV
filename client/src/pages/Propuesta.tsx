@@ -1,9 +1,11 @@
 // ============================================================
-// RESUMEN — página de inicio post-login de PREDIX-ICV.
-// Resume la propuesta: diagnóstico, los 5 módulos (enlazan a su vista
-// previa en /modulos/:slug), arquitectura, resultados esperados y fases.
-// Cifras de "resultados esperados", "metas" y "fases" vienen literalmente
-// de docs/Propuesta PREDIX ICVNL Paco.docx — no son mediciones del ICVNL.
+// Propuesta — contenido original de la propuesta comercial (venta), movido
+// a /propuesta y ya no la landing post-login (eso es Tablero.tsx desde el
+// Task 6 de esta consolidación). Resume la propuesta: diagnóstico, los 5
+// módulos (enlazan a su vista previa en /modulos/:slug), arquitectura,
+// resultados esperados y fases. Cifras de "resultados esperados", "metas" y
+// "fases" vienen literalmente de docs/Propuesta PREDIX ICVNL Paco.docx —
+// no son mediciones del ICVNL.
 // ============================================================
 
 import { useState } from "react";
@@ -20,7 +22,15 @@ import { SectionHeading } from "@/components/layout/SectionHeading";
 import { AlertTriangle, ChevronRight, ChevronDown, TrendingUp, DoorOpen, CalendarClock, Activity, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const PROPUESTA_MODULOS = [
+// Congelado a propósito: contenido histórico/comercial de la propuesta
+// original (5 módulos), desacoplado por diseño de los MODULE_* del producto
+// ya construido (Task 7 de esta consolidación) — no se deriva de
+// moduleLabels.ts/moduleGroups.ts ni cambia si esos archivos cambian. Las
+// `ruta` de abajo sí son slugs de UI reales (@/lib/moduleGroups) y hay que
+// revisarlas a mano si las rutas del producto cambian — nada aquí lo hace
+// automático (ver moduleSlugConsistency.test.ts para las 4 dictionaries que
+// sí se auto-verifican; esta lista no es una de ellas).
+export const PROPUESTA_MODULOS = [
   {
     nombre: "Motor de Predicción de Demanda",
     descripcion: "Anticipa volumen y tipo de trámites por delegación, día y hora.",

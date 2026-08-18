@@ -13,6 +13,13 @@ describe("buildCsv", () => {
     expect(lines[1]).toBe('"Tiempo de espera","14"');
     expect(lines[2]).toBe('"Con ""cita"" previa","22"');
   });
+
+  it("escapes an embedded quote in the valor field with RFC-4180 doubling, not backslashes", () => {
+    const csv = buildCsv([{ metrica: "Comentario", valor: 'Con "cita" previa' }]);
+    const lines = csv.split("\n");
+    expect(lines[1]).toBe('"Comentario","Con ""cita"" previa"');
+    expect(lines[1]).not.toContain("\\");
+  });
 });
 
 describe("ReportExporter", () => {

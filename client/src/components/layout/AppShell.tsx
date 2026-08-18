@@ -1,6 +1,6 @@
 // ============================================================
 // AppShell — sidebar de navegación + contenedor de contenido.
-// Sidebar lista Resumen + los módulos accesibles por RBAC (auth.getAccessibleModules).
+// Sidebar lista Tablero + los módulos accesibles por RBAC (auth.getAccessibleModules).
 // Colapsable en escritorio (preferencia guardada en localStorage); en
 // móvil se abre como Sheet.
 // ============================================================

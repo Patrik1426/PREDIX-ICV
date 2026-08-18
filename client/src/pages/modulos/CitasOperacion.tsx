@@ -7,16 +7,28 @@
 
 import { trpc } from "@/lib/trpc";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { EmptyState } from "@/components/dashboard";
+import { EmptyState, SkeletonKpi } from "@/components/dashboard";
 import { CalendarClock, Activity } from "lucide-react";
 import PreviewCitas from "./Citas";
 import PreviewMonitor from "./Monitor";
+import { MODULE_GROUPS } from "@/lib/moduleGroups";
+
+const [SLUG_CITAS, SLUG_MONITOR] = MODULE_GROUPS.citas_operacion;
 
 export default function PreviewCitasOperacion() {
-  const { data: accessibleModules } = trpc.auth.getAccessibleModules.useQuery();
+  const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
   const modules = accessibleModules ?? [];
-  const puedeCitas = modules.includes("citas");
-  const puedeMonitor = modules.includes("monitor");
+  const puedeCitas = modules.includes(SLUG_CITAS);
+  const puedeMonitor = modules.includes(SLUG_MONITOR);
+
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <SkeletonKpi />
+        <SkeletonKpi />
+      </div>
+    );
+  }
 
   if (!puedeCitas && !puedeMonitor) {
     return <EmptyState text="Tu rol no tiene permiso para ver Citas ni Operación." />;

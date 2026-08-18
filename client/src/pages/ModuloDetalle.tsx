@@ -19,7 +19,7 @@ import PreviewCitasOperacion from "@/pages/modulos/CitasOperacion";
 import PreviewChatbot from "@/pages/modulos/Chatbot";
 import { hasGroupAccess } from "@/lib/moduleGroups";
 
-const MODULE_PREVIEWS: Record<string, ComponentType> = {
+export const MODULE_PREVIEWS: Record<string, ComponentType> = {
   prediccion_asignacion: PreviewPrediccionAsignacion,
   citas_operacion: PreviewCitasOperacion,
   chatbot: PreviewChatbot,

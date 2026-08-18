@@ -2,12 +2,13 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 let mockModules: string[] = ["citas", "monitor"];
+let mockIsLoading = false;
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     auth: {
       getAccessibleModules: {
-        useQuery: () => ({ data: mockModules, isLoading: false }),
+        useQuery: () => ({ data: mockModules, isLoading: mockIsLoading }),
       },
     },
   },
@@ -41,5 +42,15 @@ describe("CitasOperacion", () => {
     mockModules = [];
     render(<PreviewCitasOperacion />);
     expect(screen.getByText("Tu rol no tiene permiso para ver Citas ni Operación.")).toBeInTheDocument();
+  });
+
+  it("does not flash the access-denied state while the permission query is loading", () => {
+    mockIsLoading = true;
+    mockModules = [];
+    render(<PreviewCitasOperacion />);
+    expect(
+      screen.queryByText("Tu rol no tiene permiso para ver Citas ni Operación.")
+    ).not.toBeInTheDocument();
+    mockIsLoading = false;
   });
 });
