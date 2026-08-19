@@ -11,7 +11,7 @@
 
 import { Link } from "wouter";
 import { DEMO_DELEGACIONES, DEMO_CITAS_SEMANA } from "@/lib/demoData";
-import { KPIS_EXITO_PROYECTO } from "@/lib/proposalData";
+import { KPIS_EXITO_PROYECTO, RESULTADOS_ESPERADOS } from "@/lib/proposalData";
 import { DataRow, ModuleHeader } from "@/components/dashboard";
 import { BulletKpi, CarrilFlujo } from "@/components/demo/DemoVisuals";
 import ReportExporter, { type ReportRow } from "@/components/ReportExporter";
@@ -54,6 +54,26 @@ export default function Tablero() {
           <Link href="/propuesta" className="underline underline-offset-2 hover:text-foreground">
             Ver propuesta completa
           </Link>
+        </p>
+      </section>
+
+      {/* Hero — tesis del Tablero: el dato titular del Resumen Ejecutivo de la
+          propuesta (RESULTADOS_ESPERADOS[0]), no un KPI genérico. Da el "para
+          qué" antes de entrar al detalle línea-base/meta de abajo. */}
+      <section className="rounded-lg border bg-card p-6">
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary">
+          Meta del proyecto — resumen ejecutivo
+        </p>
+        <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="font-mono text-6xl font-bold tracking-tight text-primary">
+            {RESULTADOS_ESPERADOS[0].cambio}
+          </span>
+          <span className="text-lg font-medium text-foreground">
+            en {RESULTADOS_ESPERADOS[0].metrica.toLowerCase()}
+          </span>
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {RESULTADOS_ESPERADOS[0].detalle} — meta a 12 meses (sección 8, detalle abajo).
         </p>
       </section>
 

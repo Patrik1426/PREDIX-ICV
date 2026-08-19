@@ -14,6 +14,13 @@ function renderTablero() {
 }
 
 describe("Tablero", () => {
+  it("opens with a hero stat from the proposal's executive summary (RESULTADOS_ESPERADOS), not a generic KPI", () => {
+    renderTablero();
+    expect(screen.getByText("-40%")).toBeInTheDocument();
+    expect(screen.getByText(/en tiempo de espera/i)).toBeInTheDocument();
+    expect(screen.getByText(/de 45-120 min en pico a <20 min/)).toBeInTheDocument();
+  });
+
   it("renders the 5 blocks: indicadores de éxito, comparativo, tendencia, fuentes de datos, reporteador", () => {
     renderTablero();
     expect(screen.getByText("Indicadores de éxito — línea base vs. meta (12 meses)")).toBeInTheDocument();

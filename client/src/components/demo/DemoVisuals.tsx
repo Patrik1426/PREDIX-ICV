@@ -164,7 +164,10 @@ export function BulletKpi({
           className={cn("h-full rounded-full transition-all", cumple ? "bg-primary" : "bg-chart-2")}
           style={{ width: `${actualPct}%` }}
         />
-        <div className="absolute top-1/2 h-3.5 w-0.5 -translate-y-1/2 bg-foreground" style={{ left: `${metaPct}%` }} />
+        <div
+          className="absolute top-1/2 h-5 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-foreground ring-2 ring-card"
+          style={{ left: `${metaPct}%` }}
+        />
       </div>
     </div>
   );
