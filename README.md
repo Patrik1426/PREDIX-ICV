@@ -10,6 +10,7 @@ Scaffold inicial forkeado de la arquitectura genérica de `seguridad-edomex` (au
 pnpm install
 cp ENV_TEMPLATE.txt .env   # completar DATABASE_URL / JWT_SECRET / VAULT_MASTER_KEY
 pnpm db:push
+pnpm exec tsx scripts/load-nl-municipios-geojson.ts   # descarga los 5 poligonos municipales reales (INEGI WFS, gitignored — necesario para el mapa de delegaciones del Tablero)
 pnpm dev
 ```
 
