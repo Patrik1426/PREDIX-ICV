@@ -86,31 +86,51 @@ export default function DelegacionesMap() {
         return;
       }
 
-      const layer = L.geoJSON(geojson as GeoJSON.GeoJsonObject, {
-        style: (feature) => {
-          const d = feature?.properties?.nombre ? porNombreReal.get(feature.properties.nombre) : undefined;
-          return {
-            color: d ? ESTADO_COLOR[d.estado] : "var(--border)",
-            weight: 2,
-            fillOpacity: 0.45,
-            fillColor: d ? ESTADO_COLOR[d.estado] : "var(--muted)",
-          };
-        },
-        onEachFeature: (feature, featureLayer) => {
-          const d = feature.properties?.nombre ? porNombreReal.get(feature.properties.nombre) : undefined;
-          if (d) {
-            featureLayer.bindTooltip(
-              `<strong>${escHtml(d.nombre)}</strong><br/>${Math.round(d.ocupacion * 100)}% de ocupación`,
-              { sticky: true }
-            );
-          }
-        },
-      });
-      layer.addTo(map);
+      // JSON que parsea pero no es GeoJSON válido (o cuyas geometrías están
+      // corruptas) hace que L.geoJSON/addTo/fitBounds truenen — sin este
+      // try/catch, esa excepción quedaba como una promesa rechazada sin
+      // manejar y setStatus nunca se llamaba, dejando el skeleton de carga
+      // girando para siempre (viola "nunca un mapa en blanco sin
+      // explicación").
+      try {
+        const layer = L.geoJSON(geojson as GeoJSON.GeoJsonObject, {
+          style: (feature) => {
+            const d = feature?.properties?.nombre ? porNombreReal.get(feature.properties.nombre) : undefined;
+            return {
+              color: d ? ESTADO_COLOR[d.estado] : "var(--border)",
+              weight: 2,
+              fillOpacity: 0.45,
+              fillColor: d ? ESTADO_COLOR[d.estado] : "var(--muted)",
+            };
+          },
+          onEachFeature: (feature, featureLayer) => {
+            const d = feature.properties?.nombre ? porNombreReal.get(feature.properties.nombre) : undefined;
+            if (d) {
+              featureLayer.bindTooltip(
+                `<strong>${escHtml(d.nombre)}</strong><br/>${Math.round(d.ocupacion * 100)}% de ocupación`,
+                { sticky: true }
+              );
+            }
+          },
+        });
 
-      const bounds = layer.getBounds();
-      if (bounds.isValid()) map.fitBounds(bounds, { padding: [24, 24] });
-      setStatus("ready");
+        // Geojson válido pero sin ninguna feature que matchee (0 polígonos)
+        // no debe pasar como "ready" — es un mapa base vacío sin explicación,
+        // el mismo problema que el try/catch de arriba evita para el caso de
+        // una excepción.
+        if (layer.getLayers().length === 0) {
+          setStatus("error");
+          return;
+        }
+
+        layer.addTo(map);
+
+        const bounds = layer.getBounds();
+        if (bounds.isValid()) map.fitBounds(bounds, { padding: [24, 24] });
+        setStatus("ready");
+      } catch {
+        setStatus("error");
+      }
     });
 
     const ro = new ResizeObserver(() => map.invalidateSize());
@@ -126,18 +146,43 @@ export default function DelegacionesMap() {
   }, []);
 
   return (
-    <div className="relative h-80 w-full overflow-hidden rounded-lg">
-      {status === "loading" && (
-        <div data-testid="delegaciones-map-loading" className="absolute inset-0 z-[1000]">
-          <SkeletonCard />
-        </div>
-      )}
-      {status === "error" && (
-        <div className="absolute inset-0 z-[1000] flex items-center justify-center rounded-lg border bg-card">
-          <p className="text-sm text-muted-foreground">No se pudo cargar el mapa de delegaciones.</p>
-        </div>
-      )}
-      <div ref={containerRef} className="h-full w-full" />
+    <div>
+      <div className="relative h-80 w-full overflow-hidden rounded-lg">
+        {status === "loading" && (
+          <div
+            data-testid="delegaciones-map-loading"
+            className="absolute inset-0 z-[1000] rounded-lg bg-card"
+          >
+            <SkeletonCard />
+          </div>
+        )}
+        {status === "error" && (
+          <div className="absolute inset-0 z-[1000] flex items-center justify-center rounded-lg border bg-card">
+            <p className="text-sm text-muted-foreground">No se pudo cargar el mapa de delegaciones.</p>
+          </div>
+        )}
+        <div ref={containerRef} className="h-full w-full" />
+      </div>
+
+      {/* Leyenda/caption — los tooltips de Leaflet solo existen en el DOM al
+          hacer hover, así que sin esto el nombre y % de 3 de las 5
+          delegaciones nunca aparecen como texto (accesibilidad/lectores de
+          pantalla). Dobla como leyenda de color: cada punto usa el mismo
+          ESTADO_COLOR que pinta su polígono. Se muestra siempre (no solo en
+          "ready") porque viene de DEMO_DELEGACIONES, no del geojson. */}
+      <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-muted-foreground">
+        {DEMO_DELEGACIONES.map((d) => (
+          <li key={d.nombre} className="flex items-center gap-1.5">
+            <span
+              aria-hidden="true"
+              className="h-2.5 w-2.5 shrink-0 rounded-full"
+              style={{ backgroundColor: ESTADO_COLOR[d.estado] }}
+            />
+            <span className="font-medium text-foreground">{d.nombre}</span>
+            <span className="tabular-nums">{Math.round(d.ocupacion * 100)}%</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

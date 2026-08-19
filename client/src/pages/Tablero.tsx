@@ -14,7 +14,7 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { DEMO_DELEGACIONES, DEMO_CITAS_SEMANA } from "@/lib/demoData";
 import { KPIS_EXITO_PROYECTO, RESULTADOS_ESPERADOS } from "@/lib/proposalData";
 import { DataRow, ModuleHeader } from "@/components/dashboard";
-import { BulletKpi } from "@/components/demo/DemoVisuals";
+import { BulletKpi, DatoEjemplo } from "@/components/demo/DemoVisuals";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import ReportExporter, { type ReportRow } from "@/components/ReportExporter";
@@ -120,8 +120,12 @@ export default function Tablero() {
       </section>
 
       <section className="rounded-lg border bg-card p-6">
-        <ModuleHeader eyebrow="Sección 6.3 — ver" title="Comparativo por delegación" />
+        <ModuleHeader eyebrow="Sección 6.3 — ver" title="Comparativo por delegación" action={<DatoEjemplo />} />
         <DelegacionesMap />
+        <p className="mt-2 text-xs text-muted-foreground">
+          "Monterrey Centro" usa el polígono completo del municipio de Monterrey — "Centro" es una
+          zona interna, no un municipio propio.
+        </p>
         <p className="mt-3 text-xs text-muted-foreground">
           Mayor demanda proyectada: <span className="font-semibold text-foreground">{delegacionTop.nombre}</span>.{" "}
           <Link
