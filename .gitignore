@@ -117,7 +117,7 @@ data/**/*.zip
 
 # Polígonos municipales de INEGI (grande, re-descargable vía
 # scripts/load-municipios-geojson.ts — ver CLAUDE.md, setup local)
-client/public/data/edomex-municipios.geojson
+client/public/data/nl-municipios.geojson
 
 # Playwright MCP debug artifacts (console logs, page snapshots)
 .playwright-mcp/
