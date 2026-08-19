@@ -40,6 +40,21 @@ interface InegiFeatureCollection {
   features: InegiFeature[];
 }
 
+// Forma real del archivo que este script escribe — properties ya traducidas
+// a cveMuni/nombre (no cvegeo/nomgeo). Debe mantenerse consistente con
+// MunicipioProps en client/src/components/demo/DelegacionesMap.tsx, que lee
+// este mismo archivo.
+interface MunicipioFeature {
+  type: "Feature";
+  geometry: { type: string; coordinates: unknown };
+  properties: { cveMuni: string; nombre: string };
+}
+
+interface MunicipioFeatureCollection {
+  type: "FeatureCollection";
+  features: MunicipioFeature[];
+}
+
 async function main() {
   console.log("[nl-municipios-geojson] Consultando WFS de INEGI (Marco Geoestadístico)...");
   const res = await fetch(WFS_URL);
@@ -57,24 +72,26 @@ async function main() {
       `Desajuste de claves entre INEGI y delegacionMunicipios.ts — faltantes: [${faltantes.join(",")}], sobrantes: [${sobrantes.join(",")}]`
     );
   }
-  if (data.features.length !== 5) {
-    throw new Error(`Se esperaban 5 municipios, llegaron ${data.features.length}`);
+  if (data.features.length !== cveEsperadas.size) {
+    throw new Error(`Se esperaban ${cveEsperadas.size} municipios, llegaron ${data.features.length}`);
   }
 
-  const limpio: InegiFeatureCollection = {
+  const limpio: MunicipioFeatureCollection = {
     type: "FeatureCollection",
     features: data.features.map((f) => ({
       type: "Feature",
-      geometry: f.geometry as InegiFeature["geometry"],
+      geometry: f.geometry,
       properties: { cveMuni: f.properties.cvegeo, nombre: f.properties.nomgeo },
-    })) as unknown as InegiFeature[],
+    })),
   };
 
   mkdirSync(path.dirname(OUTPUT_PATH), { recursive: true });
   writeFileSync(OUTPUT_PATH, JSON.stringify(limpio));
 
   const pesoKb = (Buffer.byteLength(JSON.stringify(limpio)) / 1024).toFixed(0);
-  console.log(`[nl-municipios-geojson] 5/5 municipios verificados (${pesoKb} KB), guardado en ${OUTPUT_PATH}`);
+  console.log(
+    `[nl-municipios-geojson] ${data.features.length}/${cveEsperadas.size} municipios verificados (${pesoKb} KB), guardado en ${OUTPUT_PATH}`
+  );
 }
 
 main().catch((error) => {
