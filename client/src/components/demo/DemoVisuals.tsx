@@ -151,7 +151,7 @@ export function BulletKpi({
 
   return (
     <div>
-      <div className="flex items-baseline justify-between text-xs">
+      <div className="flex items-baseline justify-between text-sm">
         <span className="font-medium text-foreground">{label}</span>
         <span className="tabular-nums text-muted-foreground">
           {actual}
@@ -159,7 +159,7 @@ export function BulletKpi({
           {unidad}
         </span>
       </div>
-      <div className="relative mt-1.5 h-2 rounded-full bg-muted">
+      <div className="relative mt-2 h-2.5 rounded-full bg-muted">
         <div
           className={cn("h-full rounded-full transition-all", cumple ? "bg-primary" : "bg-chart-2")}
           style={{ width: `${actualPct}%` }}

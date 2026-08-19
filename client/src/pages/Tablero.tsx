@@ -74,7 +74,7 @@ export default function Tablero() {
           Meta del proyecto — resumen ejecutivo
         </p>
         <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="font-mono text-6xl font-bold tracking-tight text-primary">
+          <span className="font-mono text-7xl font-bold tracking-tight text-primary">
             {RESULTADOS_ESPERADOS[0].cambio}
           </span>
           <span className="text-lg font-medium text-foreground">
@@ -86,7 +86,7 @@ export default function Tablero() {
         </p>
       </section>
 
-      <section className="space-y-4 rounded-lg border bg-card p-5">
+      <section className="space-y-4 rounded-lg border bg-card p-6">
         <SectionHeading
           eyebrow="Sección 8 de la propuesta"
           title="Indicadores de éxito — línea base vs. meta (12 meses)"
@@ -119,7 +119,7 @@ export default function Tablero() {
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border bg-card p-5">
+        <section className="rounded-lg border bg-card p-6">
           <ModuleHeader eyebrow="Sección 6.3 — ver" title="Comparativo por delegación" />
           <div className="space-y-2.5">
             {[...DEMO_DELEGACIONES]
@@ -139,9 +139,9 @@ export default function Tablero() {
           </p>
         </section>
 
-        <section className="rounded-lg border bg-card p-5">
+        <section className="rounded-lg border bg-card p-6">
           <ModuleHeader eyebrow="Sección 4 — anticipar" title="Tendencia semanal" />
-          <ChartContainer config={TENDENCIA_CONFIG} className="h-32 w-full">
+          <ChartContainer config={TENDENCIA_CONFIG} className="h-56 w-full">
             <BarChart data={tendenciaData} margin={{ left: -20 }}>
               <CartesianGrid vertical={false} />
               <XAxis dataKey="dia" tickLine={false} axisLine={false} tickMargin={8} />
@@ -155,7 +155,7 @@ export default function Tablero() {
         </section>
       </div>
 
-      <section className="rounded-lg border bg-card p-5">
+      <section className="rounded-lg border bg-card p-6">
         <ModuleHeader eyebrow="Sección 5.1" title="Fuentes de datos" />
         <div>
           {FUENTES_DE_DATOS.map((nombre, i) => (
@@ -171,7 +171,7 @@ export default function Tablero() {
         </div>
       </section>
 
-      <section className="space-y-2 rounded-lg border bg-card p-5">
+      <section className="space-y-2 rounded-lg border bg-card p-6">
         <ModuleHeader eyebrow="Sección 9.2 — demostrar" title="Reporteador" action={<ReportExporter rows={reportRows} />} />
         <p className="text-sm text-muted-foreground">
           Exporta los indicadores de éxito del proyecto a CSV. Los valores de línea base son
