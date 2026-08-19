@@ -14,7 +14,8 @@ import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { DEMO_DELEGACIONES, DEMO_CITAS_SEMANA } from "@/lib/demoData";
 import { KPIS_EXITO_PROYECTO, RESULTADOS_ESPERADOS } from "@/lib/proposalData";
 import { DataRow, ModuleHeader } from "@/components/dashboard";
-import { BulletKpi, CarrilFlujo } from "@/components/demo/DemoVisuals";
+import { BulletKpi } from "@/components/demo/DemoVisuals";
+import DelegacionesMap from "@/components/demo/DelegacionesMap";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import ReportExporter, { type ReportRow } from "@/components/ReportExporter";
 import { SectionHeading } from "@/components/layout/SectionHeading";
@@ -118,42 +119,34 @@ export default function Tablero() {
         )}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border bg-card p-6">
-          <ModuleHeader eyebrow="Sección 6.3 — ver" title="Comparativo por delegación" />
-          <div className="space-y-2.5">
-            {[...DEMO_DELEGACIONES]
-              .sort((a, b) => b.ocupacion - a.ocupacion)
-              .map((d) => (
-                <CarrilFlujo key={d.nombre} {...d} />
-              ))}
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Mayor demanda proyectada: <span className="font-semibold text-foreground">{delegacionTop.nombre}</span>.{" "}
-            <Link
-              href="/modulos/prediccion_asignacion"
-              className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
-            >
-              Ver Predicción y Asignación <ArrowRight className="h-3 w-3" />
-            </Link>
-          </p>
-        </section>
+      <section className="rounded-lg border bg-card p-6">
+        <ModuleHeader eyebrow="Sección 6.3 — ver" title="Comparativo por delegación" />
+        <DelegacionesMap />
+        <p className="mt-3 text-xs text-muted-foreground">
+          Mayor demanda proyectada: <span className="font-semibold text-foreground">{delegacionTop.nombre}</span>.{" "}
+          <Link
+            href="/modulos/prediccion_asignacion"
+            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
+          >
+            Ver Predicción y Asignación <ArrowRight className="h-3 w-3" />
+          </Link>
+        </p>
+      </section>
 
-        <section className="rounded-lg border bg-card p-6">
-          <ModuleHeader eyebrow="Sección 4 — anticipar" title="Tendencia semanal" />
-          <ChartContainer config={TENDENCIA_CONFIG} className="h-56 w-full">
-            <BarChart data={tendenciaData} margin={{ left: -20 }}>
-              <CartesianGrid vertical={false} />
-              <XAxis dataKey="dia" tickLine={false} axisLine={false} tickMargin={8} />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent hideLabel formatter={(value) => `${value}% de ocupación`} />}
-              />
-              <Bar dataKey="ocupacion" fill="var(--color-ocupacion)" radius={4} />
-            </BarChart>
-          </ChartContainer>
-        </section>
-      </div>
+      <section className="rounded-lg border bg-card p-6">
+        <ModuleHeader eyebrow="Sección 4 — anticipar" title="Tendencia semanal" />
+        <ChartContainer config={TENDENCIA_CONFIG} className="h-56 w-full">
+          <BarChart data={tendenciaData} margin={{ left: -20 }}>
+            <CartesianGrid vertical={false} />
+            <XAxis dataKey="dia" tickLine={false} axisLine={false} tickMargin={8} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel formatter={(value) => `${value}% de ocupación`} />}
+            />
+            <Bar dataKey="ocupacion" fill="var(--color-ocupacion)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      </section>
 
       <section className="rounded-lg border bg-card p-6">
         <ModuleHeader eyebrow="Sección 5.1" title="Fuentes de datos" />

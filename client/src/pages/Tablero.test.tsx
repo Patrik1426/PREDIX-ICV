@@ -49,6 +49,12 @@ describe("Tablero", () => {
     );
   });
 
+  it("mounts the real DelegacionesMap inside the Comparativo por delegación section", () => {
+    renderTablero();
+    const section = screen.getByText("Comparativo por delegación").closest("section");
+    expect(section?.querySelector(".leaflet-container")).not.toBeNull();
+  });
+
   it("marks all 6 real data sources from section 5.1 as Planeado, never Conectado", () => {
     renderTablero();
     expect(screen.getByText("Portal icvnl.gob.mx")).toBeInTheDocument();
