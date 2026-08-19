@@ -10,13 +10,19 @@
 // ============================================================
 
 import { Link } from "wouter";
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { DEMO_DELEGACIONES, DEMO_CITAS_SEMANA } from "@/lib/demoData";
 import { KPIS_EXITO_PROYECTO, RESULTADOS_ESPERADOS } from "@/lib/proposalData";
 import { DataRow, ModuleHeader } from "@/components/dashboard";
 import { BulletKpi, CarrilFlujo } from "@/components/demo/DemoVisuals";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import ReportExporter, { type ReportRow } from "@/components/ReportExporter";
 import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Database, ArrowRight } from "lucide-react";
+
+const TENDENCIA_CONFIG = {
+  ocupacion: { label: "Ocupación", color: "var(--chart-2)" },
+} satisfies ChartConfig;
 
 const FUENTES_DE_DATOS = [
   "Portal icvnl.gob.mx",
@@ -32,7 +38,10 @@ export default function Tablero() {
   const delegacionesSaturadas = DEMO_DELEGACIONES.filter((d) => d.estado === "saturado").sort(
     (a, b) => b.ocupacion - a.ocupacion
   );
-  const maxSemana = Math.max(...DEMO_CITAS_SEMANA.map((d) => d.ocupacion));
+  const tendenciaData = DEMO_CITAS_SEMANA.map((d) => ({
+    dia: d.dia,
+    ocupacion: Math.round(d.ocupacion * 100),
+  }));
 
   const reportRows: ReportRow[] = [
     ...KPIS_EXITO_PROYECTO.conBullet.map((k) => ({
@@ -132,26 +141,17 @@ export default function Tablero() {
 
         <section className="rounded-lg border bg-card p-5">
           <ModuleHeader eyebrow="Sección 4 — anticipar" title="Tendencia semanal" />
-          {/* Altura en % solo resuelve contra un padre con altura fija — por eso
-              las barras van directas en la fila h-24 (no en un flex-col interno
-              de altura automática); las etiquetas van en su propia fila aparte. */}
-          <div className="flex h-24 items-end gap-3">
-            {DEMO_CITAS_SEMANA.map((d) => (
-              <div
-                key={d.dia}
-                data-testid="tendencia-barra"
-                className="w-full flex-1 rounded-t-sm bg-chart-2"
-                style={{ height: `${Math.round((d.ocupacion / maxSemana) * 100)}%` }}
+          <ChartContainer config={TENDENCIA_CONFIG} className="h-32 w-full">
+            <BarChart data={tendenciaData} margin={{ left: -20 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis dataKey="dia" tickLine={false} axisLine={false} tickMargin={8} />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel formatter={(value) => `${value}% de ocupación`} />}
               />
-            ))}
-          </div>
-          <div className="mt-1 flex gap-3">
-            {DEMO_CITAS_SEMANA.map((d) => (
-              <span key={d.dia} className="flex-1 text-center text-xs text-muted-foreground">
-                {d.dia}
-              </span>
-            ))}
-          </div>
+              <Bar dataKey="ocupacion" fill="var(--color-ocupacion)" radius={4} />
+            </BarChart>
+          </ChartContainer>
         </section>
       </div>
 

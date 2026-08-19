@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
@@ -68,14 +68,13 @@ describe("Tablero", () => {
     expect(screen.getByText(/Monterrey Centro \(86%\)/)).toBeInTheDocument();
   });
 
-  it("renders the weekly trend bars as direct children of the fixed-height row (regression: a percentage height needs a sized parent, not an auto-height flex-col wrapper)", () => {
+  it("renders the weekly trend as a real recharts bar chart, one bar per day of DEMO_CITAS_SEMANA", () => {
     renderTablero();
-    const bars = screen.getAllByTestId("tendencia-barra");
-    expect(bars).toHaveLength(6);
-    bars.forEach((bar) => {
-      expect(bar.parentElement).toHaveClass("h-24");
-      expect(bar.style.height).not.toBe("");
-      expect(bar.style.height).not.toBe("0%");
-    });
+    const section = screen.getByText("Tendencia semanal").closest("section");
+    expect(section).not.toBeNull();
+    const scoped = within(section as HTMLElement);
+    expect(section?.querySelectorAll(".recharts-bar-rectangle")).toHaveLength(6);
+    expect(scoped.getByText("Lun")).toBeInTheDocument();
+    expect(scoped.getByText("Sáb")).toBeInTheDocument();
   });
 });
