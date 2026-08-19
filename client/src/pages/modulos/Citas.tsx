@@ -37,12 +37,17 @@ export default function PreviewCitas() {
         />
       </div>
       <div className="space-y-4">
-      <div className="flex h-24 items-end gap-3">
+      {/* Altura en % solo resuelve contra un padre con altura fija — por eso
+          el botón de cada día va directo como hijo de la fila h-24 (no en un
+          wrapper flex-col de altura automática); la etiqueta va en su propia
+          fila aparte, también clicable. */}
+      <div className="flex h-24 gap-3">
         {DEMO_CITAS_SEMANA.map((c) => (
           <button
             key={c.dia}
+            data-testid={`citas-semana-barra-${c.dia}`}
             onClick={() => setDiaSeleccionado(c.dia)}
-            className="flex flex-1 flex-col items-center gap-1 group"
+            className="group flex h-full flex-1 flex-col justify-end"
           >
             <div
               className={cn(
@@ -51,9 +56,20 @@ export default function PreviewCitas() {
               )}
               style={{ height: `${Math.round(c.ocupacion * 100)}%` }}
             />
-            <span className={cn("text-xs", c.dia === diaSeleccionado ? "font-semibold text-foreground" : "text-muted-foreground")}>
-              {c.dia}
-            </span>
+          </button>
+        ))}
+      </div>
+      <div className="mt-1 flex gap-3">
+        {DEMO_CITAS_SEMANA.map((c) => (
+          <button
+            key={c.dia}
+            onClick={() => setDiaSeleccionado(c.dia)}
+            className={cn(
+              "flex-1 text-center text-xs",
+              c.dia === diaSeleccionado ? "font-semibold text-foreground" : "text-muted-foreground"
+            )}
+          >
+            {c.dia}
           </button>
         ))}
       </div>
