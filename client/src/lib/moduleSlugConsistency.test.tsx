@@ -79,4 +79,14 @@ describe("module slug dictionaries stay in sync", () => {
     }
     expect(order.sort()).toEqual(EXPECTED_SLUGS.filter((s) => s !== "admin"));
   });
+
+  // Orden real de prioridad del ICVNL (cuestionario de dimensionamiento
+  // respondido 2026-08-19, bloque 7.6): Asistente Virtual Predictivo #1,
+  // Sistema de Citas Inteligente #2 + Monitor de Operaciones #3 (ambos caen
+  // en citas_operacion), Asignador Dinámico #4 + Motor de Predicción #5
+  // (ambos caen en prediccion_asignacion). Ya no es un orden de flujo
+  // operativo asumido por nosotros.
+  it("MODULE_ORDER reflects the ICVNL's real stated priority (chatbot > citas_operacion > prediccion_asignacion)", () => {
+    expect(MODULE_ORDER).toEqual(["chatbot", "citas_operacion", "prediccion_asignacion"]);
+  });
 });

@@ -9,10 +9,14 @@ export const MODULE_ICONS: Record<string, ReactNode> = {
   admin: <Settings className="h-5 w-5" />,
 };
 
-// Orden real del flujo operativo: predecir+asignar → agendar+monitorear. El
-// asistente corre en paralelo, atendiendo al ciudadano en cualquier punto
-// del proceso.
-export const MODULE_ORDER = ["prediccion_asignacion", "citas_operacion", "chatbot"] as const;
+// Orden real de prioridad del ICVNL (cuestionario de dimensionamiento
+// respondido 2026-08-19, bloque 7.6), no un flujo operativo asumido por
+// nosotros. El cliente priorizó: Asistente Virtual Predictivo (#1) sobre
+// Sistema de Citas Inteligente/Monitor de Operaciones (#2-3, fusionados en
+// citas_operacion) sobre Asignador Dinámico/Motor de Predicción (#4-5,
+// fusionados en prediccion_asignacion) — justo lo inverso del peso que
+// tenía la demo hasta ahora. Ver docs/CUESTIONARIO_RESPUESTAS_ICVNL.md.
+export const MODULE_ORDER = ["chatbot", "citas_operacion", "prediccion_asignacion"] as const;
 
 // Un color distinto por módulo (paleta categórica --chart-1..5) para que el
 // pipeline se lea de un vistazo. admin no es parte del pipeline — neutro.
