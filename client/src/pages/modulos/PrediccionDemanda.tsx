@@ -11,38 +11,62 @@
 // Se agrega "Desglose por tipo de trámite" (DEMO_DEMANDA_POR_TRAMITE,
 // proporciones fijas sobre la curva agregada) con un ForecastChart
 // compacto por trámite — mismo componente compartido de DemoVisuals.tsx.
+//
+// Curva principal migrada a recharts (mismo día): el SVG a mano ya tenía
+// grid/eje/tooltip, pero seguía siendo una línea delgada sin peso visual.
+// Pasa a área rellena (ComposedChart, misma familia de componente que
+// "Capacidad vs. demanda" en AsignadorVentanillas.tsx) — misma serie real
+// vs. proyectada (mismo hue --chart-1, solo el trazo cambia sólido/
+// punteado, nunca dos colores para una sola entidad) más una segunda Area
+// de rango [lo,hi] para la banda de incertidumbre.
 // ============================================================
 
-import { useState } from "react";
+import { Area, CartesianGrid, ComposedChart, XAxis } from "recharts";
+import type { TooltipProps } from "recharts";
 import { DEMO_DEMANDA_HORARIA, DEMO_KPIS, DEMO_PRECISION_MODELO, DEMO_DEMANDA_POR_TRAMITE } from "@/lib/demoData";
 import { KpiCard, ModuleHeader } from "@/components/dashboard";
 import { ForecastChart } from "@/components/demo/DemoVisuals";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
+import { ChartContainer, ChartTooltip, type ChartConfig } from "@/components/ui/chart";
 import { TrendingUp, Target } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 const AHORA_INDEX = 9; // 9:00 — hora "actual" de la demo
-const HORAS_EJE = [0, 6, 12, 18, 23]; // grid recesivo, no una etiqueta por hora
-const GRID_Y = [25, 50, 75]; // líneas horizontales de referencia (viewBox 0-100)
+
+const CURVA_CONFIG = {
+  real: { label: "Real", color: "var(--chart-1)" },
+  proyeccion: { label: "Proyección", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
+const curvaData = DEMO_DEMANDA_HORARIA.map((v, hora) => {
+  const esProyeccion = hora >= AHORA_INDEX;
+  const margen = Math.round(v * 0.12); // ±12%, ilustrativo — mismo criterio que el resto del demo
+  return {
+    hora,
+    // AHORA_INDEX aparece en AMBAS series a propósito — es el punto donde
+    // el área "real" termina y "proyección" empieza; sin este punto
+    // compartido, recharts dibuja dos polígonos que no se tocan y deja un
+    // hueco en blanco de una hora completa entre los dos rellenos.
+    real: hora <= AHORA_INDEX ? v : null,
+    proyeccion: esProyeccion ? v : null,
+    banda: esProyeccion ? ([Math.max(0, v - margen), v + margen] as [number, number]) : null,
+  };
+});
+
+function CurvaTooltip({ active, payload, label }: TooltipProps<number, string>) {
+  const punto = payload?.find((p) => (p.dataKey === "real" || p.dataKey === "proyeccion") && p.value != null);
+  if (!active || !punto) return null;
+  const esProyeccion = punto.dataKey === "proyeccion";
+  return (
+    <div className="whitespace-nowrap rounded-lg border bg-card px-2.5 py-1.5 text-xs shadow-md">
+      <p className="font-mono font-semibold text-foreground">{punto.value} trámites/h</p>
+      <p className="text-muted-foreground">
+        {label}:00 · {esProyeccion ? "proyectado" : "real"}
+      </p>
+    </div>
+  );
+}
 
 export default function PreviewPrediccion() {
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
-  const max = Math.max(...DEMO_DEMANDA_HORARIA);
-  const points = DEMO_DEMANDA_HORARIA.map((v, i) => ({
-    x: (i / (DEMO_DEMANDA_HORARIA.length - 1)) * 100,
-    y: 100 - (v / max) * 100,
-    v,
-  }));
-  const real = points.slice(0, AHORA_INDEX + 1);
-  const forecast = points.slice(AHORA_INDEX);
-  const band = forecast.map((p) => ({ x: p.x, hi: Math.max(0, p.y - 8), lo: Math.min(100, p.y + 8) }));
-  const bandPath = band.map((p) => `${p.x},${p.hi}`).join(" ") + " " + [...band].reverse().map((p) => `${p.x},${p.lo}`).join(" ");
-  const active = hoverIndex !== null ? points[hoverIndex] : null;
-  // Tooltip flotante: el viewBox 0-100 mapea 1:1 a % del contenedor, así que
-  // la posición del punto activo ya es un porcentaje válido de left/top —
-  // no hace falta medir el DOM.
-  const tooltipSide = active && active.x > 70 ? "left" : "right";
-
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 gap-3">
@@ -63,88 +87,41 @@ export default function PreviewPrediccion() {
         />
       </div>
       <div>
-      <div className="relative">
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="h-36 w-full cursor-crosshair overflow-visible"
-          onMouseMove={(e) => {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const ratio = (e.clientX - rect.left) / rect.width;
-            const i = Math.round(ratio * (points.length - 1));
-            setHoverIndex(Math.min(Math.max(i, 0), points.length - 1));
-          }}
-          onMouseLeave={() => setHoverIndex(null)}
-        >
-          {/* Grid recesivo — sin esto la curva flota sin ningún punto de referencia visual. */}
-          {GRID_Y.map((y) => (
-            <line key={y} x1="0" y1={y} x2="100" y2={y} stroke="var(--border)" strokeWidth="0.5" vectorEffect="non-scaling-stroke" />
-          ))}
-          <polygon points={bandPath} fill="var(--chart-1)" fillOpacity="0.12" />
-          <polyline
-            points={real.map((p) => `${p.x},${p.y}`).join(" ")}
-            fill="none"
-            stroke="var(--chart-1)"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
+      <ChartContainer config={CURVA_CONFIG} className="h-40 w-full">
+        <ComposedChart data={curvaData} margin={{ left: -20, right: 8 }}>
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="hora"
+            tickFormatter={(h) => `${h}h`}
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            ticks={[0, 6, 12, 18, 23]}
+            interval={0}
           />
-          <polyline
-            points={forecast.map((p) => `${p.x},${p.y}`).join(" ")}
-            fill="none"
-            stroke="var(--chart-1)"
-            strokeWidth="2.5"
+          <ChartTooltip cursor={{ stroke: "var(--border)", strokeWidth: 1 }} content={<CurvaTooltip />} />
+          <Area dataKey="banda" fill="var(--color-real)" fillOpacity={0.12} stroke="none" isAnimationActive={false} />
+          <Area
+            dataKey="real"
+            fill="var(--color-real)"
+            fillOpacity={0.15}
+            stroke="var(--color-real)"
+            strokeWidth={2.5}
+            dot={false}
+            isAnimationActive={false}
+          />
+          <Area
+            dataKey="proyeccion"
+            fill="var(--color-proyeccion)"
+            fillOpacity={0.15}
+            stroke="var(--color-proyeccion)"
+            strokeWidth={2.5}
             strokeDasharray="5,4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            vectorEffect="non-scaling-stroke"
+            dot={false}
+            isAnimationActive={false}
           />
-          {active && (
-            <>
-              <line x1={active.x} y1="0" x2={active.x} y2="100" stroke="currentColor" strokeOpacity="0.15" vectorEffect="non-scaling-stroke" />
-              <circle cx={active.x} cy={active.y} r="2.6" fill="var(--card)" stroke="var(--chart-1)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-            </>
-          )}
-        </svg>
-
-        {/* Eje de horas — recesivo, solo unas pocas marcas (no una por hora). */}
-        <div className="relative mt-1 h-4 text-[10px] text-muted-foreground">
-          {HORAS_EJE.map((h) => (
-            <span
-              key={h}
-              className="absolute -translate-x-1/2 tabular-nums"
-              style={{ left: `${(h / (points.length - 1)) * 100}%` }}
-            >
-              {h}h
-            </span>
-          ))}
-        </div>
-
-        {/* Tooltip flotante — sigue al punto activo, nunca tapa la curva
-            porque cambia de lado (izq/der) según en qué mitad está el punto. */}
-        {active && (
-          <div
-            className={cn(
-              "pointer-events-none absolute top-0 z-10 -translate-y-1/2 whitespace-nowrap rounded-lg border bg-card px-2.5 py-1.5 text-xs shadow-md",
-              tooltipSide === "left" ? "-translate-x-full" : ""
-            )}
-            style={{
-              left: `${active.x}%`,
-              top: `${active.y}%`,
-              marginLeft: tooltipSide === "left" ? "-10px" : "10px",
-            }}
-          >
-            <p className="font-mono font-semibold text-foreground">{active.v} trámites/h</p>
-            <p className="text-muted-foreground">
-              {hoverIndex}:00{hoverIndex! > AHORA_INDEX ? " · proyectado" : " · real"}
-            </p>
-          </div>
-        )}
-      </div>
-      <div className="mt-1 flex h-4 items-center text-xs text-muted-foreground">
-        {!active && "Pasa el mouse sobre la curva para ver el detalle por hora"}
-      </div>
+        </ComposedChart>
+      </ChartContainer>
       <div className="mt-2 flex flex-wrap gap-4 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-0 w-4 border-t-2 border-chart-1" /> Real (hasta las 9:00)

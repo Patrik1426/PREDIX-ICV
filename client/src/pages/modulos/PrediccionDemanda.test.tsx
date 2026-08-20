@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PreviewPrediccion from "./PrediccionDemanda";
 
@@ -40,8 +40,13 @@ describe("PrediccionDemanda", () => {
 
   it("shows recessive hour-axis ticks on the main curve — no longer a chart floating with zero reference", async () => {
     await renderPreview();
-    expect(screen.getByText("0h")).toBeInTheDocument();
-    expect(screen.getByText("12h")).toBeInTheDocument();
-    expect(screen.getByText("23h")).toBeInTheDocument();
+    // Acotado al eje real: recharts deja un <span id="recharts_measurement_span">
+    // aria-hidden oculto en el DOM (mide ancho de texto para el layout) que
+    // también matchea por texto — sin acotar, "23h" da falso-positivo de
+    // "múltiples elementos" aunque el eje visible esté bien.
+    const eje = document.querySelector(".recharts-xAxis") as HTMLElement;
+    expect(within(eje).getByText("0h")).toBeInTheDocument();
+    expect(within(eje).getByText("12h")).toBeInTheDocument();
+    expect(within(eje).getByText("23h")).toBeInTheDocument();
   });
 });
