@@ -1,78 +1,99 @@
 // ============================================================
-// Chatbot — vista previa del módulo 05. Chat guiado, sin IA real todavía.
-// Corre sobre @/lib/demoData, nunca el LLM real.
+// Chatbot — vista previa del módulo 01 (Asistente Virtual Predictivo).
+// Chat de texto libre real: llama trpc.ai.chat (LLM real, Gemini). No hay
+// árbol de decisión ni respuestas pre-escritas — ver server/services/
+// chatAssistant.ts para el system prompt y las reglas de privacidad.
 // ============================================================
 
-import { useState } from "react";
-import { DEMO_CHAT_GUION, DEMO_CHAT_OPCIONES, DEMO_CHATBOT_KPIS, DEMO_DEMANDA_HORARIA } from "@/lib/demoData";
-import { KpiCard } from "@/components/dashboard";
+import { useState, type FormEvent } from "react";
+import { TRPCClientError } from "@trpc/client";
+import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Send, Timer, MessageCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type ChatMsg = { autor: "ciudadano" | "asistente"; texto: string };
+type ChatMsg = { role: "user" | "assistant"; content: string };
 
 export default function PreviewChatbot() {
   const [historial, setHistorial] = useState<ChatMsg[]>([
-    { autor: "asistente", texto: DEMO_CHAT_GUION.inicio.texto },
+    {
+      role: "assistant",
+      content: "Hola, soy el asistente virtual del ICVNL. ¿En qué te puedo ayudar?",
+    },
   ]);
-  const [nodoActual, setNodoActual] = useState("inicio");
+  const [texto, setTexto] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const chat = trpc.ai.chat.useMutation();
 
-  const opciones = DEMO_CHAT_GUION[nodoActual]?.siguiente ?? [];
+  const enviar = (e: FormEvent) => {
+    e.preventDefault();
+    const mensaje = texto.trim();
+    if (!mensaje || chat.isPending) return;
 
-  const elegir = (opcionId: string) => {
-    const pregunta = DEMO_CHAT_OPCIONES[opcionId];
-    const respuesta = DEMO_CHAT_GUION[opcionId];
-    if (!pregunta || !respuesta) return;
-    setHistorial((h) => [...h, { autor: "ciudadano", texto: pregunta }, { autor: "asistente", texto: respuesta.texto }]);
-    setNodoActual(opcionId);
+    setError(null);
+    const siguienteHistorial: ChatMsg[] = [...historial, { role: "user", content: mensaje }];
+    setHistorial(siguienteHistorial);
+    setTexto("");
+
+    chat.mutate(
+      { messages: siguienteHistorial },
+      {
+        onSuccess: (data) => {
+          if (data.success && data.reply) {
+            setHistorial((h) => [...h, { role: "assistant", content: data.reply as string }]);
+          } else {
+            setError(data.message);
+          }
+        },
+        onError: (err) => {
+          if (err instanceof TRPCClientError && err.data?.code === "FORBIDDEN") {
+            setError("Tu rol no tiene permiso para usar el asistente.");
+          } else if (err instanceof TRPCClientError && err.data?.code === "UNAUTHORIZED") {
+            setError("Requiere sesión iniciada.");
+          } else {
+            setError("No se pudo contactar al asistente.");
+          }
+        },
+      }
+    );
   };
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3">
-        <KpiCard
-          icon={<MessageCircle className="h-4 w-4" />}
-          label="Consultas resueltas hoy"
-          value={DEMO_CHATBOT_KPIS.consultasHoy}
-          colorClassName="text-chart-3"
-          spark={DEMO_DEMANDA_HORARIA}
-        />
-        <KpiCard
-          icon={<Timer className="h-4 w-4" />}
-          label="Tiempo de respuesta"
-          value={DEMO_CHATBOT_KPIS.tiempoRespuestaSeg}
-          suffix=" seg"
-          colorClassName="text-chart-3"
-          spark={DEMO_DEMANDA_HORARIA}
-        />
-      </div>
-      <div className="space-y-3">
-      <div className="max-h-56 space-y-2 overflow-y-auto pr-1">
+    <div className="space-y-3">
+      <div className="max-h-72 min-h-56 space-y-2 overflow-y-auto pr-1">
         {historial.map((m, i) => (
           <div
             key={i}
             className={cn(
               "max-w-[85%] rounded-xl px-3 py-2 text-sm",
-              m.autor === "ciudadano" ? "bg-muted text-foreground" : "ml-auto bg-primary text-primary-foreground"
+              m.role === "user" ? "ml-auto bg-primary text-primary-foreground" : "bg-muted text-foreground"
             )}
           >
-            {m.texto}
+            {m.content}
           </div>
         ))}
-      </div>
-      <div className="flex flex-wrap gap-2 border-t pt-3">
-        {opciones.map((id) => (
-          <Button key={id} variant="outline" size="sm" className="h-auto whitespace-normal py-1.5 text-left" onClick={() => elegir(id)}>
-            <Send className="mr-1.5 h-3 w-3 shrink-0" />
-            {DEMO_CHAT_OPCIONES[id]}
-          </Button>
-        ))}
-        {opciones.length === 0 && (
-          <p className="text-xs text-muted-foreground">Fin del guion de demo.</p>
+        {chat.isPending && (
+          <div className="max-w-[85%] rounded-xl bg-muted px-3 py-2 text-sm text-muted-foreground">
+            Escribiendo…
+          </div>
         )}
       </div>
-      </div>
+
+      {error && <p className="text-xs text-destructive">{error}</p>}
+
+      <form onSubmit={enviar} className="flex items-center gap-2 border-t pt-3">
+        <Input
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+          placeholder="Escribe tu pregunta…"
+          disabled={chat.isPending}
+          aria-label="Mensaje para el asistente"
+        />
+        <Button type="submit" size="icon" disabled={chat.isPending || !texto.trim()} aria-label="Enviar">
+          <Send className="h-4 w-4" />
+        </Button>
+      </form>
     </div>
   );
 }

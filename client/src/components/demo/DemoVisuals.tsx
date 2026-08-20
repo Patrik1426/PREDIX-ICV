@@ -25,6 +25,15 @@ export function DatoEjemplo() {
   );
 }
 
+export function LlmReal() {
+  return (
+    <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+      <span className="h-1.5 w-1.5 rounded-full bg-success" />
+      LLM real · Gemini
+    </span>
+  );
+}
+
 export function MetaDelProyecto() {
   return (
     <span className="inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">

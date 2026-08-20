@@ -98,32 +98,6 @@ export const DEMO_SLOTS_CITAS = [
   { hora: "13-16", demandaWalkIn: 20, slotsCita: 12, capacidadTotal: 32 },
 ] as const;
 
-// Guion de conversación demo — respuestas fijas, NO usa el LLM real todavía.
-export const DEMO_CHAT_GUION: Record<string, { texto: string; siguiente?: string[] }> = {
-  inicio: {
-    texto: "Hola, soy el asistente de PREDIX-ICV (demo). Pregúntame por requisitos, espera o citas.",
-    siguiente: ["requisitos", "espera", "cita"],
-  },
-  requisitos: {
-    texto: "Para refrendo necesitas: tarjeta de circulación, identificación oficial y comprobante de domicilio.",
-    siguiente: ["espera", "cita"],
-  },
-  espera: {
-    texto: "Ahora mismo Guadalupe tiene la menor espera proyectada: ~12 min.",
-    siguiente: ["requisitos", "cita"],
-  },
-  cita: {
-    texto: "Tengo un espacio mañana 10:40am en Guadalupe. ¿Confirmo? (demo, no agenda real)",
-    siguiente: ["requisitos", "espera"],
-  },
-};
-
-export const DEMO_CHAT_OPCIONES: Record<string, string> = {
-  requisitos: "¿Qué documentos necesito para el refrendo?",
-  espera: "¿En qué delegación hay menos espera ahorita?",
-  cita: "Quiero agendar una cita",
-};
-
 // Matriz de competencias — de qué trámites puede encargarse cada empleado
 // (sección 3.2, "Capacitación cruzada del personal"). Nombres y asignación
 // son de ejemplo, la estructura de la matriz es la real.
@@ -174,8 +148,3 @@ export const DEMO_PROXIMAS_ATENCIONES = [
   { hora: "09:30", nombre: "Gómez Ruiz, Carlos", tramite: "Renovación", estado: "Programada" },
   { hora: "09:45", nombre: "Reyes Ibarra, Sofía", tramite: "Altas y bajas", estado: "Programada" },
 ] as const;
-
-export const DEMO_CHATBOT_KPIS = {
-  consultasHoy: 318,
-  tiempoRespuestaSeg: 4,
-};

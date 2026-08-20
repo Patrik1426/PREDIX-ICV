@@ -10,7 +10,7 @@ import { useParams, Redirect, Link } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { MODULE_LABELS, MODULE_DESCRIPTIONS } from "@/lib/moduleLabels";
 import { MODULE_ICONS, MODULE_ORDER, MODULE_ACCENT } from "@/lib/moduleIcons";
-import { DatoEjemplo } from "@/components/demo/DemoVisuals";
+import { DatoEjemplo, LlmReal } from "@/components/demo/DemoVisuals";
 import { MODULE_DESARROLLO } from "@/components/demo/ModuloDesarrollo";
 import { ChevronLeft, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -84,7 +84,7 @@ export default function ModuloDetalle() {
       <div className="rounded-xl border bg-card p-6">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-sm font-semibold">Vista previa interactiva</h2>
-          <DatoEjemplo />
+          {slug === "chatbot" ? <LlmReal /> : <DatoEjemplo />}
         </div>
         <Preview slug={slug} />
       </div>
