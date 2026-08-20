@@ -175,6 +175,31 @@ export const KPIS_EXITO_PROYECTO = {
   ],
 } as const;
 
+/**
+ * Volumetría real reportada por el ICVNL en el cuestionario de dimensionamiento
+ * (2026-08-19, ver docs/CUESTIONARIO_RESPUESTAS_ICVNL.md, bloque 7.1-7.2). A diferencia
+ * de KPIS_EXITO_PROYECTO (metas/línea-base de la propuesta comercial), esto son hechos
+ * operativos que el cliente reportó sobre su operación actual — no una meta de proyecto.
+ *
+ * NOTA: sin cablear a ningún componente todavía (decisión explícita, 2026-08-19) — es
+ * dato de referencia para diseñar el workstream de datos reales (schema, escala del
+ * piloto), no para mostrarse en la demo sin que exista aún la integración real detrás.
+ *
+ * Los campos de delegaciones/ventanillas/usuarios son PISOS ("10+", "22+", "350+" en el
+ * PDF original) — el cliente no dio un número exacto, dio un mínimo. No tratar como cifra
+ * precisa.
+ */
+export const VOLUMETRIA_REAL_ICVNL = {
+  tramitesPromedioDiario: 6000,
+  tramitesPromedioMensual: 180000,
+  incrementoPicoEneroAbrilPct: 1000,
+  delegacionesZonaMetropolitanaMin: 10,
+  delegacionesRestoEstadoMin: 22,
+  ventanillasActivasMin: 350,
+  usuariosPlataformaMin: 350,
+  alcanceFase1: "piloto_1_2_delegaciones",
+} as const;
+
 export const STACK_TECNOLOGICO = [
   { capa: "Frontend web", tecnologia: "React 19 + Tailwind CSS 4" },
   { capa: "Backend API", tecnologia: "Node.js + Express + tRPC" },
