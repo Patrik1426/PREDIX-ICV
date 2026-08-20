@@ -37,4 +37,11 @@ describe("PrediccionDemanda", () => {
     expect(screen.getByText("Altas y bajas")).toBeInTheDocument();
     expect(screen.getByText("Ponlo a tu Nombre")).toBeInTheDocument();
   });
+
+  it("shows recessive hour-axis ticks on the main curve — no longer a chart floating with zero reference", async () => {
+    await renderPreview();
+    expect(screen.getByText("0h")).toBeInTheDocument();
+    expect(screen.getByText("12h")).toBeInTheDocument();
+    expect(screen.getByText("23h")).toBeInTheDocument();
+  });
 });
