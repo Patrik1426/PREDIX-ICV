@@ -17,8 +17,6 @@ import {
   CITAS_CANALES,
   MONITOR_KPIS,
   MONITOR_ALERTAS,
-  CHATBOT_CAPACIDADES,
-  CHATBOT_IMPACTO,
   ADMIN_CAPACIDADES,
 } from "@/lib/proposalData";
 import { DEMO_TRAMITES, DEMO_MATRIZ_COMPETENCIAS } from "@/lib/demoData";
@@ -44,8 +42,6 @@ import {
   Clock,
   UserX,
   Smile,
-  FileQuestion,
-  CalendarPlus,
   Users,
   ScrollText,
 } from "lucide-react";
@@ -303,33 +299,9 @@ function DesarrolloMonitor() {
   );
 }
 
-// ---- 05 · Asistente — capacidades con ícono + el impacto estimado como
-// cifra destacada (es el dato más persuasivo de esta sección). ----
-const CHATBOT_ICONS = [FileQuestion, Clock, CalendarPlus];
-
-function DesarrolloChatbot() {
-  return (
-    <div className="space-y-5">
-      <h2 className="text-sm font-semibold">Qué incluirá este módulo</h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        {CHATBOT_CAPACIDADES.map((c, i) => {
-          const Icon = CHATBOT_ICONS[i];
-          return (
-            <div key={c.titulo} className="rounded-xl border bg-chart-3/10 p-3">
-              <Icon className="mb-2 h-4 w-4 text-chart-3" />
-              <div className="text-sm font-medium leading-tight">{c.titulo}</div>
-              <div className="mt-0.5 text-xs text-muted-foreground">{c.detalle}</div>
-            </div>
-          );
-        })}
-      </div>
-      <div className="rounded-xl border bg-muted/30 p-4">
-        <div className="text-3xl font-bold tabular-nums text-chart-3">{CHATBOT_IMPACTO.pct}</div>
-        <p className="mt-1 text-sm text-muted-foreground">{CHATBOT_IMPACTO.detalle}</p>
-      </div>
-    </div>
-  );
-}
+// ---- 05 · Asistente — retirado (2026-08-20): "chatbot" ya no pasa por este
+// shell de "vista previa"/"qué incluirá" — es real, tiene su propia página
+// (AsistenteVirtual.tsx). Ver moduleSlugConsistency.test.tsx.
 
 // ---- admin · No es parte del pipeline — su backend ya existe, así que la
 // nota de estado importa más que la lista de capacidades. ----
@@ -379,6 +351,5 @@ export const MODULE_DESARROLLO: Record<string, ReactNode> = {
       </div>
     </div>
   ),
-  chatbot: <DesarrolloChatbot />,
   admin: <DesarrolloAdmin />,
 };

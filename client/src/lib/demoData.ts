@@ -42,11 +42,6 @@ export const DEMO_CITAS_SEMANA = [
   { dia: "Sáb", ocupacion: 0.32 },
 ];
 
-export const DEMO_CHAT_PREVIEW = [
-  { autor: "ciudadano" as const, texto: "¿Cuánto tarda el refrendo con descuento?" },
-  { autor: "asistente" as const, texto: "En Guadalupe hoy: ~12 min de espera. ¿Agendo tu cita?" },
-];
-
 // Escenarios de reasignación — de la tabla "Mecanismo de operación" de la
 // propuesta (sección 3.2). Cada uno recalcula la distribución de ventanillas.
 export const DEMO_ESCENARIOS_ASIGNACION = [

@@ -13,11 +13,6 @@ vi.mock("@/lib/trpc", () => ({
         useQuery: () => ({ data: mockAccessibleModules, isLoading: false }),
       },
     },
-    ai: {
-      chat: {
-        useMutation: () => ({ mutate: vi.fn(), isPending: false }),
-      },
-    },
   },
 }));
 
@@ -64,15 +59,6 @@ describe("ModuloDetalle — Citas y Operación", () => {
     renderModulo("citas_operacion", ["citas", "monitor"]);
     expect(screen.getByRole("tab", { name: /Citas/ })).toBeInTheDocument();
     expect(screen.getByText("Próximas atenciones")).toBeInTheDocument();
-  });
-});
-
-describe("ModuloDetalle — Asistente Virtual", () => {
-  it("renders the real chat input and the LLM-real badge, not the old demo KPIs", () => {
-    renderModulo("chatbot", ["chatbot"]);
-    expect(screen.getByLabelText("Mensaje para el asistente")).toBeInTheDocument();
-    expect(screen.getByText("LLM real · Gemini")).toBeInTheDocument();
-    expect(screen.queryByText("Consultas resueltas hoy")).not.toBeInTheDocument();
   });
 });
 

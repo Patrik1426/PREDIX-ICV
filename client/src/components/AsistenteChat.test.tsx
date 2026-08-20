@@ -14,18 +14,18 @@ vi.mock("@/lib/trpc", () => ({
   },
 }));
 
-import PreviewChatbot from "./Chatbot";
+import AsistenteChat from "./AsistenteChat";
 
-describe("Chatbot", () => {
+describe("AsistenteChat", () => {
   beforeEach(() => {
     mockMutate = vi.fn();
     mockIsPending = false;
   });
 
-  it("shows a real greeting, no scripted quick-reply buttons", () => {
-    render(<PreviewChatbot />);
+  it("shows a real greeting and the starter suggestion chips", () => {
+    render(<AsistenteChat />);
     expect(screen.getByText(/asistente virtual del ICVNL/i)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /requisitos|espera|cita/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "¿Qué documentos necesito para el refrendo?" })).toBeInTheDocument();
   });
 
   it("sends free-text input via trpc.ai.chat and appends the real reply on success", async () => {
@@ -33,7 +33,7 @@ describe("Chatbot", () => {
       opts.onSuccess({ success: true, message: "Respuesta generada", reply: "Puedes tramitar el refrendo en cualquier delegación." });
     });
 
-    render(<PreviewChatbot />);
+    render(<AsistenteChat />);
     fireEvent.change(screen.getByLabelText("Mensaje para el asistente"), { target: { value: "¿Dónde tramito el refrendo?" } });
     fireEvent.click(screen.getByLabelText("Enviar"));
 
@@ -46,12 +46,35 @@ describe("Chatbot", () => {
     );
   });
 
+  it("clicking a suggested question sends it through the real mutation, not a canned answer", () => {
+    mockMutate = vi.fn();
+    render(<AsistenteChat />);
+
+    fireEvent.click(screen.getByRole("button", { name: "¿Cómo agendo una cita?" }));
+
+    expect(mockMutate).toHaveBeenCalledWith(
+      { messages: expect.arrayContaining([{ role: "user", content: "¿Cómo agendo una cita?" }]) },
+      expect.anything()
+    );
+  });
+
+  it("hides the suggestion chips once the conversation has moved past the greeting", () => {
+    mockMutate = vi.fn((_input, opts) => {
+      opts.onSuccess({ success: true, message: "ok", reply: "..." });
+    });
+    render(<AsistenteChat />);
+
+    fireEvent.click(screen.getByRole("button", { name: "¿Cómo agendo una cita?" }));
+
+    expect(screen.queryByRole("button", { name: "¿Qué documentos necesito para el refrendo?" })).not.toBeInTheDocument();
+  });
+
   it("shows the honest unavailable message instead of a fake reply when success:false", async () => {
     mockMutate = vi.fn((_input, opts) => {
       opts.onSuccess({ success: false, message: "El asistente no está disponible en este momento.", reply: null });
     });
 
-    render(<PreviewChatbot />);
+    render(<AsistenteChat />);
     fireEvent.change(screen.getByLabelText("Mensaje para el asistente"), { target: { value: "hola" } });
     fireEvent.click(screen.getByLabelText("Enviar"));
 
@@ -68,7 +91,7 @@ describe("Chatbot", () => {
       opts.onError(err);
     });
 
-    render(<PreviewChatbot />);
+    render(<AsistenteChat />);
     fireEvent.change(screen.getByLabelText("Mensaje para el asistente"), { target: { value: "hola" } });
     fireEvent.click(screen.getByLabelText("Enviar"));
 

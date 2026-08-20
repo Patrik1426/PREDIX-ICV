@@ -132,18 +132,6 @@ export const MONITOR_ALERTAS = [
   { titulo: "Anomalías de atención", detalle: "Tiempos fuera de rango — posible falla técnica o de capacitación" },
 ] as const;
 
-/** Asistente — capacidades reales (sección 3.5) + el impacto estimado como cifra destacada. */
-export const CHATBOT_CAPACIDADES = [
-  { titulo: "Requisitos y estado de cuenta", detalle: "Resuelve dudas documentales y adeudos vehiculares" },
-  { titulo: "Recomendación de horario", detalle: "Delegación y hora con menor espera prevista" },
-  { titulo: "Agenda desde el chat", detalle: "Cita directa dentro de la conversación" },
-] as const;
-
-export const CHATBOT_IMPACTO = {
-  pct: "30-40%",
-  detalle: "de las visitas presenciales son consultas que podrían resolverse digitalmente",
-} as const;
-
 /** Admin — ya tiene backend real; falta solo la pantalla. */
 export const ADMIN_CAPACIDADES = [
   { titulo: "Usuarios y roles", detalle: "Gestión de cuentas institucionales y matriz de permisos por rol" },
