@@ -19,3 +19,11 @@ class ResizeObserverStub {
   disconnect() {}
 }
 global.ResizeObserver = ResizeObserverStub;
+
+// jsdom doesn't implement scrollIntoView — components that auto-scroll a
+// chat/list (e.g. Chatbot.tsx) throw "not a function" without a stub. This
+// setup file also loads for server (node env) tests, where `Element`
+// doesn't exist at all — guard so those don't crash on import.
+if (typeof Element !== "undefined") {
+  Element.prototype.scrollIntoView = function scrollIntoViewStub() {};
+}
