@@ -1,6 +1,15 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, fireEvent } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PreviewMonitor from "./Monitor";
+
+function settleCounters() {
+  act(() => {
+    vi.advanceTimersByTime(700);
+  });
+  act(() => {
+    vi.advanceTimersByTime(1500);
+  });
+}
 
 describe("Monitor", () => {
   beforeEach(() => {
@@ -46,5 +55,31 @@ describe("Monitor", () => {
     });
     // DEMO_VENTANILLAS_MONITOR: 8 + 5 + 3 = 16 — suma real, no fabricada
     expect(screen.getByText("16")).toBeInTheDocument();
+  });
+
+  it("marking a ventanilla fuera de servicio excludes it from trámites completados/hora", () => {
+    render(<PreviewMonitor />);
+    settleCounters();
+    expect(screen.getByText("16")).toBeInTheDocument();
+
+    // V2 aporta 5 atendidos (ver DEMO_VENTANILLAS_MONITOR) — al sacarla de
+    // servicio, el KPI debe bajar a 16 - 5 = 11, nunca seguir fingiendo 16.
+    fireEvent.click(screen.getAllByRole("button", { name: "Marcar fuera de servicio" })[0]);
+    settleCounters();
+
+    expect(screen.queryByText("16")).not.toBeInTheDocument();
+  });
+
+  it("switching to a load scenario updates the ring's centerValue (esperando) instantly", () => {
+    render(<PreviewMonitor />);
+    settleCounters();
+    // Escenario inicial "Demanda normal" — DEMO_ESCENARIOS_MONITOR[0].esperando
+    expect(screen.getByText("24")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Hora pico" }));
+
+    // DEMO_ESCENARIOS_MONITOR.hora_pico.esperando — sin animación, centerValue
+    // de StatusRing es texto plano, no pasa por useCounter.
+    expect(screen.getByText("61")).toBeInTheDocument();
   });
 });

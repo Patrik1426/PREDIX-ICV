@@ -83,6 +83,44 @@ export const DEMO_ESCENARIOS_ASIGNACION = [
   },
 ] as const;
 
+// Escenarios de carga operativa — mismo patrón que DEMO_ESCENARIOS_ASIGNACION,
+// para el Monitor de Operaciones. "temporada_alta" está anclado a un dato real:
+// el ICVNL reportó en el cuestionario de dimensionamiento (2026-08-19, ver
+// docs/CUESTIONARIO_RESPUESTAS_ICVNL.md bloque 7.1) un incremento de hasta
+// 1000% en el periodo de refrendo (enero-abril) respecto al promedio anual —
+// los números de este escenario son ilustrativos, no ese 1000% literal
+// (llevarían el demo a valores absurdos), pero la nota lo cita para que el
+// escenario no sea un número inventado sin respaldo.
+export const DEMO_ESCENARIOS_MONITOR = [
+  {
+    id: "normal",
+    etiqueta: "Demanda normal",
+    nota: null,
+    capacidadPct: 58,
+    esperando: 24,
+    tiempoEsperaPromedioMin: 11,
+    tramitesProyectadosHoy: 2100,
+  },
+  {
+    id: "hora_pico",
+    etiqueta: "Hora pico",
+    nota: "Pico matutino típico, ver la curva de Demanda por hora (9-11h).",
+    capacidadPct: 88,
+    esperando: 61,
+    tiempoEsperaPromedioMin: 24,
+    tramitesProyectadosHoy: 3400,
+  },
+  {
+    id: "temporada_alta",
+    etiqueta: "Temporada alta (ene-abr)",
+    nota: "El ICVNL reportó un incremento de hasta 1000% en el periodo de refrendo (ene-abr) respecto al promedio anual — cifra real del cuestionario de dimensionamiento, no de este demo.",
+    capacidadPct: 97,
+    esperando: 89,
+    tiempoEsperaPromedioMin: 39,
+    tramitesProyectadosHoy: 5200,
+  },
+] as const;
+
 // Slots por hora — tabla real de la sección 3.3 de la propuesta (día de
 // mayor demanda, ilustrativo de cómo varía la capacidad de citas vs walk-in).
 export const DEMO_SLOTS_CITAS = [

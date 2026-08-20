@@ -25,4 +25,21 @@ describe("Citas", () => {
     fireEvent.click(screen.getByTestId("citas-semana-barra-Lun"));
     expect(screen.getByText("Slots del Lun — ejemplo de distribución por hora")).toBeInTheDocument();
   });
+
+  it("scheduling a test cita adds it to Próximas atenciones as Programada", () => {
+    render(<PreviewCitas />);
+
+    fireEvent.click(screen.getByRole("button", { name: /Agendar cita/ }));
+    fireEvent.change(screen.getByLabelText("Nombre del ciudadano"), { target: { value: "Prueba Demo" } });
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar" }));
+
+    expect(screen.getByText(/Prueba Demo/)).toBeInTheDocument();
+  });
+
+  it("rejects scheduling without a citizen name", () => {
+    render(<PreviewCitas />);
+    fireEvent.click(screen.getByRole("button", { name: /Agendar cita/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar" }));
+    expect(screen.getByText("Escribe el nombre del ciudadano.")).toBeInTheDocument();
+  });
 });

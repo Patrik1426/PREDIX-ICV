@@ -1,22 +1,66 @@
 // ============================================================
 // Citas — vista previa del módulo 03. Clic en un día abre el desglose de
 // slots por hora. Corre sobre @/lib/demoData, nunca datos reales del ICVNL.
+//
+// Interactivo (2026-08-20): "Agendar cita" abre un formulario y agrega una
+// cita simulada real a "Próximas atenciones" (client-side, se pierde al
+// recargar — nunca se manda a ningún backend, no existe todavía). Trámites
+// del catálogo (DEMO_TRAMITES) verificados contra los servicios reales del
+// ICVNL (nl.gob.mx/es/controlvehicular): Refrendo, Licencias, Altas y bajas,
+// Ponlo a tu Nombre son nombres reales de trámites del Instituto, no
+// inventados para la demo.
 // ============================================================
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import {
   DEMO_CITAS_SEMANA,
   DEMO_SLOTS_CITAS,
   DEMO_PROXIMAS_ATENCIONES,
   DEMO_CITAS_HOY_KPIS,
   DEMO_DEMANDA_HORARIA,
+  DEMO_TRAMITES,
 } from "@/lib/demoData";
 import { KpiCard, DataRow } from "@/components/dashboard";
-import { CalendarClock, Users2, Clock } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { CalendarClock, Users2, Clock, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+type CitaSimulada = { hora: string; nombre: string; tramite: string; estado: "Programada" };
 
 export default function PreviewCitas() {
   const [diaSeleccionado, setDiaSeleccionado] = useState(DEMO_CITAS_SEMANA[4].dia); // Viernes, pico
+  const [citasSimuladas, setCitasSimuladas] = useState<CitaSimulada[]>([]);
+  const [dialogAbierto, setDialogAbierto] = useState(false);
+  const [nombre, setNombre] = useState("");
+  const [tramite, setTramite] = useState<(typeof DEMO_TRAMITES)[number]>(DEMO_TRAMITES[0]);
+  const [hora, setHora] = useState<string>(DEMO_SLOTS_CITAS[0].hora);
+  const [error, setError] = useState<string | null>(null);
+
+  const agendar = (e: FormEvent) => {
+    e.preventDefault();
+    if (!nombre.trim()) {
+      setError("Escribe el nombre del ciudadano.");
+      return;
+    }
+    setCitasSimuladas((cs) => [{ hora, nombre: nombre.trim(), tramite, estado: "Programada" }, ...cs]);
+    toast.success("Cita agendada (simulación) — no se guarda al recargar la página.");
+    setNombre("");
+    setError(null);
+    setDialogAbierto(false);
+  };
+
+  const proximasAtenciones = [...citasSimuladas, ...DEMO_PROXIMAS_ATENCIONES];
 
   return (
     <div className="space-y-5">
@@ -24,7 +68,7 @@ export default function PreviewCitas() {
         <KpiCard
           icon={<CalendarClock className="h-4 w-4" />}
           label="Citas hoy"
-          value={DEMO_CITAS_HOY_KPIS.citasHoy}
+          value={DEMO_CITAS_HOY_KPIS.citasHoy + citasSimuladas.length}
           colorClassName="text-chart-5"
           spark={DEMO_DEMANDA_HORARIA}
         />
@@ -103,16 +147,78 @@ export default function PreviewCitas() {
       </div>
 
       <div>
-        <h3 className="mb-2 text-sm font-semibold">Próximas atenciones</h3>
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-sm font-semibold">Próximas atenciones</h3>
+          <Dialog open={dialogAbierto} onOpenChange={setDialogAbierto}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 text-xs">
+                <Plus className="mr-1 h-3.5 w-3.5" /> Agendar cita
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Agendar cita de prueba</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={agendar} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="cita-nombre">Nombre del ciudadano</Label>
+                  <Input
+                    id="cita-nombre"
+                    value={nombre}
+                    onChange={(e) => {
+                      setNombre(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    placeholder="Nombre completo"
+                  />
+                  {error && <p className="text-xs text-destructive">{error}</p>}
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cita-tramite">Trámite</Label>
+                  <select
+                    id="cita-tramite"
+                    value={tramite}
+                    onChange={(e) => setTramite(e.target.value as (typeof DEMO_TRAMITES)[number])}
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  >
+                    {DEMO_TRAMITES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="cita-hora">Hora</Label>
+                  <select
+                    id="cita-hora"
+                    value={hora}
+                    onChange={(e) => setHora(e.target.value)}
+                    className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  >
+                    {DEMO_SLOTS_CITAS.map((s) => (
+                      <option key={s.hora} value={s.hora}>
+                        {s.hora}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <DialogFooter>
+                  <Button type="submit">Confirmar</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
+        </div>
         <div className="rounded-lg border bg-card px-4">
-          {DEMO_PROXIMAS_ATENCIONES.map((a, i) => (
+          {proximasAtenciones.map((a, i) => (
             <DataRow
-              key={a.hora + a.nombre}
+              key={a.hora + a.nombre + i}
               icon={<Clock className="h-4 w-4" />}
               label={`${a.nombre} — ${a.tramite}`}
               value={`${a.hora} · ${a.estado}`}
               colorClassName="text-chart-5"
-              last={i === DEMO_PROXIMAS_ATENCIONES.length - 1}
+              last={i === proximasAtenciones.length - 1}
             />
           ))}
         </div>
