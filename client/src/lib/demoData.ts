@@ -25,6 +25,22 @@ export const DEMO_DEMANDA_HORARIA = [
   12, 8, 5, 4, 6, 18, 42, 68, 81, 74, 60, 55, 58, 62, 57, 49, 44, 38, 25, 16, 10, 7, 5, 4,
 ];
 
+// Desglose de la demanda horaria por tipo de trámite — proporciones fijas
+// aplicadas sobre DEMO_DEMANDA_HORARIA (no series inventadas sueltas, cada
+// hora sigue sumando al mismo total agregado). Refrendo domina por ser el
+// trámite de mayor volumen real del ICVNL (temporada ene-abr, ver
+// docs/CUESTIONARIO_RESPUESTAS_ICVNL.md), el resto en proporción
+// decreciente. Suma de shares = 1.
+export const DEMO_DEMANDA_POR_TRAMITE = [
+  { tramite: "Refrendo", share: 0.45 },
+  { tramite: "Licencias", share: 0.25 },
+  { tramite: "Altas y bajas", share: 0.2 },
+  { tramite: "Ponlo a tu Nombre", share: 0.1 },
+].map((t) => ({
+  ...t,
+  valores: DEMO_DEMANDA_HORARIA.map((v) => Math.round(v * t.share)),
+}));
+
 export const DEMO_VENTANILLAS = [
   { ventanilla: "V1", tramite: "Refrendo", carga: 0.9 },
   { ventanilla: "V2", tramite: "Refrendo", carga: 0.85 },

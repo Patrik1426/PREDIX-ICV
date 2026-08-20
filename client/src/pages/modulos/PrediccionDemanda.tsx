@@ -4,12 +4,20 @@
 // patrón estándar para series de tiempo con predicción: trazo sólido =
 // observado, punteado = proyectado. Corre sobre @/lib/demoData, nunca datos
 // reales del ICVNL.
+//
+// "Como PREDIX" (2026-08-20): "Ocupación por delegación" pasa de una lista
+// de barras de texto al mapa Leaflet real (DelegacionesMap, mismo
+// componente del Tablero) — reuso directo, sin duplicar lógica de mapa.
+// Se agrega "Desglose por tipo de trámite" (DEMO_DEMANDA_POR_TRAMITE,
+// proporciones fijas sobre la curva agregada) con un ForecastChart
+// compacto por trámite — mismo componente compartido de DemoVisuals.tsx.
 // ============================================================
 
 import { useState } from "react";
-import { DEMO_DEMANDA_HORARIA, DEMO_KPIS, DEMO_PRECISION_MODELO, DEMO_DELEGACIONES } from "@/lib/demoData";
+import { DEMO_DEMANDA_HORARIA, DEMO_KPIS, DEMO_PRECISION_MODELO, DEMO_DEMANDA_POR_TRAMITE } from "@/lib/demoData";
 import { KpiCard, ModuleHeader } from "@/components/dashboard";
-import { CarrilFlujo } from "@/components/demo/DemoVisuals";
+import { ForecastChart } from "@/components/demo/DemoVisuals";
+import DelegacionesMap from "@/components/demo/DelegacionesMap";
 import { TrendingUp, Target } from "lucide-react";
 
 const AHORA_INDEX = 9; // 9:00 — hora "actual" de la demo
@@ -109,9 +117,17 @@ export default function PreviewPrediccion() {
 
       <div className="rounded-lg border bg-card p-4">
         <ModuleHeader eyebrow="Proyección por ubicación" title="Ocupación por delegación" />
-        <div className="space-y-2.5">
-          {DEMO_DELEGACIONES.map((d) => (
-            <CarrilFlujo key={d.nombre} {...d} />
+        <DelegacionesMap />
+      </div>
+
+      <div className="rounded-lg border bg-card p-4">
+        <ModuleHeader eyebrow="Misma curva agregada, separada por tipo de trámite" title="Desglose por tipo de trámite" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {DEMO_DEMANDA_POR_TRAMITE.map((t) => (
+            <div key={t.tramite} className="rounded-lg border bg-muted/20 p-3">
+              <p className="mb-1 text-xs font-medium text-foreground">{t.tramite}</p>
+              <ForecastChart values={t.valores} nowIndex={AHORA_INDEX} className="h-16" />
+            </div>
           ))}
         </div>
       </div>
