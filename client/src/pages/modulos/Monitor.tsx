@@ -17,6 +17,13 @@
 // VentanillaCard se puede marcar "fuera de servicio", recalculando trámites
 // completados/hora en vivo. "temporada_alta" cita el +1000% real reportado
 // por el ICVNL en el cuestionario (docs/CUESTIONARIO_RESPUESTAS_ICVNL.md).
+//
+// "Se siente vivo" (2026-08-20): el mismo ciclo de 2.2s que ya movía el
+// ring con jitter ahora también hace avanzar "atendidos" — cada 3 ticks
+// (~6.6s), UNA ventanilla activa (turno rotativo, nunca una fuera de
+// servicio) suma 1 trámite. Determinista (turno por índice, no
+// Math.random()) a propósito: se puede testear con timers falsos sin
+// volverse un test frágil por aleatoriedad.
 // ============================================================
 
 import { useEffect, useState } from "react";
@@ -43,6 +50,16 @@ export default function PreviewMonitor() {
       clearInterval(id);
     };
   }, []);
+
+  useEffect(() => {
+    if (tick === 0 || tick % 3 !== 0) return;
+    setVentanillas((vs) => {
+      const activos = vs.reduce<number[]>((acc, v, i) => (v.activa ? [...acc, i] : acc), []);
+      if (activos.length === 0) return vs;
+      const turno = activos[(tick / 3 - 1) % activos.length];
+      return vs.map((v, i) => (i === turno ? { ...v, atendidos: v.atendidos + 1 } : v));
+    });
+  }, [tick]);
 
   const escenario = DEMO_ESCENARIOS_MONITOR.find((e) => e.id === escenarioId)!;
   const jitter = Math.sin(tick) * 4;

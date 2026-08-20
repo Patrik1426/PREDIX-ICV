@@ -82,4 +82,65 @@ describe("Monitor", () => {
     // de StatusRing es texto plano, no pasa por useCounter.
     expect(screen.getByText("61")).toBeInTheDocument();
   });
+
+  it("stays at the real sum (16) through the first 2 ticks — the live climb is calm, not per-tick", () => {
+    render(<PreviewMonitor />);
+    settleCounters();
+    expect(screen.getByText("16")).toBeInTheDocument();
+
+    // 1 tick más (2200ms) sin llegar al 3er tick todavía.
+    act(() => {
+      vi.advanceTimersByTime(2200);
+    });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(screen.getByText("16")).toBeInTheDocument();
+  });
+
+  it("después de 3 ticks, una ventanilla activa suma 1 atendido más — el panel se siente vivo, no estático", () => {
+    render(<PreviewMonitor />);
+    settleCounters();
+    expect(screen.getByText("16")).toBeInTheDocument();
+
+    // 2 ticks más (llega a tick=3, el ritmo del incremento) + settle del
+    // contador (mismo settleCounters() de siempre, no un advance(1000) a
+    // secas — el cambio de target ocurre justo al final del 2do advance de
+    // 2200ms, así que el useCounter recién empieza a contar desde ahí y
+    // necesita su margen completo, no exactamente 1000ms al límite).
+    act(() => {
+      vi.advanceTimersByTime(2200);
+    });
+    act(() => {
+      vi.advanceTimersByTime(2200);
+    });
+    settleCounters();
+
+    expect(screen.queryByText("16")).not.toBeInTheDocument();
+    expect(screen.getByText("17")).toBeInTheDocument();
+  });
+
+  it("a ventanilla fuera de servicio nunca acumula atendidos en el ciclo vivo", () => {
+    render(<PreviewMonitor />);
+    settleCounters();
+
+    // Saca la primera ventanilla (V4, la que el ciclo tocaría primero en tick=3).
+    fireEvent.click(screen.getAllByRole("button", { name: "Marcar fuera de servicio" })[0]);
+    settleCounters();
+    // V4 aporta 8 -> 16 - 8 = 8 activo.
+    expect(screen.getByText("8")).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(2200);
+    });
+    act(() => {
+      vi.advanceTimersByTime(2200);
+    });
+    settleCounters();
+
+    // Debe subir por otra ventanilla activa (no V4, que sigue fuera), nunca
+    // seguir en 8 para siempre ni revivir a V4.
+    expect(screen.queryByText("8")).not.toBeInTheDocument();
+    expect(screen.getByText("9")).toBeInTheDocument();
+  });
 });
