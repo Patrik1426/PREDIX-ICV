@@ -3,7 +3,9 @@
 // Cada Preview deja tocar/hacer clic algo para sentir cómo se comportaría
 // el módulo real — pero todo corre sobre @/lib/demoData, nunca datos del
 // ICVNL ni el LLM real. "chatbot" ya no pasa por aquí (2026-08-20): es real,
-// App.tsx lo enruta directo a AsistenteVirtual.tsx.
+// App.tsx lo enruta directo a AsistenteVirtual.tsx. "citas_operacion"
+// tampoco (2026-08-20): sigue siendo demo, pero ya tiene su propia página
+// (CitasYOperacion.tsx) — solo queda "prediccion_asignacion" en este shell.
 // ============================================================
 
 import type { ComponentType } from "react";
@@ -16,15 +18,13 @@ import { MODULE_DESARROLLO } from "@/components/demo/ModuloDesarrollo";
 import { ChevronLeft, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PreviewPrediccionAsignacion from "@/pages/modulos/PrediccionAsignacion";
-import PreviewCitasOperacion from "@/pages/modulos/CitasOperacion";
 import { hasGroupAccess } from "@/lib/moduleGroups";
 
-// "chatbot" no está aquí a propósito — ese slug ya no pasa por este shell de
-// "vista previa" (App.tsx lo intercepta antes con una ruta específica hacia
-// AsistenteVirtual.tsx, real, ya no un preview). Ver moduleSlugConsistency.test.tsx.
+// "chatbot" y "citas_operacion" no están aquí a propósito — App.tsx los
+// intercepta antes con rutas específicas (AsistenteVirtual.tsx,
+// CitasYOperacion.tsx). Ver moduleSlugConsistency.test.tsx.
 export const MODULE_PREVIEWS: Record<string, ComponentType> = {
   prediccion_asignacion: PreviewPrediccionAsignacion,
-  citas_operacion: PreviewCitasOperacion,
 };
 
 function Preview({ slug }: { slug: string }) {

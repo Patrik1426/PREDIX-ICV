@@ -54,14 +54,6 @@ describe("ModuloDetalle — Predicción y Asignación", () => {
   });
 });
 
-describe("ModuloDetalle — Citas y Operación", () => {
-  it("renders the fused view when the user has both real sub-modules", () => {
-    renderModulo("citas_operacion", ["citas", "monitor"]);
-    expect(screen.getByRole("tab", { name: /Citas/ })).toBeInTheDocument();
-    expect(screen.getByText("Próximas atenciones")).toBeInTheDocument();
-  });
-});
-
 describe("ModuloDetalle — access gate", () => {
   it("redirects home when the user has none of the real sub-modules for the fused slug", () => {
     const { hook } = memoryLocation({ path: "/modulos/prediccion_asignacion" });

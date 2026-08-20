@@ -5,13 +5,12 @@
 // MODULE_LABELS/MODULE_DESCRIPTIONS (moduleLabels.ts), MODULE_ICONS/
 // MODULE_ORDER/MODULE_ACCENT (moduleIcons.tsx), MODULE_DESARROLLO
 // (demo/ModuloDesarrollo.tsx) y MODULE_PREVIEWS (pages/ModuloDetalle.tsx).
-// MODULE_ORDER (subset intencional, 3 no-admin), MODULE_PREVIEWS (subset
-// porque "admin" todavía no tiene pantalla propia — cae en el fallback de
-// ModuloDetalle.tsx) y MODULE_DESARROLLO (subset desde 2026-08-20: "chatbot"
-// se graduó de "vista previa" a página real — AsistenteVirtual.tsx — y ya
-// no pasa por el shell "Detalle técnico"/"qué incluirá este módulo" que
-// MODULE_DESARROLLO alimenta) se verifican como subconjunto en vez de match
-// exacto.
+// MODULE_ORDER (subset intencional, 3 no-admin), MODULE_PREVIEWS (subset:
+// "admin" no tiene pantalla propia todavía, "chatbot" y "citas_operacion"
+// se graduaron a página real de primer nivel — ver razón detallada abajo) y
+// MODULE_DESARROLLO (subset desde 2026-08-20: "chatbot" ya no pasa por el
+// shell "Detalle técnico"/"qué incluirá este módulo" que MODULE_DESARROLLO
+// alimenta) se verifican como subconjunto en vez de match exacto.
 //
 // Nota de extensión: este archivo no tiene JSX, pero debe llamarse
 // `.test.tsx` — vitest.config.ts (`include`) solo recoge tests de cliente
@@ -71,9 +70,11 @@ describe("module slug dictionaries stay in sync", () => {
   // MODULE_PREVIEWS es distinto de los otros 4: ModuloDetalle.tsx tiene un
   // fallback explícito ("Sin vista previa disponible todavía") para
   // cualquier slug sin componente registrado — hoy "admin" cae ahí a
-  // propósito (su pantalla todavía no existe, ver ModuloDesarrollo.tsx) y
-  // "chatbot" también, porque ya ni siquiera pasa por ModuloDetalle.tsx (App.tsx
-  // lo intercepta antes hacia AsistenteVirtual.tsx). Así que es un
+  // propósito (su pantalla todavía no existe, ver ModuloDesarrollo.tsx),
+  // "chatbot" también (real, App.tsx lo intercepta antes hacia
+  // AsistenteVirtual.tsx) y "citas_operacion" también (sigue siendo demo,
+  // pero ya tiene su propia página, CitasYOperacion.tsx — App.tsx la
+  // intercepta antes de llegar a ModuloDetalle.tsx igual). Así que es un
   // subconjunto válido, no un match exacto — pero cualquier clave que NO
   // esté en el set de 4 slugs canónicos sí sería drift real.
   it("MODULE_PREVIEWS only contains keys from the 4 canonical UI slugs", () => {

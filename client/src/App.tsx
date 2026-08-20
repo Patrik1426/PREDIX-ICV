@@ -8,6 +8,7 @@ import Login from "@/pages/Login";
 import Tablero from "@/pages/Tablero";
 import Propuesta from "@/pages/Propuesta";
 import AsistenteVirtual from "@/pages/AsistenteVirtual";
+import CitasYOperacion from "@/pages/CitasYOperacion";
 import ModuloDetalle from "@/pages/ModuloDetalle";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -45,6 +46,13 @@ export default function App() {
             <RequireAuth>
               <AppShell>
                 <AsistenteVirtual />
+              </AppShell>
+            </RequireAuth>
+          </Route>
+          <Route path="/modulos/citas_operacion">
+            <RequireAuth>
+              <AppShell>
+                <CitasYOperacion />
               </AppShell>
             </RequireAuth>
           </Route>
