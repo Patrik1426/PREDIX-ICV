@@ -2,10 +2,12 @@
 // ModuloDetalle — vista previa interactiva de un módulo aún no construido.
 // Cada Preview deja tocar/hacer clic algo para sentir cómo se comportaría
 // el módulo real — pero todo corre sobre @/lib/demoData, nunca datos del
-// ICVNL ni el LLM real. "chatbot" ya no pasa por aquí (2026-08-20): es real,
-// App.tsx lo enruta directo a AsistenteVirtual.tsx. "citas_operacion"
-// tampoco (2026-08-20): sigue siendo demo, pero ya tiene su propia página
-// (CitasYOperacion.tsx) — solo queda "prediccion_asignacion" en este shell.
+// ICVNL ni el LLM real. Los 3 módulos reales (chatbot, citas_operacion,
+// prediccion_asignacion) ya NO pasan por aquí (2026-08-20) — App.tsx los
+// intercepta antes con rutas específicas propias (AsistenteVirtual.tsx,
+// CitasYOperacion.tsx, PrediccionYAsignacion.tsx). Este shell solo sigue
+// vivo para "admin", que todavía no tiene pantalla propia — cae en el
+// fallback "Sin vista previa disponible todavía".
 // ============================================================
 
 import type { ComponentType } from "react";
@@ -17,15 +19,15 @@ import { DatoEjemplo } from "@/components/demo/DemoVisuals";
 import { MODULE_DESARROLLO } from "@/components/demo/ModuloDesarrollo";
 import { ChevronLeft, ChevronRight, ArrowLeft, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
-import PreviewPrediccionAsignacion from "@/pages/modulos/PrediccionAsignacion";
 import { hasGroupAccess } from "@/lib/moduleGroups";
 
-// "chatbot" y "citas_operacion" no están aquí a propósito — App.tsx los
-// intercepta antes con rutas específicas (AsistenteVirtual.tsx,
-// CitasYOperacion.tsx). Ver moduleSlugConsistency.test.tsx.
-export const MODULE_PREVIEWS: Record<string, ComponentType> = {
-  prediccion_asignacion: PreviewPrediccionAsignacion,
-};
+// Vacío a propósito: los 3 slugs que sí tenían preview (chatbot,
+// citas_operacion, prediccion_asignacion) ya se graduaron a página propia
+// (ver comentario de arriba) — "admin" nunca estuvo aquí. Se conserva el
+// diccionario (en vez de borrar todo el mecanismo de Preview/dispatch) para
+// que moduleSlugConsistency.test.tsx siga vigilando drift si algún día se
+// agrega un módulo nuevo sin pantalla propia todavía.
+export const MODULE_PREVIEWS: Record<string, ComponentType> = {};
 
 function Preview({ slug }: { slug: string }) {
   const Component = MODULE_PREVIEWS[slug];

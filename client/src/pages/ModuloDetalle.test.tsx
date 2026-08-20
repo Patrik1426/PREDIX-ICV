@@ -41,22 +41,22 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe("ModuloDetalle — Predicción y Asignación", () => {
-  it("renders the fused view when the user has both real sub-modules", () => {
-    renderModulo("prediccion_asignacion", ["prediccion_demanda", "asignador_ventanillas"]);
-    expect(screen.getByRole("tab", { name: /Predicción/ })).toBeInTheDocument();
-    expect(screen.getByText("Precisión del modelo")).toBeInTheDocument();
-  });
-
-  it("stays on the page (no redirect) when the user has only one of the two real sub-modules", () => {
-    renderModulo("prediccion_asignacion", ["asignador_ventanillas"]);
-    expect(screen.getByText("Ventanillas activas")).toBeInTheDocument();
+// Los 3 slugs con preview propio (chatbot, citas_operacion,
+// prediccion_asignacion) ya se graduaron a página real — App.tsx los
+// intercepta antes de llegar aquí (ver PrediccionYAsignacion.test.tsx,
+// CitasYOperacion.test.tsx, AsistenteVirtual.test.tsx para su cobertura
+// real). Lo único que sigue vivo en ModuloDetalle es "admin" — sin pantalla
+// propia todavía, cae en el fallback genérico.
+describe("ModuloDetalle — admin (único slug que sigue usando este shell)", () => {
+  it("falls back to 'Sin vista previa disponible todavía' — no MODULE_PREVIEWS entry for admin", () => {
+    renderModulo("admin", ["admin"]);
+    expect(screen.getByText("Sin vista previa disponible todavía.")).toBeInTheDocument();
   });
 });
 
 describe("ModuloDetalle — access gate", () => {
-  it("redirects home when the user has none of the real sub-modules for the fused slug", () => {
-    const { hook } = memoryLocation({ path: "/modulos/prediccion_asignacion" });
+  it("redirects home when the role doesn't have access to the slug", () => {
+    const { hook } = memoryLocation({ path: "/modulos/admin" });
     mockAccessibleModules = ["chatbot"];
     render(
       <Router hook={hook}>

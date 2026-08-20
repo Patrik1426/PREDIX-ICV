@@ -9,6 +9,7 @@ import Tablero from "@/pages/Tablero";
 import Propuesta from "@/pages/Propuesta";
 import AsistenteVirtual from "@/pages/AsistenteVirtual";
 import CitasYOperacion from "@/pages/CitasYOperacion";
+import PrediccionYAsignacion from "@/pages/PrediccionYAsignacion";
 import ModuloDetalle from "@/pages/ModuloDetalle";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -53,6 +54,13 @@ export default function App() {
             <RequireAuth>
               <AppShell>
                 <CitasYOperacion />
+              </AppShell>
+            </RequireAuth>
+          </Route>
+          <Route path="/modulos/prediccion_asignacion">
+            <RequireAuth>
+              <AppShell>
+                <PrediccionYAsignacion />
               </AppShell>
             </RequireAuth>
           </Route>
