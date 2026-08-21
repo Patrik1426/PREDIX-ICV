@@ -148,6 +148,11 @@ export function BulletKpi({
   const cumple = menorEsMejor ? actual <= meta : actual >= meta;
   const actualPct = Math.min(100, (actual / max) * 100);
   const metaPct = Math.min(100, (meta / max) * 100);
+  // Severidad real derivada del gap actual/meta (no dato nuevo): cumple -> verde;
+  // gap >= 50% de la meta -> rojo (lejos); si no, ámbar (cerca). Evita que los 5
+  // indicadores se vean igual de "mal" cuando unos están mucho peor que otros.
+  const gap = Math.abs(actual - meta) / meta;
+  const barColor = cumple ? "bg-success" : gap >= 0.5 ? "bg-destructive" : "bg-chart-2";
 
   return (
     <div>
@@ -161,7 +166,8 @@ export function BulletKpi({
       </div>
       <div className="relative mt-2 h-2.5 rounded-full bg-muted">
         <div
-          className={cn("h-full rounded-full transition-all", cumple ? "bg-primary" : "bg-chart-2")}
+          data-testid="bullet-kpi-bar"
+          className={cn("h-full rounded-full transition-all", barColor)}
           style={{ width: `${actualPct}%` }}
         />
         <div

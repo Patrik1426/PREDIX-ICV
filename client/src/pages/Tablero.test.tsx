@@ -100,4 +100,26 @@ describe("Tablero", () => {
     expect(scoped.getByText("Lun")).toBeInTheDocument();
     expect(scoped.getByText("Sáb")).toBeInTheDocument();
   });
+
+  it("uses the same quiet eyebrow style across all 6 sections, never the loud report-cover style", async () => {
+    await renderTablero();
+    // "Sección 8 de la propuesta" (Indicadores de éxito) used to render via SectionHeading
+    // (bold, uppercase, primary-colored eyebrow) while the other 5 sections already used
+    // ModuleHeader's quiet eyebrow (muted-foreground, no uppercase). This asserted they all
+    // match ModuleHeader's treatment, so the page reads as one consistent dashboard.
+    const eyebrows = [
+      "Meta del proyecto — resumen ejecutivo",
+      "Sección 8 de la propuesta",
+      "Sección 6.3 — ver",
+      "Sección 4 — anticipar",
+      "Sección 5.1",
+      "Sección 9.2 — demostrar",
+    ];
+    for (const text of eyebrows) {
+      const el = screen.getByText(text);
+      expect(el).toHaveClass("text-muted-foreground");
+      expect(el).not.toHaveClass("uppercase");
+      expect(el).not.toHaveClass("text-primary");
+    }
+  });
 });

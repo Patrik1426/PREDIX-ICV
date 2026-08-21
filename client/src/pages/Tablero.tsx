@@ -18,7 +18,6 @@ import { BulletKpi, DatoEjemplo } from "@/components/demo/DemoVisuals";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import ReportExporter, { type ReportRow } from "@/components/ReportExporter";
-import { SectionHeading } from "@/components/layout/SectionHeading";
 import { Database, ArrowRight } from "lucide-react";
 
 const TENDENCIA_CONFIG = {
@@ -71,9 +70,7 @@ export default function Tablero() {
           propuesta (RESULTADOS_ESPERADOS[0]), no un KPI genérico. Da el "para
           qué" antes de entrar al detalle línea-base/meta de abajo. */}
       <section className="rounded-lg border bg-card p-6">
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary">
-          Meta del proyecto — resumen ejecutivo
-        </p>
+        <p className="text-xs text-muted-foreground">Meta del proyecto — resumen ejecutivo</p>
         <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <span className="font-mono text-7xl font-bold tracking-tight text-primary">
             {RESULTADOS_ESPERADOS[0].cambio}
@@ -88,7 +85,7 @@ export default function Tablero() {
       </section>
 
       <section className="space-y-4 rounded-lg border bg-card p-6">
-        <SectionHeading
+        <ModuleHeader
           eyebrow="Sección 8 de la propuesta"
           title="Indicadores de éxito — línea base vs. meta (12 meses)"
         />
@@ -152,7 +149,10 @@ export default function Tablero() {
         </ChartContainer>
       </section>
 
-      <section className="rounded-lg border bg-card p-6">
+      {/* Fuentes de datos + Reporteador: utilitarias, no contenido primario — sin card
+          bordeada propia para que Hero/Indicadores/Mapa/Tendencia destaquen por
+          jerarquía real en vez de 6 cajas idénticas. */}
+      <section className="border-t pt-6">
         <ModuleHeader eyebrow="Sección 5.1" title="Fuentes de datos" />
         <div>
           {FUENTES_DE_DATOS.map((nombre, i) => (
@@ -168,7 +168,7 @@ export default function Tablero() {
         </div>
       </section>
 
-      <section className="space-y-2 rounded-lg border bg-card p-6">
+      <section className="space-y-2 border-t pt-6">
         <ModuleHeader eyebrow="Sección 9.2 — demostrar" title="Reporteador" action={<ReportExporter rows={reportRows} />} />
         <p className="text-sm text-muted-foreground">
           Exporta los indicadores de éxito del proyecto a CSV. Los valores de línea base son
