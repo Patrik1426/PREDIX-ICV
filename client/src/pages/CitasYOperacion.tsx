@@ -1,7 +1,7 @@
 import { Redirect } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { hasGroupAccess, MODULE_GROUPS } from "@/lib/moduleGroups";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Monitor,
   WifiOff,
@@ -31,6 +31,16 @@ const S = {
 const SCENARIOS = ["Demanda Normal", "Hora Pico", "Temporada Alta"] as const;
 type Scenario = typeof SCENARIOS[number];
 
+type Ventanilla = {
+  id: string;
+  name: string;
+  agent: string;
+  tramite: string;
+  status: "active" | "offline" | "break";
+  wait: number;
+  atendidos: number;
+};
+
 const [SLUG_CITAS, SLUG_MONITOR] = MODULE_GROUPS.citas_operacion;
 
 const scenarioData: Record<Scenario, {
@@ -48,15 +58,15 @@ const scenarioData: Record<Scenario, {
   "Temporada Alta": { espera: 51, atencion: 14, tramitosHora: 71, ocupacion: 96, citasCumplidas: 41, enFila: 412, atendidos: 1640, queueRing: 96 },
 };
 
-const ventanillas = [
-  { id: "V-01", name: "Ventanilla 01", agent: "L. Martínez", tramite: "Refrendo", status: "active", wait: 8 },
-  { id: "V-02", name: "Ventanilla 02", agent: "R. Garza", tramite: "Licencias", status: "active", wait: 12 },
-  { id: "V-03", name: "Ventanilla 03", agent: "A. Torres", tramite: "Refrendo", status: "active", wait: 9 },
-  { id: "V-04", name: "Ventanilla 04", agent: "M. Reyes", tramite: "Altas y Bajas", status: "active", wait: 7 },
-  { id: "V-05", name: "Ventanilla 05", agent: "C. López", tramite: "Ponlo a Tu Nombre", status: "active", wait: 15 },
-  { id: "V-06", name: "Ventanilla 06", agent: "—", tramite: "—", status: "offline", wait: 0 },
-  { id: "V-07", name: "Ventanilla 07", agent: "F. Núñez", tramite: "Refrendo", status: "active", wait: 11 },
-  { id: "V-08", name: "Ventanilla 08", agent: "—", tramite: "—", status: "break", wait: 0 },
+const ventanillasIniciales: Ventanilla[] = [
+  { id: "V-01", name: "Ventanilla 01", agent: "L. Martínez", tramite: "Refrendo", status: "active", wait: 8, atendidos: 9 },
+  { id: "V-02", name: "Ventanilla 02", agent: "R. Garza", tramite: "Licencias", status: "active", wait: 12, atendidos: 6 },
+  { id: "V-03", name: "Ventanilla 03", agent: "A. Torres", tramite: "Refrendo", status: "active", wait: 9, atendidos: 8 },
+  { id: "V-04", name: "Ventanilla 04", agent: "M. Reyes", tramite: "Altas y Bajas", status: "active", wait: 7, atendidos: 5 },
+  { id: "V-05", name: "Ventanilla 05", agent: "C. López", tramite: "Ponlo a Tu Nombre", status: "active", wait: 15, atendidos: 11 },
+  { id: "V-06", name: "Ventanilla 06", agent: "—", tramite: "—", status: "offline", wait: 0, atendidos: 0 },
+  { id: "V-07", name: "Ventanilla 07", agent: "F. Núñez", tramite: "Refrendo", status: "active", wait: 11, atendidos: 8 },
+  { id: "V-08", name: "Ventanilla 08", agent: "—", tramite: "—", status: "break", wait: 0, atendidos: 0 },
 ];
 
 function StatusRing({ value, color }: { value: number; color: string }) {
@@ -89,7 +99,7 @@ function StatusRing({ value, color }: { value: number; color: string }) {
   );
 }
 
-function VentanillaCard({ v }: { v: typeof ventanillas[0] }) {
+function VentanillaCard({ v, onToggle }: { v: Ventanilla; onToggle: () => void }) {
   const isActive = v.status === "active";
   const isOffline = v.status === "offline";
   const borderColor = isActive ? "oklch(0.62 0.14 145 / 0.25)" : isOffline ? "oklch(0.58 0.20 28 / 0.2)" : S.border;
@@ -158,6 +168,26 @@ function VentanillaCard({ v }: { v: typeof ventanillas[0] }) {
             </span>
           </div>
         </>
+      )}
+
+      {(isActive || isOffline) && (
+        <button
+          onClick={onToggle}
+          style={{
+            marginTop: 4,
+            padding: "6px 0",
+            background: "transparent",
+            border: `1px solid ${S.border}`,
+            borderRadius: 6,
+            fontFamily: "var(--font-mono)",
+            fontSize: 9.5,
+            color: S.muted,
+            cursor: "pointer",
+            letterSpacing: "0.04em",
+          }}
+        >
+          {isActive ? "Marcar fuera de servicio" : "Reactivar"}
+        </button>
       )}
     </div>
   );
@@ -384,6 +414,26 @@ export default function CitasYOperacion() {
   // simula esa transición loading→loaded, así que no lo habría detectado).
   const [scenario, setScenario] = useState<Scenario>("Demanda Normal");
   const [showDialog, setShowDialog] = useState(false);
+  const [ventanillas, setVentanillas] = useState<Ventanilla[]>(() => ventanillasIniciales.map((v) => ({ ...v })));
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 2200);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (tick === 0 || tick % 3 !== 0) return;
+    setVentanillas((vs) => {
+      const activos = vs.reduce<number[]>((acc, v, i) => (v.status === "active" ? [...acc, i] : acc), []);
+      if (activos.length === 0) return vs;
+      const turno = activos[(tick / 3 - 1) % activos.length];
+      return vs.map((v, i) => (i === turno ? { ...v, atendidos: v.atendidos + 1 } : v));
+    });
+  }, [tick]);
+
+  const toggleVentanilla = (id: string) =>
+    setVentanillas((vs) => vs.map((v) => (v.id === id ? { ...v, status: v.status === "active" ? "offline" : "active" } : v)));
 
   const modules = accessibleModules ?? [];
   const puedeCitas = isLoading || modules.includes(SLUG_CITAS);
@@ -393,11 +443,12 @@ export default function CitasYOperacion() {
 
   const d = scenarioData[scenario];
   const ringColor = d.queueRing >= 90 ? S.coral : d.queueRing >= 70 ? S.warn : S.ok;
+  const tramitesHoraVivo = ventanillas.filter((v) => v.status === "active").reduce((sum, v) => sum + v.atendidos, 0);
 
   const kpis = [
     { label: "TIEMPO ESPERA", value: `${d.espera} min`, color: d.espera > 20 ? S.coral : S.ok, perm: SLUG_MONITOR },
     { label: "TIEMPO ATENCIÓN", value: `${d.atencion} min`, color: S.ink, perm: SLUG_MONITOR },
-    { label: "TRÁMITES / HORA", value: `${d.tramitosHora}`, color: S.brand, perm: SLUG_MONITOR },
+    { label: "TRÁMITES / HORA", value: `${tramitesHoraVivo}`, color: S.brand, perm: SLUG_MONITOR },
     { label: "OCUPACIÓN", value: `${d.ocupacion}%`, color: ringColor, perm: SLUG_MONITOR },
     { label: "CITAS CUMPLIDAS", value: `${d.citasCumplidas}%`, color: d.citasCumplidas < 60 ? S.coral : S.warn, perm: SLUG_CITAS },
     { label: "ATENDIDOS HOY", value: d.atendidos.toLocaleString(), color: S.ink, perm: SLUG_MONITOR },
@@ -546,7 +597,7 @@ export default function CitasYOperacion() {
                   </div>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-                  {ventanillas.map((v) => <VentanillaCard key={v.id} v={v} />)}
+                  {ventanillas.map((v) => <VentanillaCard key={v.id} v={v} onToggle={() => toggleVentanilla(v.id)} />)}
                 </div>
               </div>
             )}

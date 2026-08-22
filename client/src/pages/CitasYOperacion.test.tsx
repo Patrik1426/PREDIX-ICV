@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Route, Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
@@ -100,5 +100,31 @@ describe("CitasYOperacion", () => {
     );
     expect(screen.getByText("redirected home")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Citas y Operación" })).not.toBeInTheDocument();
+  });
+
+  it("marking an active ventanilla fuera de servicio flips its label to Reactivar", () => {
+    renderPage(["citas", "monitor"]);
+    fireEvent.click(screen.getAllByRole("button", { name: "Marcar fuera de servicio" })[0]);
+    expect(screen.getAllByRole("button", { name: "Reactivar" }).length).toBeGreaterThan(0);
+  });
+
+  it("TRÁMITES / HORA starts at the real sum of atendidos across active ventanillas (47)", () => {
+    renderPage(["citas", "monitor"]);
+    // ventanillasIniciales activas: 9+6+8+5+11+8 = 47 — suma real, no fabricada.
+    expect(screen.getByText("47")).toBeInTheDocument();
+  });
+
+  it("after 3 live ticks, one active ventanilla's atendidos climbs by 1 and TRÁMITES / HORA follows", () => {
+    vi.useFakeTimers();
+    renderPage(["citas", "monitor"]);
+    expect(screen.getByText("47")).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(2200 * 3);
+    });
+
+    expect(screen.queryByText("47")).not.toBeInTheDocument();
+    expect(screen.getByText("48")).toBeInTheDocument();
+    vi.useRealTimers();
   });
 });
