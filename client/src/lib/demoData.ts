@@ -20,7 +20,7 @@ export const DEMO_DELEGACIONES = [
 export const DEMO_KPIS = {
   tiempoEsperaPromedioMin: 14,
   tramitesProyectadosHoy: 2840,
-  delegacionesEnAlerta: 1,
+  delegacionesEnAlerta: 2,
   tramitesConCitaPct: 22,
 };
 

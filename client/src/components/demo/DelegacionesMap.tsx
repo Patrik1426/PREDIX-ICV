@@ -1,5 +1,5 @@
 // ============================================================
-// DelegacionesMap — mapa Leaflet real de los 5 municipios de Nuevo León que
+// DelegacionesMap — mapa Leaflet real de los 9 municipios de Nuevo León que
 // corresponden a las delegaciones demo, coloreado por su `estado`
 // (DEMO_DELEGACIONES, fluido/moderado/saturado). Los polígonos vienen del
 // WFS público de INEGI, descargados una sola vez por
@@ -165,8 +165,8 @@ export default function DelegacionesMap() {
       </div>
 
       {/* Leyenda/caption — los tooltips de Leaflet solo existen en el DOM al
-          hacer hover, así que sin esto el nombre y % de 3 de las 5
-          delegaciones nunca aparecen como texto (accesibilidad/lectores de
+          hacer hover, así que sin esto el nombre y % de las 9 delegaciones
+          nunca aparecen como texto (accesibilidad/lectores de
           pantalla). Dobla como leyenda de color: cada punto usa el mismo
           ESTADO_COLOR que pinta su polígono. Se muestra siempre (no solo en
           "ready") porque viene de DEMO_DELEGACIONES, no del geojson. */}

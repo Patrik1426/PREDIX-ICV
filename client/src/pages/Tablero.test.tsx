@@ -65,6 +65,9 @@ describe("Tablero", () => {
 
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
   // Reactivar cuando se reintegre demoData.ts a esta página.
+  // Nota (2026-08-22): además, "Monterrey Centro" se renombró a "Monterrey" y su
+  // ocupación pasó de 86% a 91% (ver docs/superpowers/specs/2026-08-22-mapa-real-9-delegaciones-design.md)
+  // — al reactivar, esta aserción también necesita ese ajuste, no solo demoData.ts.
   it.skip("shows the delegación with the highest ocupación and links to Predicción y Asignación", async () => {
     await renderTablero();
     expect(screen.getAllByText("Monterrey Centro").length).toBeGreaterThan(0);
@@ -74,11 +77,9 @@ describe("Tablero", () => {
     );
   });
 
-  // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
-  // Reactivar cuando se reintegre demoData.ts a esta página.
-  it.skip("mounts the real DelegacionesMap inside the Comparativo por delegación section", async () => {
+  it("mounts the real DelegacionesMap inside the Comparativo por delegación section", async () => {
     await renderTablero();
-    const section = screen.getByText("Comparativo por delegación").closest("section");
+    const section = screen.getByText("Ocupación por Delegación").closest("section");
     expect(section?.querySelector(".leaflet-container")).not.toBeNull();
   });
 
@@ -101,6 +102,9 @@ describe("Tablero", () => {
 
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
   // Reactivar cuando se reintegre demoData.ts a esta página.
+  // Nota (2026-08-22): además, "Monterrey Centro" se renombró a "Monterrey" y su
+  // ocupación pasó de 86% a 91% (ver docs/superpowers/specs/2026-08-22-mapa-real-9-delegaciones-design.md)
+  // — al reactivar, esta aserción también necesita ese ajuste, no solo demoData.ts.
   it.skip("connects the statewide KPIs to delegaciones en estado saturado, without fabricating a per-delegación breakdown", async () => {
     await renderTablero();
     expect(screen.getByText(/Delegaciones en estado saturado/)).toBeInTheDocument();

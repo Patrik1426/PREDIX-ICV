@@ -1,5 +1,5 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Route, Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
 
@@ -17,7 +17,7 @@ vi.mock("@/lib/trpc", () => ({
 
 import PrediccionYAsignacion from "./PrediccionYAsignacion";
 
-function renderPage(accessibleModules: string[]) {
+async function renderPage(accessibleModules: string[]) {
   mockAccessibleModules = accessibleModules;
   const { hook } = memoryLocation({ path: "/modulos/prediccion_asignacion", static: true });
   render(
@@ -27,13 +27,28 @@ function renderPage(accessibleModules: string[]) {
       </Route>
     </Router>
   );
+  // PrediccionYAsignacion monta el DelegacionesMap real (tab "Mapa de Ocupación",
+  // activo por default) — mismo motivo que Tablero.test.tsx: sin esperar su
+  // asentamiento aquí, el setState posterior al fetch stubeado genera warnings de
+  // act() aunque las aserciones sigan pasando.
+  await waitFor(() => {
+    expect(screen.queryByTestId("delegaciones-map-loading")).not.toBeInTheDocument();
+  });
 }
 
 describe("PrediccionYAsignacion", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn(() => Promise.reject(new Error("fetch not stubbed"))));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
   // Reactivar cuando se reintegre demoData.ts a esta página.
-  it.skip("renders as a real top-level page — no 'vista previa'/module-numbering framing, but keeps the honest example-data badge", () => {
-    renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+  it.skip("renders as a real top-level page — no 'vista previa'/module-numbering framing, but keeps the honest example-data badge", async () => {
+    await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
     expect(screen.getByRole("heading", { name: "Predicción y Asignación", level: 1 })).toBeInTheDocument();
     // getAllByText, no getByText: la sección "Cómo funcionará" (matriz de
     // competencias) trae su propio badge "Datos de ejemplo" contextual,
@@ -45,16 +60,16 @@ describe("PrediccionYAsignacion", () => {
 
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
   // Reactivar cuando se reintegre demoData.ts a esta página.
-  it.skip("renders the real tabbed Predicción/Asignación demo", () => {
-    renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+  it.skip("renders the real tabbed Predicción/Asignación demo", async () => {
+    await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
     expect(screen.getByRole("tab", { name: /Predicción/ })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /Asignación/ })).toBeInTheDocument();
   });
 
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
   // Reactivar cuando se reintegre demoData.ts a esta página.
-  it.skip("keeps the 'Cómo funcionará' section with the real proposal content", () => {
-    renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+  it.skip("keeps the 'Cómo funcionará' section with the real proposal content", async () => {
+    await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
     expect(screen.getByText("Cómo funcionará")).toBeInTheDocument();
   });
 
@@ -73,24 +88,25 @@ describe("PrediccionYAsignacion", () => {
     expect(screen.queryByRole("heading", { name: "Predicción y Asignación" })).not.toBeInTheDocument();
   });
 
-  it("shows all 4 tabs when the role has both prediccion_demanda and asignador_ventanillas", () => {
-    renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+  it("shows all 4 tabs when the role has both prediccion_demanda and asignador_ventanillas", async () => {
+    await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
     expect(screen.getByRole("button", { name: "Mapa de Ocupación" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Demanda por Trámite" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Capacidad vs Demanda" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Escenarios" })).toBeInTheDocument();
+    expect(document.querySelector(".leaflet-container")).not.toBeNull();
   });
 
-  it("shows only the Predicción tabs when the role has only prediccion_demanda", () => {
-    renderPage(["prediccion_demanda"]);
+  it("shows only the Predicción tabs when the role has only prediccion_demanda", async () => {
+    await renderPage(["prediccion_demanda"]);
     expect(screen.getByRole("button", { name: "Mapa de Ocupación" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Demanda por Trámite" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Capacidad vs Demanda" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Escenarios" })).not.toBeInTheDocument();
   });
 
-  it("shows only Asignador tabs and defaults to Capacidad vs Demanda when the role has only asignador_ventanillas", () => {
-    renderPage(["asignador_ventanillas"]);
+  it("shows only Asignador tabs and defaults to Capacidad vs Demanda when the role has only asignador_ventanillas", async () => {
+    await renderPage(["asignador_ventanillas"]);
     expect(screen.queryByRole("button", { name: "Mapa de Ocupación" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Demanda por Trámite" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Capacidad vs Demanda" })).toBeInTheDocument();

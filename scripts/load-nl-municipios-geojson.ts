@@ -1,14 +1,14 @@
 // scripts/load-nl-municipios-geojson.ts
 /**
- * load-nl-municipios-geojson.ts — Descarga los polígonos reales de los 5
+ * load-nl-municipios-geojson.ts — Descarga los polígonos reales de los 9
  * municipios de Nuevo León que corresponden a las delegaciones demo
  * (DEMO_DELEGACIONES) desde el WFS público de INEGI (mismo servicio que usó
  * seguridad-edomex para Edomex, ver su scripts/load-municipios-geojson.ts).
  *
- * A diferencia de esa referencia, aquí solo se piden 5 municipios (no los 51
- * del estado) — el resultado ya es chico (158 KB sin simplificar, verificado
- * en la consulta de prueba del 2026-08-18), así que no se usa
- * @turf/simplify.
+ * A diferencia de esa referencia, aquí solo se piden 9 municipios (no los 51
+ * del estado) — el resultado ya es chico (~223 KB sin simplificar, verificado
+ * en la consulta real del 2026-08-22 tras extender de 5 a 9), así que no se
+ * usa @turf/simplify.
  *
  * Uso: pnpm exec tsx scripts/load-nl-municipios-geojson.ts
  */
