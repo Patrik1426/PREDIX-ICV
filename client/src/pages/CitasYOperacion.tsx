@@ -1,6 +1,6 @@
 import { Redirect } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { hasGroupAccess } from "@/lib/moduleGroups";
+import { hasGroupAccess, MODULE_GROUPS } from "@/lib/moduleGroups";
 import { useState } from "react";
 import {
   Monitor,
@@ -30,6 +30,8 @@ const S = {
 
 const SCENARIOS = ["Demanda Normal", "Hora Pico", "Temporada Alta"] as const;
 type Scenario = typeof SCENARIOS[number];
+
+const [SLUG_CITAS, SLUG_MONITOR] = MODULE_GROUPS.citas_operacion;
 
 const scenarioData: Record<Scenario, {
   espera: number;
@@ -383,19 +385,24 @@ export default function CitasYOperacion() {
   const [scenario, setScenario] = useState<Scenario>("Demanda Normal");
   const [showDialog, setShowDialog] = useState(false);
 
+  const modules = accessibleModules ?? [];
+  const puedeCitas = isLoading || modules.includes(SLUG_CITAS);
+  const puedeMonitor = isLoading || modules.includes(SLUG_MONITOR);
+
   if (!isLoading && !hasGroupAccess("citas_operacion", accessibleModules)) return <Redirect to="/" />;
 
   const d = scenarioData[scenario];
   const ringColor = d.queueRing >= 90 ? S.coral : d.queueRing >= 70 ? S.warn : S.ok;
 
   const kpis = [
-    { label: "TIEMPO ESPERA", value: `${d.espera} min`, color: d.espera > 20 ? S.coral : S.ok },
-    { label: "TIEMPO ATENCIÓN", value: `${d.atencion} min`, color: S.ink },
-    { label: "TRÁMITES / HORA", value: `${d.tramitosHora}`, color: S.brand },
-    { label: "OCUPACIÓN", value: `${d.ocupacion}%`, color: ringColor },
-    { label: "CITAS CUMPLIDAS", value: `${d.citasCumplidas}%`, color: d.citasCumplidas < 60 ? S.coral : S.warn },
-    { label: "ATENDIDOS HOY", value: d.atendidos.toLocaleString(), color: S.ink },
+    { label: "TIEMPO ESPERA", value: `${d.espera} min`, color: d.espera > 20 ? S.coral : S.ok, perm: SLUG_MONITOR },
+    { label: "TIEMPO ATENCIÓN", value: `${d.atencion} min`, color: S.ink, perm: SLUG_MONITOR },
+    { label: "TRÁMITES / HORA", value: `${d.tramitosHora}`, color: S.brand, perm: SLUG_MONITOR },
+    { label: "OCUPACIÓN", value: `${d.ocupacion}%`, color: ringColor, perm: SLUG_MONITOR },
+    { label: "CITAS CUMPLIDAS", value: `${d.citasCumplidas}%`, color: d.citasCumplidas < 60 ? S.coral : S.warn, perm: SLUG_CITAS },
+    { label: "ATENDIDOS HOY", value: d.atendidos.toLocaleString(), color: S.ink, perm: SLUG_MONITOR },
   ];
+  const visibleKpis = kpis.filter((k) => (k.perm === SLUG_CITAS ? puedeCitas : puedeMonitor));
 
   return (
     <>
@@ -451,14 +458,14 @@ export default function CitasYOperacion() {
 
         <div style={{ padding: "24px 40px", display: "flex", flexDirection: "column", gap: 24 }}>
           {/* KPI grid */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 12 }}>
-            {kpis.map((k) => (
-              <DenseKpi key={k.label} {...k} />
+          <div style={{ display: "grid", gridTemplateColumns: `repeat(${visibleKpis.length}, 1fr)`, gap: 12 }}>
+            {visibleKpis.map((k) => (
+              <DenseKpi key={k.label} label={k.label} value={k.value} color={k.color} />
             ))}
           </div>
 
           {/* Status ring + ventanillas */}
-          <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: puedeMonitor ? "240px 1fr" : "1fr", gap: 20 }}>
             {/* Ring */}
             <div
               style={{
@@ -474,124 +481,134 @@ export default function CitasYOperacion() {
                 boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               }}
             >
-              <StatusRing value={d.queueRing} color={ringColor} />
-              <div style={{ textAlign: "center" }}>
-                <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 28, color: ringColor, letterSpacing: "-0.03em", lineHeight: 1 }}>
-                  {d.enFila}
-                </div>
-                <div style={{ fontFamily: "var(--font-body)", fontSize: 12, color: S.muted, marginTop: 4 }}>
-                  ciudadanos en fila activa
-                </div>
-              </div>
-              <button
-                onClick={() => setShowDialog(true)}
-                style={{
-                  width: "100%",
-                  padding: "10px 0",
-                  background: S.brand,
-                  border: "none",
-                  borderRadius: 8,
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 600,
-                  fontSize: 12.5,
-                  color: "oklch(0.18 0.02 50)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 6,
-                  letterSpacing: "-0.01em",
-                }}
-              >
-                <Calendar size={13} />
-                Agendar cita
-              </button>
+              {puedeMonitor && (
+                <>
+                  <StatusRing value={d.queueRing} color={ringColor} />
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 28, color: ringColor, letterSpacing: "-0.03em", lineHeight: 1 }}>
+                      {d.enFila}
+                    </div>
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 12, color: S.muted, marginTop: 4 }}>
+                      ciudadanos en fila activa
+                    </div>
+                  </div>
+                </>
+              )}
+              {puedeCitas && (
+                <button
+                  onClick={() => setShowDialog(true)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 0",
+                    background: S.brand,
+                    border: "none",
+                    borderRadius: 8,
+                    fontFamily: "var(--font-body)",
+                    fontWeight: 600,
+                    fontSize: 12.5,
+                    color: "oklch(0.18 0.02 50)",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  <Calendar size={13} />
+                  Agendar cita
+                </button>
+              )}
             </div>
 
             {/* Ventanillas */}
+            {puedeMonitor && (
+              <div
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 12,
+                  padding: "18px 18px 20px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: S.ink, letterSpacing: "-0.01em" }}>
+                    Estado de Ventanillas
+                  </div>
+                  <div style={{ display: "flex", gap: 12 }}>
+                    {[["Activa", S.ok], ["Descanso", S.warn], ["Fuera", S.coral]].map(([l, c]) => (
+                      <div key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                        <div style={{ width: 6, height: 6, borderRadius: "50%", background: c }} />
+                        <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted, letterSpacing: "0.06em" }}>{l}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                  {ventanillas.map((v) => <VentanillaCard key={v.id} v={v} />)}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Upcoming appointments */}
+          {puedeCitas && (
             <div
               style={{
                 background: S.surface,
                 border: `1px solid ${S.border}`,
                 borderRadius: 12,
-                padding: "18px 18px 20px",
+                padding: "18px 20px",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                 <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: S.ink, letterSpacing: "-0.01em" }}>
-                  Estado de Ventanillas
+                  Próximas Citas — Hoy
                 </div>
-                <div style={{ display: "flex", gap: 12 }}>
-                  {[["Activa", S.ok], ["Descanso", S.warn], ["Fuera", S.coral]].map(([l, c]) => (
-                    <div key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: c }} />
-                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted, letterSpacing: "0.06em" }}>{l}</span>
-                    </div>
-                  ))}
-                </div>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.muted, letterSpacing: "0.06em" }}>21 AGO 2026</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-                {ventanillas.map((v) => <VentanillaCard key={v.id} v={v} />)}
-              </div>
-            </div>
-          </div>
-
-          {/* Upcoming appointments */}
-          <div
-            style={{
-              background: S.surface,
-              border: `1px solid ${S.border}`,
-              borderRadius: 12,
-              padding: "18px 20px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
-              <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 14, color: S.ink, letterSpacing: "-0.01em" }}>
-                Próximas Citas — Hoy
-              </div>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.muted, letterSpacing: "0.06em" }}>21 AGO 2026</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-              {[
-                { hora: "10:20", folio: "ICVNL-2026-84231", nombre: "María González", tramite: "Refrendo", del: "Monterrey Centro", status: "pending" },
-                { hora: "10:40", folio: "ICVNL-2026-84232", nombre: "Carlos Herrera", tramite: "Licencias", del: "Guadalupe", status: "confirmed" },
-                { hora: "11:00", folio: "ICVNL-2026-84233", nombre: "Ana Martínez", tramite: "Altas y Bajas", del: "Monterrey Centro", status: "confirmed" },
-                { hora: "11:20", folio: "ICVNL-2026-84234", nombre: "Pedro Reyes", tramite: "Ponlo a Tu Nombre", del: "Apodaca", status: "pending" },
-                { hora: "11:40", folio: "ICVNL-2026-84235", nombre: "Laura Torres", tramite: "Refrendo", del: "San Nicolás", status: "confirmed" },
-              ].map((apt, i) => (
-                <div
-                  key={apt.folio}
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "60px 140px 1fr 160px 100px 80px",
-                    gap: 12,
-                    padding: "10px 0",
-                    borderBottom: i < 4 ? `1px solid ${S.border}` : "none",
-                    alignItems: "center",
-                  }}
-                >
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: S.brand }}>{apt.hora}</span>
-                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.muted, letterSpacing: "0.03em" }}>{apt.folio}</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 12.5, color: S.ink, fontWeight: 500 }}>{apt.nombre}</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: S.muted }}>{apt.tramite}</span>
-                  <span style={{ fontFamily: "var(--font-body)", fontSize: 11.5, color: S.muted }}>{apt.del}</span>
-                  <span
+              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+                {[
+                  { hora: "10:20", folio: "ICVNL-2026-84231", nombre: "María González", tramite: "Refrendo", del: "Monterrey Centro", status: "pending" },
+                  { hora: "10:40", folio: "ICVNL-2026-84232", nombre: "Carlos Herrera", tramite: "Licencias", del: "Guadalupe", status: "confirmed" },
+                  { hora: "11:00", folio: "ICVNL-2026-84233", nombre: "Ana Martínez", tramite: "Altas y Bajas", del: "Monterrey Centro", status: "confirmed" },
+                  { hora: "11:20", folio: "ICVNL-2026-84234", nombre: "Pedro Reyes", tramite: "Ponlo a Tu Nombre", del: "Apodaca", status: "pending" },
+                  { hora: "11:40", folio: "ICVNL-2026-84235", nombre: "Laura Torres", tramite: "Refrendo", del: "San Nicolás", status: "confirmed" },
+                ].map((apt, i) => (
+                  <div
+                    key={apt.folio}
                     style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 9.5,
-                      color: apt.status === "confirmed" ? S.ok : S.warn,
-                      letterSpacing: "0.08em",
-                      textTransform: "uppercase",
+                      display: "grid",
+                      gridTemplateColumns: "60px 140px 1fr 160px 100px 80px",
+                      gap: 12,
+                      padding: "10px 0",
+                      borderBottom: i < 4 ? `1px solid ${S.border}` : "none",
+                      alignItems: "center",
                     }}
                   >
-                    {apt.status === "confirmed" ? "Confirmada" : "Pendiente"}
-                  </span>
-                </div>
-              ))}
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, fontWeight: 600, color: S.brand }}>{apt.hora}</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.muted, letterSpacing: "0.03em" }}>{apt.folio}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: 12.5, color: S.ink, fontWeight: 500 }}>{apt.nombre}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: 12, color: S.muted }}>{apt.tramite}</span>
+                    <span style={{ fontFamily: "var(--font-body)", fontSize: 11.5, color: S.muted }}>{apt.del}</span>
+                    <span
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: 9.5,
+                        color: apt.status === "confirmed" ? S.ok : S.warn,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {apt.status === "confirmed" ? "Confirmada" : "Pendiente"}
+                    </span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </>

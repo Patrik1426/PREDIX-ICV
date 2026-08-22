@@ -57,6 +57,36 @@ describe("CitasYOperacion", () => {
     expect(screen.getByText("Metas del panel")).toBeInTheDocument();
   });
 
+  it("shows all 6 KPIs, ring+Agendar cita together, and both blocks when the role has both citas and monitor", () => {
+    renderPage(["citas", "monitor"]);
+    expect(screen.getByText("TIEMPO ESPERA")).toBeInTheDocument();
+    expect(screen.getByText("CITAS CUMPLIDAS")).toBeInTheDocument();
+    expect(screen.getByText("ciudadanos en fila activa")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Agendar cita/ })).toBeInTheDocument();
+    expect(screen.getByText("Estado de Ventanillas")).toBeInTheDocument();
+    expect(screen.getByText("Próximas Citas — Hoy")).toBeInTheDocument();
+  });
+
+  it("shows only Citas Cumplidas, Agendar cita without the ring, and hides Ventanillas when the role has only citas", () => {
+    renderPage(["citas"]);
+    expect(screen.getByText("CITAS CUMPLIDAS")).toBeInTheDocument();
+    expect(screen.queryByText("TIEMPO ESPERA")).not.toBeInTheDocument();
+    expect(screen.queryByText("ciudadanos en fila activa")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Agendar cita/ })).toBeInTheDocument();
+    expect(screen.queryByText("Estado de Ventanillas")).not.toBeInTheDocument();
+    expect(screen.getByText("Próximas Citas — Hoy")).toBeInTheDocument();
+  });
+
+  it("shows the 5 monitor KPIs, the ring without Agendar cita, and hides Próximas Citas when the role has only monitor", () => {
+    renderPage(["monitor"]);
+    expect(screen.queryByText("CITAS CUMPLIDAS")).not.toBeInTheDocument();
+    expect(screen.getByText("TIEMPO ESPERA")).toBeInTheDocument();
+    expect(screen.getByText("ciudadanos en fila activa")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Agendar cita/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Estado de Ventanillas")).toBeInTheDocument();
+    expect(screen.queryByText("Próximas Citas — Hoy")).not.toBeInTheDocument();
+  });
+
   it("redirects home when the role has no access to either sub-module", () => {
     mockAccessibleModules = [];
     const { hook } = memoryLocation({ path: "/modulos/citas_operacion" });
