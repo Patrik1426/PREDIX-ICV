@@ -1,300 +1,735 @@
-// ============================================================
-// Propuesta — contenido original de la propuesta comercial (venta), movido
-// a /propuesta y ya no la landing post-login (eso es Tablero.tsx desde el
-// Task 6 de esta consolidación). Resume la propuesta: diagnóstico, los 5
-// módulos (enlazan a su vista previa en /modulos/:slug), arquitectura,
-// resultados esperados y fases. Cifras de "resultados esperados", "metas" y
-// "fases" vienen literalmente de docs/Propuesta PREDIX ICVNL Paco.docx —
-// no son mediciones del ICVNL.
-// ============================================================
+import { useEffect, useRef, ReactNode } from "react";
+import {
+  BrainCircuit,
+  CalendarClock,
+  MapPin,
+  BarChart3,
+  MessageSquare,
+  Server,
+  CheckCircle2,
+  ArrowRight,
+  Layers,
+  Cpu,
+  Database,
+  Globe,
+} from "lucide-react";
 
-import { useState } from "react";
-import { Link } from "wouter";
-import { trpc } from "@/lib/trpc";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { INSTITUTIONAL_ROLE_LABELS } from "@/lib/institutionalRoles";
-import { DEMO_DELEGACIONES, DEMO_DEMANDA_HORARIA, DEMO_KPIS } from "@/lib/demoData";
-import { DIAGNOSTICO, RESULTADOS_ESPERADOS, FASES, ARQUITECTURA_CAPAS, METAS_12_MESES } from "@/lib/proposalData";
-import { CarrilFlujo, DatoEjemplo, MetaDelProyecto, ForecastChart, BulletKpi } from "@/components/demo/DemoVisuals";
-import { Reveal } from "@/components/layout/Reveal";
-import { LineaCarril } from "@/components/layout/LineaCarril";
-import { SectionHeading } from "@/components/layout/SectionHeading";
-import { AlertTriangle, ChevronRight, ChevronDown, TrendingUp, DoorOpen, CalendarClock, Activity, MessageCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+const S = {
+  surface: "oklch(1 0 0)",
+  surface2: "oklch(0.95 0.008 50)",
+  surface3: "oklch(0.94 0.05 55)",
+  border: "oklch(0.91 0.006 50)",
+  brand: "oklch(0.70 0.17 54)",
+  coral: "oklch(0.58 0.20 28)",
+  ink: "oklch(0.22 0.01 50)",
+  muted: "oklch(0.48 0.01 50)",
+  ok: "oklch(0.62 0.14 145)",
+  warn: "oklch(0.75 0.15 75)",
+};
 
-// Congelado a propósito: contenido histórico/comercial de la propuesta
-// original (5 módulos), desacoplado por diseño de los MODULE_* del producto
-// ya construido (Task 7 de esta consolidación) — no se deriva de
-// moduleLabels.ts/moduleGroups.ts ni cambia si esos archivos cambian. Las
-// `ruta` de abajo sí son slugs de UI reales (@/lib/moduleGroups) y hay que
-// revisarlas a mano si las rutas del producto cambian — nada aquí lo hace
-// automático (ver moduleSlugConsistency.test.ts para las 4 dictionaries que
-// sí se auto-verifican; esta lista no es una de ellas).
-export const PROPUESTA_MODULOS = [
+const MTY_BG = "https://images.unsplash.com/photo-1580279982082-7392b4369815?w=1400&h=560&fit=crop&auto=format";
+
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) el.classList.add("in"); },
+      { threshold: 0.08 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
+
+function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+  const ref = useReveal();
+  return (
+    <div ref={ref} className="reveal" style={{ transitionDelay: `${delay}ms` }}>
+      {children}
+    </div>
+  );
+}
+
+const diagnostics = [
+  { label: "TIEMPO ESPERA ACTUAL", value: "34 min", color: "oklch(0.58 0.20 28)" },
+  { label: "TRÁMITES/HORA", value: "28", color: S.warn },
+  { label: "CITAS CUMPLIDAS", value: "51%", color: S.warn },
+  { label: "COSTO INEFICIENCIA", value: "$12.4M MXN/año", color: "oklch(0.58 0.20 28)" },
+];
+
+const modules = [
   {
-    nombre: "Motor de Predicción de Demanda",
-    descripcion: "Anticipa volumen y tipo de trámites por delegación, día y hora.",
-    ruta: "/modulos/prediccion_asignacion",
-    icon: <TrendingUp className="h-5 w-5" />,
-    accent: "text-chart-1",
+    num: "01",
+    title: "Predicción de Demanda",
+    icon: BrainCircuit,
+    desc: "Modelos de ML entrenados con datos históricos de ICVNL predicen el volumen de trámites por hora, delegación y tipo — con 48h de anticipación y precisión ≥96%.",
+    benefits: ["Anticipación de picos con 48h de aviso", "Precisión ≥96% en demanda horaria", "Modelo re-entrenado semanalmente"],
   },
   {
-    nombre: "Asignador Dinámico de Ventanillas",
-    descripcion: "Redistribuye ventanillas en tiempo real según la demanda.",
-    ruta: "/modulos/prediccion_asignacion",
-    icon: <DoorOpen className="h-5 w-5" />,
-    accent: "text-chart-1",
+    num: "02",
+    title: "Asignación Inteligente",
+    icon: Layers,
+    desc: "El motor de optimización distribuye la carga entre delegaciones en tiempo real, equilibrando capacidad instalada y demanda proyectada para eliminar colas innecesarias.",
+    benefits: ["Balanceo automático inter-delegación", "Reducción de tiempo de espera -40%", "Reglas configurables por autoridad"],
   },
   {
-    nombre: "Sistema de Citas Inteligente",
-    descripcion: "Agenda con optimización automática de carga por delegación.",
-    ruta: "/modulos/citas_operacion",
-    icon: <CalendarClock className="h-5 w-5" />,
-    accent: "text-chart-5",
+    num: "03",
+    title: "Citas y Operación",
+    icon: CalendarClock,
+    desc: "Sistema de agendamiento que distribuye citas según la curva de demanda predicha, evitando saturación en hora pico y dejando capacidad de reserva para urgencias.",
+    benefits: ["Citas distribuidas por curva predictiva", "Recordatorios automáticos SMS/email", "Cola virtual eliminando filas físicas"],
   },
   {
-    nombre: "Monitor de Operaciones en Tiempo Real",
-    descripcion: "KPIs operativos y alertas de saturación en tiempo real.",
-    ruta: "/modulos/citas_operacion",
-    icon: <Activity className="h-5 w-5" />,
-    accent: "text-chart-5",
+    num: "04",
+    title: "Mapa de Ocupación",
+    icon: MapPin,
+    desc: "Vista geoespacial del área metropolitana de Monterrey con niveles de saturación en tiempo real, alertas automáticas y redireccionamiento ciudadano inteligente.",
+    benefits: ["9 delegaciones del AMM en tiempo real", "Alertas push a ciudadanos", "Redirección automática cuando >85%"],
   },
   {
-    nombre: "Asistente Virtual",
-    descripcion: "Asistente conversacional para consultas ciudadanas.",
-    ruta: "/modulos/chatbot",
-    icon: <MessageCircle className="h-5 w-5" />,
-    accent: "text-chart-3",
+    num: "05",
+    title: "Asistente IA",
+    icon: MessageSquare,
+    desc: "Chatbot con LLM fine-tuned sobre datos operativos de ICVNL: responde consultas de estado, guía trámites, agenda citas y escala a humano cuando es necesario.",
+    benefits: ["Disponible 24/7 en web y app", "Integración con módulos de citas", "Escalado a agente humano sin fricción"],
   },
-] as const;
+];
+
+const archLayers = [
+  {
+    label: "PRESENTACIÓN",
+    color: S.brand,
+    items: ["Portal Ciudadano", "Panel Operativo ICVNL", "App Móvil (roadmap)", "Asistente Virtual"],
+  },
+  {
+    label: "SERVICIOS",
+    color: "#A78BFA",
+    items: ["API Gateway", "Microservicios REST/gRPC", "Motor de Predicción (Python/FastAPI)", "Scheduler de Citas"],
+  },
+  {
+    label: "DATOS",
+    color: S.warn,
+    items: ["Data Lake (GCP BigQuery)", "PostgreSQL Operativo", "Redis Cache", "Apache Kafka (streaming)"],
+  },
+  {
+    label: "INTEGRACIÓN",
+    color: S.ok,
+    items: ["REPUVE Webservice", "Registro Vehicular NL", "Portal Citas Online", "IoT Ventanillas (Fase 2)"],
+  },
+];
+
+const phases = [
+  {
+    num: "01",
+    name: "PILOTO",
+    duration: "Meses 1–4",
+    delegaciones: "2 delegaciones (Monterrey centro, Guadalupe)",
+    metas: [
+      "Validar precisión del modelo con datos reales",
+      "Integrar sistema de colas existente",
+      "KPIs baseline documentados",
+      "Capacitación del equipo operativo",
+    ],
+    status: "active",
+  },
+  {
+    num: "02",
+    name: "ZONA METRO",
+    duration: "Meses 5–9",
+    delegaciones: "9 delegaciones AMM completas",
+    metas: [
+      "Despliegue completo en área metropolitana",
+      "Sistema de citas en producción",
+      "Integración con app ciudadana",
+      "Reducción 40% tiempo de espera validada",
+    ],
+    status: "planned",
+  },
+  {
+    num: "03",
+    name: "ESTATAL",
+    duration: "Meses 10–18",
+    delegaciones: "Cobertura total Nuevo León",
+    metas: [
+      "Expansión a municipios del interior del estado",
+      "Integración completa REPUVE y Licencias",
+      "Asistente IA en producción",
+      "Modelo predictivo estacional calibrado",
+    ],
+    status: "planned",
+  },
+];
 
 export default function Propuesta() {
-  const [delegacionAbierta, setDelegacionAbierta] = useState<string | null>(null);
-  const { user } = useAuth();
-  const { data: profile } = trpc.auth.getUserProfile.useQuery();
-
-  const roleLabel = profile?.institutionalRole
-    ? INSTITUTIONAL_ROLE_LABELS[profile.institutionalRole] ?? profile.institutionalRole
-    : "";
-
   return (
-    <div className="container py-10 space-y-14">
-      {/* HERO — tesis del producto */}
-      <section className="space-y-6">
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-start">
-          <div className="space-y-5">
-            <p className="text-sm font-medium text-primary">
-              Hola, {(user?.name ?? profile?.name ?? "").split(" ")[0] || "de nuevo"}
-              {roleLabel ? ` · ${roleLabel}` : ""}
-            </p>
-            <h1 className="text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
-              Anticipar la fila,{" "}
-              <span className="text-primary">antes de que se forme.</span>
+    <div style={{ minHeight: "100%", paddingBottom: 60 }}>
+      {/* ── Hero ── */}
+      <section
+        style={{
+          position: "relative",
+          overflow: "hidden",
+          minHeight: 380,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          padding: "52px 56px",
+        }}
+      >
+        {/* Photo bg */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `url('${MTY_BG}')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center 40%",
+          }}
+        />
+        {/* Dark overlay */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "linear-gradient(135deg, rgba(9,9,11,0.92) 0%, rgba(9,9,11,0.70) 60%, rgba(9,9,11,0.85) 100%)",
+          }}
+        />
+        {/* Orange accent line top */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 3,
+            background: `linear-gradient(90deg, ${S.brand}, ${S.coral})`,
+          }}
+        />
+
+        <div style={{ position: "relative", zIndex: 1, maxWidth: 720 }}>
+          <Reveal>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: S.brand,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                marginBottom: 16,
+              }}
+            >
+              Propuesta Técnica · Instituto de Control Vehicular de Nuevo León
+            </div>
+          </Reveal>
+          <Reveal delay={60}>
+            <h1
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 800,
+                fontSize: 52,
+                lineHeight: 1.05,
+                color: S.ink,
+                letterSpacing: "-0.03em",
+                margin: "0 0 16px",
+              }}
+            >
+              Inteligencia Predictiva
+              <br />
+              <span style={{ color: S.brand }}>para el Control Vehicular</span>
+              <br />
+              de Nuevo León
             </h1>
-            <p className="max-w-md text-muted-foreground">
-              PREDIX-ICV combina predicción de demanda y asignación dinámica de
-              ventanillas para que cada delegación del ICVNL opere con la carga
-              justa, todos los días del año.
+          </Reveal>
+          <Reveal delay={120}>
+            <p
+              style={{
+                fontFamily: "var(--font-body)",
+                fontSize: 15,
+                color: "rgba(242,242,244,0.65)",
+                lineHeight: 1.65,
+                maxWidth: 560,
+                margin: 0,
+              }}
+            >
+              Plataforma de IA que predice demanda de trámites vehiculares con 48 horas
+              de anticipación, distribuye carga entre delegaciones automáticamente y reduce
+              el tiempo de espera ciudadano en un 40%.
             </p>
-
-            <div className="pt-1">
-              <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
-                <h2 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Real (demo) vs. meta del proyecto
-                </h2>
-                <DatoEjemplo />
-                <MetaDelProyecto />
-              </div>
-              <div className="space-y-4">
-                <BulletKpi label="Tiempo de espera" actual={DEMO_KPIS.tiempoEsperaPromedioMin} meta={METAS_12_MESES.tiempoEsperaMin} max={40} unidad=" min" />
-                <BulletKpi
-                  label="Trámites con cita previa"
-                  actual={DEMO_KPIS.tramitesConCitaPct}
-                  meta={METAS_12_MESES.tramitesConCitaPct}
-                  max={60}
-                  unidad="%"
-                  menorEsMejor={false}
-                />
-              </div>
-              <div className="mt-4 flex items-center gap-1.5 text-sm text-destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="font-semibold tabular-nums">{DEMO_KPIS.delegacionesEnAlerta}</span>
-                <span className="text-muted-foreground">delegación en alerta ahora mismo</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-card p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Ocupación por delegación</h2>
-              <DatoEjemplo />
-            </div>
-            <p className="mb-3 text-xs text-muted-foreground">Toca una delegación para ver su curva de demanda.</p>
-            <div className="space-y-1">
-              {DEMO_DELEGACIONES.map((d) => {
-                const abierta = delegacionAbierta === d.nombre;
-                const factor = 0.5 + d.ocupacion;
-                const curva = DEMO_DEMANDA_HORARIA.map((v) => Math.round(v * factor));
-                return (
-                  <div key={d.nombre} className="rounded-md -mx-2 px-2 py-1.5 hover:bg-muted/50">
-                    <button
-                      className="flex w-full items-center gap-2 text-left"
-                      onClick={() => setDelegacionAbierta(abierta ? null : d.nombre)}
-                      aria-expanded={abierta}
-                    >
-                      <ChevronDown className={cn("h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform", abierta && "rotate-180")} />
-                      <CarrilFlujo {...d} />
-                    </button>
-                    {abierta && (
-                      <div className="mt-2 pl-6">
-                        <p className="mb-1 text-[11px] text-muted-foreground">Demanda proyectada, {d.nombre}</p>
-                        <ForecastChart values={curva} nowIndex={9} className="h-14" />
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      <LineaCarril />
-
-      {/* DIAGNÓSTICO — ledger numerado, en el orden real del documento */}
-      <Reveal>
-        <section className="space-y-4">
-          <SectionHeading eyebrow="Diagnóstico" title="Por qué el ICVNL necesita esto">
-            Cinco problemas estructurales identificados en el diagnóstico de campo.
-          </SectionHeading>
-          <div>
-            {DIAGNOSTICO.map((item, i) => (
-              <div key={item.titulo} className={cn("flex gap-4 py-4", i !== 0 && "border-t")}>
-                <span className="w-7 shrink-0 text-2xl font-bold text-muted-foreground/25">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <div>
-                  <h3 className="font-semibold leading-tight">{item.titulo}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{item.detalle}</p>
-                </div>
-              </div>
-            ))}
+      {/* ── Diagnóstico ── */}
+      <section style={{ padding: "44px 56px 0" }}>
+        <Reveal>
+          <div style={{ marginBottom: 12 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: S.muted,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
+              Diagnóstico Actual
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 24,
+                color: S.ink,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              El problema que resolvemos
+            </h2>
           </div>
-        </section>
-      </Reveal>
-
-      {/* MÓDULOS — los 5 tal como los describe la propuesta original. El
-          producto construido los consolidó en 3 (ver el Tablero). */}
-      <Reveal>
-        <section className="space-y-4">
-          <SectionHeading eyebrow="Solución" title="5 módulos de la propuesta original">
-            Como se describieron en la propuesta técnica. Toca uno para ver su vista previa
-            en el producto ya consolidado.
-          </SectionHeading>
-
-          <div className="rounded-lg border">
-            {PROPUESTA_MODULOS.map((m, i) => (
-              <Link
-                key={m.nombre}
-                href={m.ruta}
-                className={cn(
-                  "group relative flex items-center gap-4 py-3.5 pl-4 pr-3 transition-colors hover:bg-muted/50",
-                  i !== 0 && "border-t"
-                )}
+        </Reveal>
+        <Reveal delay={60}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: 14,
+              marginTop: 20,
+            }}
+          >
+            {diagnostics.map((d) => (
+              <div
+                key={d.label}
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 12,
+                  padding: "20px 22px",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+                }}
               >
-                <span className={cn("w-6 shrink-0 text-sm font-bold tabular-nums", m.accent)}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className={cn("shrink-0", m.accent)}>{m.icon}</span>
-                <div className="min-w-0 flex-1">
-                  <h3 className="truncate font-semibold leading-tight">{m.nombre}</h3>
-                  <p className="truncate text-xs text-muted-foreground">{m.descripcion}</p>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 9.5,
+                    color: S.muted,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    marginBottom: 10,
+                  }}
+                >
+                  {d.label}
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            ))}
-          </div>
-        </section>
-      </Reveal>
-
-      {/* ARQUITECTURA */}
-      <Reveal>
-        <section className="space-y-4">
-          <SectionHeading eyebrow="Arquitectura" title="Cuatro capas de la plataforma">
-            De la interacción ciudadana al dato crudo.
-          </SectionHeading>
-          <div className="rounded-lg border">
-            {ARQUITECTURA_CAPAS.map((capa, i) => (
-              <div key={capa.nombre} className={cn("flex items-center gap-4 px-5 py-3.5", i !== 0 && "border-t")}>
-                <span className="w-4 shrink-0 text-center text-xs tabular-nums text-muted-foreground/50">{i + 1}</span>
-                <span className="w-32 shrink-0 text-sm font-semibold">{capa.nombre}</span>
-                <span className="text-sm text-muted-foreground">{capa.detalle}</span>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 700,
+                    fontSize: 28,
+                    color: d.color,
+                    letterSpacing: "-0.03em",
+                    lineHeight: 1,
+                  }}
+                >
+                  {d.value}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: 11.5,
+                    color: S.muted,
+                    marginTop: 6,
+                  }}
+                >
+                  estado actual sin PREDIX-ICV
+                </div>
               </div>
             ))}
           </div>
-        </section>
-      </Reveal>
+        </Reveal>
+      </section>
 
-      {/* RESULTADOS ESPERADOS — ledger, no tarjetas repetidas */}
-      <Reveal>
-        <section className="space-y-4">
-          <SectionHeading eyebrow="Impacto" title="Resultados esperados" action={<MetaDelProyecto />}>
-            Metas de la propuesta a 12 meses de operación — no son mediciones en vivo.
-          </SectionHeading>
-          <div className="overflow-x-auto rounded-lg border">
-            <table className="w-full min-w-[720px] text-left">
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  {RESULTADOS_ESPERADOS.map((r) => (
-                    <th key={r.metrica} className="whitespace-nowrap px-4 py-2.5 text-xs font-medium text-muted-foreground">
-                      {r.metrica}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b">
-                  {RESULTADOS_ESPERADOS.map((r) => (
-                    <td key={r.metrica} className="px-4 py-2 text-2xl font-bold tabular-nums text-primary">
-                      {r.cambio}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  {RESULTADOS_ESPERADOS.map((r) => (
-                    <td key={r.metrica} className="px-4 py-2.5 text-xs text-muted-foreground">
-                      {r.detalle}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
+      {/* ── 5 Modules ── */}
+      <section style={{ padding: "44px 56px 0" }}>
+        <Reveal>
+          <div style={{ marginBottom: 24 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: S.muted,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
+              Solución
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 24,
+                color: S.ink,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              5 Módulos Integrados
+            </h2>
           </div>
-        </section>
-      </Reveal>
+        </Reveal>
 
-      {/* FASES — carril con la línea de la marca, sí es una secuencia real */}
-      <Reveal>
-        <section className="space-y-4">
-          <SectionHeading eyebrow="Hoja de ruta" title="Fases de implementación">
-            Piloto → expansión → consolidación, con validación antes de escalar.
-          </SectionHeading>
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-            {FASES.map((fase, i) => (
-              <div key={fase.nombre}>
-                <div className="flex items-center gap-2">
-                  <span className="text-lg font-bold text-primary">{i + 1}</span>
-                  <LineaCarril className="flex-1" />
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {modules.map((m, i) => (
+            <Reveal key={m.num} delay={i * 60}>
+              <div
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 12,
+                  padding: "24px 28px",
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr auto",
+                  gap: 24,
+                  alignItems: "start",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+                }}
+              >
+                {/* Number + icon */}
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontWeight: 600,
+                      fontSize: 32,
+                      color: "rgba(255,130,1,0.35)",
+                      lineHeight: 1,
+                      letterSpacing: "-0.03em",
+                      minWidth: 42,
+                    }}
+                  >
+                    {m.num}
+                  </div>
+                  <div
+                    style={{
+                      width: 40,
+                      height: 40,
+                      background: "rgba(255,130,1,0.1)",
+                      borderRadius: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "1px solid rgba(255,130,1,0.2)",
+                    }}
+                  >
+                    <m.icon size={18} color={S.brand} />
+                  </div>
                 </div>
-                <h3 className="mt-2 font-semibold leading-tight">{fase.nombre}</h3>
-                <div className="text-xs text-muted-foreground">{fase.duracion}</div>
-                <p className="mt-2 text-sm">{fase.alcance}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{fase.entregable}</p>
+
+                {/* Content */}
+                <div>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-display)",
+                      fontWeight: 700,
+                      fontSize: 17,
+                      color: S.ink,
+                      letterSpacing: "-0.02em",
+                      marginBottom: 8,
+                    }}
+                  >
+                    {m.title}
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: 13.5,
+                      color: "oklch(0.22 0.01 50 / 0.65)",
+                      lineHeight: 1.6,
+                      margin: 0,
+                    }}
+                  >
+                    {m.desc}
+                  </p>
+                </div>
+
+                {/* Benefits */}
+                <div style={{ minWidth: 220 }}>
+                  {m.benefits.map((b) => (
+                    <div
+                      key={b}
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 7,
+                        marginBottom: 6,
+                      }}
+                    >
+                      <CheckCircle2
+                        size={12}
+                        color={S.ok}
+                        style={{ marginTop: 2, flexShrink: 0 }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: "var(--font-body)",
+                          fontSize: 12,
+                          color: S.muted,
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {b}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Architecture ── */}
+      <section style={{ padding: "44px 56px 0" }}>
+        <Reveal>
+          <div style={{ marginBottom: 24 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: S.muted,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
+              Arquitectura Técnica
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 24,
+                color: S.ink,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              Stack cloud-native, capas independientes
+            </h2>
+          </div>
+        </Reveal>
+        <Reveal delay={60}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+            {archLayers.map((layer) => (
+              <div
+                key={layer.label}
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderTop: `2px solid ${layer.color}`,
+                  borderRadius: 12,
+                  padding: "18px 18px 20px",
+                  boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 9.5,
+                    color: layer.color,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    marginBottom: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  {layer.label}
+                </div>
+                {layer.items.map((item) => (
+                  <div
+                    key={item}
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: 12,
+                      color: "oklch(0.22 0.01 50 / 0.7)",
+                      marginBottom: 7,
+                      paddingLeft: 10,
+                      borderLeft: `2px solid color-mix(in oklch, ${layer.color} 30%, transparent)`,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {item}
+                  </div>
+                ))}
               </div>
             ))}
           </div>
-        </section>
-      </Reveal>
+        </Reveal>
+      </section>
+
+      {/* ── Phases ── */}
+      <section style={{ padding: "44px 56px 0" }}>
+        <Reveal>
+          <div style={{ marginBottom: 28 }}>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: S.muted,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
+              Implementación
+            </div>
+            <h2
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 24,
+                color: S.ink,
+                letterSpacing: "-0.02em",
+                margin: 0,
+              }}
+            >
+              3 Fases de Despliegue
+            </h2>
+          </div>
+        </Reveal>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          {phases.map((phase, i) => (
+            <Reveal key={phase.num} delay={i * 80}>
+              <div
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${phase.status === "active" ? "rgba(255,130,1,0.35)" : S.border}`,
+                  borderRadius: 14,
+                  padding: "24px 24px 28px",
+                  position: "relative",
+                  overflow: "hidden",
+                  boxShadow:
+                    phase.status === "active"
+                      ? "0 4px 24px rgba(255,130,1,0.18)"
+                      : "0 2px 12px rgba(0,0,0,0.08)",
+                }}
+              >
+                {phase.status === "active" && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 14,
+                      right: 14,
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 9,
+                      color: S.brand,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      background: "rgba(255,130,1,0.12)",
+                      border: "1px solid rgba(255,130,1,0.25)",
+                      borderRadius: 6,
+                      padding: "3px 8px",
+                    }}
+                  >
+                    En curso
+                  </div>
+                )}
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontWeight: 600,
+                    fontSize: 40,
+                    color:
+                      phase.status === "active"
+                        ? "rgba(255,130,1,0.4)"
+                        : "rgba(0,0,0,0.06)",
+                    lineHeight: 1,
+                    letterSpacing: "-0.03em",
+                    marginBottom: 10,
+                  }}
+                >
+                  {phase.num}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 10,
+                    color: phase.status === "active" ? S.brand : S.muted,
+                    letterSpacing: "0.1em",
+                    textTransform: "uppercase",
+                    marginBottom: 4,
+                  }}
+                >
+                  {phase.name}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: 15,
+                    color: S.ink,
+                    letterSpacing: "-0.01em",
+                    marginBottom: 4,
+                  }}
+                >
+                  {phase.duration}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "var(--font-body)",
+                    fontSize: 12,
+                    color: S.muted,
+                    marginBottom: 18,
+                  }}
+                >
+                  {phase.delegaciones}
+                </div>
+
+                <div
+                  style={{
+                    height: 1,
+                    background: S.border,
+                    marginBottom: 14,
+                  }}
+                />
+
+                {phase.metas.map((m) => (
+                  <div
+                    key={m}
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      marginBottom: 8,
+                      alignItems: "flex-start",
+                    }}
+                  >
+                    <ArrowRight
+                      size={11}
+                      color={phase.status === "active" ? S.brand : S.muted}
+                      style={{ marginTop: 2, flexShrink: 0 }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: "var(--font-body)",
+                        fontSize: 12.5,
+                        color: "oklch(0.22 0.01 50 / 0.65)",
+                        lineHeight: 1.45,
+                      }}
+                    >
+                      {m}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
