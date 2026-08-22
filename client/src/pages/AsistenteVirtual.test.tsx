@@ -40,10 +40,11 @@ describe("AsistenteVirtual", () => {
     renderPage(["chatbot"]);
     expect(screen.getByRole("heading", { name: "Asistente Virtual", level: 1 })).toBeInTheDocument();
     // El layout de Preview Design (2026-08-21) le da a AsistenteChat su propio
-    // header con LlmReal, además del que ya pone esta página — el badge
-    // aparece 2 veces en pantalla (redundante mas no incorrecto). Se relaja a
-    // getAllByText en vez de asumir una sola instancia.
-    expect(screen.getAllByText("LLM real · Gemini").length).toBeGreaterThan(0);
+    // header con LlmReal — la página dejó de tener su propio badge duplicado
+    // (removido en el fix del mismo día) para que quede exactamente 1
+    // instancia. Aserción exacta a propósito: si alguien reintroduce el
+    // badge de página, este test debe volver a fallar.
+    expect(screen.getAllByText("LLM real · Gemini")).toHaveLength(1);
     expect(screen.queryByText("Vista previa interactiva")).not.toBeInTheDocument();
     expect(screen.queryByText(/Módulo 0/)).not.toBeInTheDocument();
   });

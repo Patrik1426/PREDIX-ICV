@@ -9,7 +9,7 @@
 import { Redirect } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { hasGroupAccess } from "@/lib/moduleGroups";
-import AsistenteChat, { LlmReal } from "@/components/AsistenteChat";
+import AsistenteChat from "@/components/AsistenteChat";
 
 export default function AsistenteVirtual() {
   const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
@@ -23,7 +23,6 @@ export default function AsistenteVirtual() {
           <h1 className="text-3xl font-bold tracking-tight">Asistente Virtual</h1>
           <p className="mt-1 text-muted-foreground">Resuelve dudas ciudadanas al instante, en lenguaje natural.</p>
         </div>
-        <LlmReal />
       </div>
 
       <AsistenteChat />
