@@ -15,6 +15,7 @@ import {
   Legend,
   CartesianGrid,
 } from "recharts";
+import DelegacionesMap from "@/components/demo/DelegacionesMap";
 
 const S = {
   surface: "oklch(1 0 0)",
@@ -58,18 +59,6 @@ const inactiveTabStyle = {
   color: S.muted,
   borderColor: S.border,
 };
-
-const municipios = [
-  { id: "garcia", name: "García", lvl: "ok", pct: 41, queue: 312 },
-  { id: "stacatarina", name: "Sta. Catarina", lvl: "warn", pct: 67, queue: 821 },
-  { id: "sanpedro", name: "San Pedro GG", lvl: "ok", pct: 38, queue: 284 },
-  { id: "escobedo", name: "Escobedo", lvl: "warn", pct: 72, queue: 934 },
-  { id: "monterrey", name: "Monterrey", lvl: "crit", pct: 91, queue: 2341 },
-  { id: "sannicolas", name: "San Nicolás", lvl: "warn", pct: 69, queue: 1102 },
-  { id: "apodaca", name: "Apodaca", lvl: "warn", pct: 63, queue: 801 },
-  { id: "guadalupe", name: "Guadalupe", lvl: "crit", pct: 84, queue: 1654 },
-  { id: "juarez", name: "Juárez", lvl: "ok", pct: 33, queue: 221 },
-];
 
 const tramites = [
   {
@@ -241,17 +230,15 @@ const ChartTooltip = ({ active, payload, label }: any) => {
 
 export default function PrediccionYAsignacion() {
   const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
-  // Los 2 useState de Preview Design se llaman aquí, antes del guard, en vez
-  // de después (como en la plantilla original del brief) — deben ejecutarse
-  // incondicionalmente en cada render. Si se llamaran después del `if` de
-  // abajo, la primera vez que este componente montado pasa de
-  // isLoading=true a isLoading=false+sin acceso, React llamaría MENOS hooks
-  // en ese render que en el anterior ("Rendered fewer hooks than expected"),
-  // violando las Rules of Hooks y tronando en producción para cualquier rol
-  // sin acceso — no solo en el test (el mock de trpc en el test nunca
-  // simula esa transición loading→loaded, así que no lo habría detectado).
+  // El useState de activeTab se llama aquí, antes del guard, en vez de después
+  // (como en la plantilla original del brief) — debe ejecutarse incondicionalmente
+  // en cada render. Si se llamara después del `if` de abajo, la primera vez que
+  // este componente montado pasa de isLoading=true a isLoading=false+sin acceso,
+  // React llamaría MENOS hooks en ese render que en el anterior ("Rendered fewer
+  // hooks than expected"), violando las Rules of Hooks y tronando en producción
+  // para cualquier rol sin acceso — no solo en el test (el mock de trpc en el
+  // test nunca simula esa transición loading→loaded, así que no lo habría detectado).
   const [activeTab, setActiveTab] = useState(0);
-  const [hoveredMuni, setHoveredMuni] = useState<string | null>(null);
 
 
   const puedePrediccion = isLoading || (accessibleModules ?? []).includes(SLUG_PREDICCION);
@@ -333,44 +320,7 @@ export default function PrediccionYAsignacion() {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
             <DenseCard>
               <SectionHeader label="AMM · Área Metro" title="Ocupación por Delegación" />
-              <div style={{ display: "flex", gap: 14, marginBottom: 14 }}>
-                {["Fluido", "Moderado", "Saturado"].map((l, i) => (
-                  <div key={l} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: [S.ok, S.warn, lvlColor.crit][i] }} />
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted, letterSpacing: "0.06em" }}>{l}</span>
-                  </div>
-                ))}
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
-                {municipios.map((m) => {
-                  const color = lvlColor[m.lvl];
-                  const isHov = hoveredMuni === m.id;
-                  return (
-                    <div
-                      key={m.id}
-                      onMouseEnter={() => setHoveredMuni(m.id)}
-                      onMouseLeave={() => setHoveredMuni(null)}
-                      style={{
-                        background: isHov ? withAlpha(color, 0.13) : withAlpha(color, 0.06),
-                        border: `1px solid ${withAlpha(color, isHov ? 0.33 : 0.15)}`,
-                        borderRadius: 8,
-                        padding: "11px 12px",
-                        cursor: "default",
-                        transition: "all 150ms",
-                        position: "relative",
-                      }}
-                    >
-                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 14, fontWeight: 600, color, marginBottom: 2 }}>
-                        {m.pct}%
-                      </div>
-                      <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: S.ink, fontWeight: 500 }}>{m.name}</div>
-                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted, marginTop: 2 }}>
-                        {m.queue.toLocaleString()} en fila
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <DelegacionesMap />
             </DenseCard>
 
             <DenseCard>
