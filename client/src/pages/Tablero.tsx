@@ -22,6 +22,7 @@ import {
   Wifi,
   Clock,
 } from "lucide-react";
+import DelegacionesMap from "@/components/demo/DelegacionesMap";
 
 /* ── tokens ── */
 const S = {
@@ -82,25 +83,6 @@ const weeklyData = [
 ];
 
 const lvlColor: Record<string, string> = { ok: "oklch(0.62 0.14 145)", warn: "oklch(0.75 0.15 75)", crit: "oklch(0.55 0.20 25)" };
-
-/* alpha helper — lvlColor/S values are oklch() strings now, so the old
-   hex "+ alpha suffix" concatenation trick (`${color}1A`) no longer
-   produces valid CSS. Insert an oklch alpha channel instead. */
-function withAlpha(oklch: string, alpha: number) {
-  return oklch.replace(/\)$/, ` / ${alpha})`);
-}
-
-const municipios = [
-  { id: "garcia", name: "García", lvl: "ok", pct: 41, queue: 312 },
-  { id: "stacatarina", name: "Sta. Catarina", lvl: "warn", pct: 67, queue: 821 },
-  { id: "sanpedro", name: "San Pedro GG", lvl: "ok", pct: 38, queue: 284 },
-  { id: "escobedo", name: "Escobedo", lvl: "warn", pct: 72, queue: 934 },
-  { id: "monterrey", name: "Monterrey", lvl: "crit", pct: 91, queue: 2_341 },
-  { id: "sannicolas", name: "San Nicolás", lvl: "warn", pct: 69, queue: 1_102 },
-  { id: "apodaca", name: "Apodaca", lvl: "warn", pct: 63, queue: 801 },
-  { id: "guadalupe", name: "Guadalupe", lvl: "crit", pct: 84, queue: 1_654 },
-  { id: "juarez", name: "Juárez", lvl: "ok", pct: 33, queue: 221 },
-];
 
 const kpis = [
   {
@@ -296,108 +278,6 @@ function KpiCard({ kpi }: { kpi: typeof kpis[0] }) {
       >
         {kpi.note}
       </span>
-    </div>
-  );
-}
-
-function MunicipioCard({ m, hovered, onHover }: {
-  m: typeof municipios[0];
-  hovered: string | null;
-  onHover: (id: string | null) => void;
-}) {
-  const color = lvlColor[m.lvl];
-  const isHovered = hovered === m.id;
-
-  return (
-    <div
-      onMouseEnter={() => onHover(m.id)}
-      onMouseLeave={() => onHover(null)}
-      style={{
-        background: isHovered
-          ? withAlpha(color, 0.10)
-          : withAlpha(color, 0.06),
-        border: `1px solid ${withAlpha(color, isHovered ? 0.33 : 0.16)}`,
-        borderRadius: 10,
-        padding: "12px 14px",
-        cursor: "default",
-        transition: "all 160ms",
-        position: "relative",
-      }}
-    >
-      <div
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: 9.5,
-          color,
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          marginBottom: 4,
-        }}
-      >
-        {m.pct}% ocup.
-      </div>
-      <div
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 600,
-          fontSize: 12.5,
-          color: S.ink,
-          lineHeight: 1.2,
-        }}
-      >
-        {m.name}
-      </div>
-      {isHovered && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: "calc(100% + 6px)",
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: S.surface3,
-            border: `1px solid ${S.border}`,
-            borderRadius: 8,
-            padding: "8px 12px",
-            zIndex: 20,
-            whiteSpace: "nowrap",
-            boxShadow: "0 8px 24px rgba(0,0,0,0.14)",
-          }}
-        >
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              color: S.muted,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              marginBottom: 4,
-            }}
-          >
-            {m.name}
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontWeight: 600,
-              fontSize: 13,
-              color,
-            }}
-          >
-            {m.queue.toLocaleString()} ciudadanos en espera
-          </div>
-          <div
-            style={{
-              fontFamily: "var(--font-mono)",
-              fontSize: 10,
-              color: S.muted,
-              marginTop: 2,
-            }}
-          >
-            Ocupación: {m.pct}% ·{" "}
-            {m.lvl === "ok" ? "Fluido" : m.lvl === "warn" ? "Moderado" : "Saturado"}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -642,31 +522,9 @@ export default function Tablero() {
               >
                 Ocupación por Delegación
               </div>
-              <div style={{ display: "flex", gap: 14, marginTop: 8 }}>
-                {[
-                  { label: "Fluido", color: S.ok },
-                  { label: "Moderado", color: S.warn },
-                  { label: "Saturado", color: S.coral },
-                ].map((l) => (
-                  <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                    <div style={{ width: 7, height: 7, borderRadius: "50%", background: l.color }} />
-                    <span
-                      style={{
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 9.5,
-                        color: S.muted,
-                        letterSpacing: "0.06em",
-                      }}
-                    >
-                      {l.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {/* 3x3 grid */}
-            <MunicipioGrid />
+            <DelegacionesMap />
           </div>
         </Reveal>
 
@@ -875,26 +733,6 @@ export default function Tablero() {
           </button>
         </div>
       </section>
-    </div>
-  );
-}
-
-/* ── municipio grid extracted to fix closure issue ── */
-function MunicipioGrid() {
-  const hovered = useRef<string | null>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-
-  return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, 1fr)",
-        gap: 8,
-      }}
-    >
-      {municipios.map((m) => (
-        <MunicipioCard key={m.id} m={m} hovered={hoveredId} onHover={setHoveredId} />
-      ))}
     </div>
   );
 }
