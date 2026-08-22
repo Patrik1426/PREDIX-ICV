@@ -46,16 +46,15 @@ const [SLUG_CITAS, SLUG_MONITOR] = MODULE_GROUPS.citas_operacion;
 const scenarioData: Record<Scenario, {
   espera: number;
   atencion: number;
-  tramitosHora: number;
   ocupacion: number;
   citasCumplidas: number;
   enFila: number;
   atendidos: number;
   queueRing: number;
 }> = {
-  "Demanda Normal": { espera: 12, atencion: 9, tramitosHora: 47, ocupacion: 67, citasCumplidas: 78, enFila: 124, atendidos: 4312, queueRing: 67 },
-  "Hora Pico": { espera: 34, atencion: 11, tramitosHora: 62, ocupacion: 88, citasCumplidas: 58, enFila: 287, atendidos: 2180, queueRing: 88 },
-  "Temporada Alta": { espera: 51, atencion: 14, tramitosHora: 71, ocupacion: 96, citasCumplidas: 41, enFila: 412, atendidos: 1640, queueRing: 96 },
+  "Demanda Normal": { espera: 12, atencion: 9, ocupacion: 67, citasCumplidas: 78, enFila: 124, atendidos: 4312, queueRing: 67 },
+  "Hora Pico": { espera: 34, atencion: 11, ocupacion: 88, citasCumplidas: 58, enFila: 287, atendidos: 2180, queueRing: 88 },
+  "Temporada Alta": { espera: 51, atencion: 14, ocupacion: 96, citasCumplidas: 41, enFila: 412, atendidos: 1640, queueRing: 96 },
 };
 
 type CitaListItem = {
@@ -407,7 +406,7 @@ function AppointmentDialog({ onClose, onConfirm }: { onClose: () => void; onConf
             </div>
             <div style={{ fontFamily: "var(--font-body)", fontSize: 13, color: S.muted, lineHeight: 1.6, marginBottom: 20 }}>
               Tu cita fue registrada para el 3 sep 2026 a las 10:20 AM en {form.delegacion}.
-              <br />Recibirás confirmación por SMS.
+              <br />Simulación de demostración — no se guarda ni se envía ningún SMS.
             </div>
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: S.brand, letterSpacing: "0.06em" }}>
               FOLIO: {folio}
@@ -424,7 +423,7 @@ function AppointmentDialog({ onClose, onConfirm }: { onClose: () => void; onConf
 
 export default function CitasYOperacion() {
   const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
-  // Los 2 useState de Preview Design se llaman aquí, antes del guard, en vez
+  // Los hooks de estado/efecto se llaman aquí, antes del guard, en vez
   // de después (como en la plantilla original del brief) — deben ejecutarse
   // incondicionalmente en cada render. Si se llamaran después del `if` de
   // abajo, la primera vez que este componente montado pasa de

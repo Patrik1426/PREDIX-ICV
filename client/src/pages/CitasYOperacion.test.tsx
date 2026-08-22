@@ -1,5 +1,5 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Route, Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
 
@@ -30,6 +30,10 @@ function renderPage(accessibleModules: string[]) {
 }
 
 describe("CitasYOperacion", () => {
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-21-port-preview-figma-design.md.
   // Reactivar cuando se reintegre demoData.ts a esta página.
   it.skip("renders as a real top-level page — no 'vista previa'/module-numbering framing, but keeps the honest example-data badge", () => {
@@ -104,8 +108,15 @@ describe("CitasYOperacion", () => {
 
   it("marking an active ventanilla fuera de servicio flips its label to Reactivar", () => {
     renderPage(["citas", "monitor"]);
+    expect(screen.getAllByRole("button", { name: "Marcar fuera de servicio" })).toHaveLength(6);
+    expect(screen.getAllByRole("button", { name: "Reactivar" })).toHaveLength(1);
+
     fireEvent.click(screen.getAllByRole("button", { name: "Marcar fuera de servicio" })[0]);
-    expect(screen.getAllByRole("button", { name: "Reactivar" }).length).toBeGreaterThan(0);
+
+    expect(screen.getAllByRole("button", { name: "Marcar fuera de servicio" })).toHaveLength(5);
+    expect(screen.getAllByRole("button", { name: "Reactivar" })).toHaveLength(2);
+    // V-01 (atendidos: 9) sale del conteo de inmediato: 47 - 9 = 38.
+    expect(screen.getByText("38")).toBeInTheDocument();
   });
 
   it("TRÁMITES / HORA starts at the real sum of atendidos across active ventanillas (47)", () => {
@@ -125,7 +136,6 @@ describe("CitasYOperacion", () => {
 
     expect(screen.queryByText("47")).not.toBeInTheDocument();
     expect(screen.getByText("48")).toBeInTheDocument();
-    vi.useRealTimers();
   });
 
   it("scheduling a test cita adds it to Próximas Citas — Hoy as Confirmada", () => {
@@ -136,7 +146,11 @@ describe("CitasYOperacion", () => {
     fireEvent.click(screen.getByRole("button", { name: "Revisar cita →" }));
     fireEvent.click(screen.getByRole("button", { name: "Confirmar cita" }));
 
-    expect(screen.getByText(/Prueba Demo/)).toBeInTheDocument();
+    const filas = screen.getAllByText(/Prueba Demo|María González|Carlos Herrera/);
+    expect(filas[0]).toHaveTextContent("Prueba Demo");
+    // La nueva fila (no cualquier otra fila base con el mismo trámite) capturó "Refrendo".
+    expect(filas[0].parentElement).toHaveTextContent("Refrendo");
+    expect(screen.getAllByText("Confirmada").length).toBeGreaterThan(0);
   });
 
   it("the confirmed folio stays stable even if the page re-renders while the dialog is open", () => {
