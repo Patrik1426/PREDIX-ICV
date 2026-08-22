@@ -127,4 +127,29 @@ describe("CitasYOperacion", () => {
     expect(screen.getByText("48")).toBeInTheDocument();
     vi.useRealTimers();
   });
+
+  it("scheduling a test cita adds it to Próximas Citas — Hoy as Confirmada", () => {
+    renderPage(["citas", "monitor"]);
+
+    fireEvent.click(screen.getByRole("button", { name: /Agendar cita/ }));
+    fireEvent.change(screen.getByPlaceholderText("Ej. Juan García Martínez"), { target: { value: "Prueba Demo" } });
+    fireEvent.click(screen.getByRole("button", { name: "Revisar cita →" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar cita" }));
+
+    expect(screen.getByText(/Prueba Demo/)).toBeInTheDocument();
+  });
+
+  it("the confirmed folio stays stable even if the page re-renders while the dialog is open", () => {
+    renderPage(["citas", "monitor"]);
+
+    fireEvent.click(screen.getByRole("button", { name: /Agendar cita/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Revisar cita →" }));
+    fireEvent.click(screen.getByRole("button", { name: "Confirmar cita" }));
+
+    const folioTexto = screen.getByText(/FOLIO: ICVNL-2026-/).textContent;
+    // Forzar un re-render del árbol (mismo tipo de disparo que el tick en
+    // vivo de las ventanillas produciría) — el folio mostrado no debe cambiar.
+    fireEvent.click(screen.getByRole("button", { name: "Hora Pico" }));
+    expect(screen.getByText(/FOLIO: ICVNL-2026-/).textContent).toBe(folioTexto);
+  });
 });

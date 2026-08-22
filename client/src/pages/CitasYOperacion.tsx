@@ -58,6 +58,23 @@ const scenarioData: Record<Scenario, {
   "Temporada Alta": { espera: 51, atencion: 14, tramitosHora: 71, ocupacion: 96, citasCumplidas: 41, enFila: 412, atendidos: 1640, queueRing: 96 },
 };
 
+type CitaListItem = {
+  hora: string;
+  folio: string;
+  nombre: string;
+  tramite: string;
+  del: string;
+  status: "pending" | "confirmed";
+};
+
+const proximasCitasBase: CitaListItem[] = [
+  { hora: "10:20", folio: "ICVNL-2026-84231", nombre: "María González", tramite: "Refrendo", del: "Monterrey Centro", status: "pending" },
+  { hora: "10:40", folio: "ICVNL-2026-84232", nombre: "Carlos Herrera", tramite: "Licencias", del: "Guadalupe", status: "confirmed" },
+  { hora: "11:00", folio: "ICVNL-2026-84233", nombre: "Ana Martínez", tramite: "Altas y Bajas", del: "Monterrey Centro", status: "confirmed" },
+  { hora: "11:20", folio: "ICVNL-2026-84234", nombre: "Pedro Reyes", tramite: "Ponlo a Tu Nombre", del: "Apodaca", status: "pending" },
+  { hora: "11:40", folio: "ICVNL-2026-84235", nombre: "Laura Torres", tramite: "Refrendo", del: "San Nicolás", status: "confirmed" },
+];
+
 const ventanillasIniciales: Ventanilla[] = [
   { id: "V-01", name: "Ventanilla 01", agent: "L. Martínez", tramite: "Refrendo", status: "active", wait: 8, atendidos: 9 },
   { id: "V-02", name: "Ventanilla 02", agent: "R. Garza", tramite: "Licencias", status: "active", wait: 12, atendidos: 6 },
@@ -221,9 +238,10 @@ function DenseKpi({ label, value, color, trend, sub }: {
   );
 }
 
-function AppointmentDialog({ onClose }: { onClose: () => void }) {
+function AppointmentDialog({ onClose, onConfirm }: { onClose: () => void; onConfirm: (cita: CitaListItem) => void }) {
   const [step, setStep] = useState<"form" | "confirm" | "done">("form");
   const [form, setForm] = useState({ nombre: "", tramite: "Refrendo", delegacion: "Monterrey Centro", fecha: "" });
+  const [folio] = useState(() => `ICVNL-2026-${Math.floor(Math.random() * 90000 + 10000)}`);
 
   return (
     <div
@@ -367,7 +385,10 @@ function AppointmentDialog({ onClose }: { onClose: () => void }) {
                 ← Editar
               </button>
               <button
-                onClick={() => setStep("done")}
+                onClick={() => {
+                  onConfirm({ hora: "10:20", folio, nombre: form.nombre || "Juan García Martínez", tramite: form.tramite, del: form.delegacion, status: "confirmed" });
+                  setStep("done");
+                }}
                 style={{ flex: 2, padding: "11px 0", background: S.brand, border: "none", borderRadius: 9, fontFamily: "var(--font-body)", fontWeight: 600, fontSize: 13.5, color: "oklch(0.18 0.02 50)", cursor: "pointer" }}
               >
                 Confirmar cita
@@ -389,7 +410,7 @@ function AppointmentDialog({ onClose }: { onClose: () => void }) {
               <br />Recibirás confirmación por SMS.
             </div>
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: S.brand, letterSpacing: "0.06em" }}>
-              FOLIO: ICVNL-2026-{Math.floor(Math.random() * 90000 + 10000)}
+              FOLIO: {folio}
             </div>
             <button onClick={onClose} style={{ marginTop: 20, width: "100%", padding: "11px 0", background: S.surface3, border: `1px solid ${S.border}`, borderRadius: 9, fontFamily: "var(--font-body)", fontSize: 13, color: S.ink, cursor: "pointer" }}>
               Cerrar
@@ -416,6 +437,7 @@ export default function CitasYOperacion() {
   const [showDialog, setShowDialog] = useState(false);
   const [ventanillas, setVentanillas] = useState<Ventanilla[]>(() => ventanillasIniciales.map((v) => ({ ...v })));
   const [tick, setTick] = useState(0);
+  const [citasSimuladas, setCitasSimuladas] = useState<CitaListItem[]>([]);
 
   useEffect(() => {
     const id = setInterval(() => setTick((t) => t + 1), 2200);
@@ -457,7 +479,12 @@ export default function CitasYOperacion() {
 
   return (
     <>
-      {showDialog && <AppointmentDialog onClose={() => setShowDialog(false)} />}
+      {showDialog && (
+        <AppointmentDialog
+          onClose={() => setShowDialog(false)}
+          onConfirm={(cita) => setCitasSimuladas((cs) => [cita, ...cs])}
+        />
+      )}
 
       <div style={{ minHeight: "100%", paddingBottom: 48 }}>
         {/* Header */}
@@ -621,13 +648,7 @@ export default function CitasYOperacion() {
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.muted, letterSpacing: "0.06em" }}>21 AGO 2026</span>
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-                {[
-                  { hora: "10:20", folio: "ICVNL-2026-84231", nombre: "María González", tramite: "Refrendo", del: "Monterrey Centro", status: "pending" },
-                  { hora: "10:40", folio: "ICVNL-2026-84232", nombre: "Carlos Herrera", tramite: "Licencias", del: "Guadalupe", status: "confirmed" },
-                  { hora: "11:00", folio: "ICVNL-2026-84233", nombre: "Ana Martínez", tramite: "Altas y Bajas", del: "Monterrey Centro", status: "confirmed" },
-                  { hora: "11:20", folio: "ICVNL-2026-84234", nombre: "Pedro Reyes", tramite: "Ponlo a Tu Nombre", del: "Apodaca", status: "pending" },
-                  { hora: "11:40", folio: "ICVNL-2026-84235", nombre: "Laura Torres", tramite: "Refrendo", del: "San Nicolás", status: "confirmed" },
-                ].map((apt, i) => (
+                {[...citasSimuladas, ...proximasCitasBase].map((apt, i, arr) => (
                   <div
                     key={apt.folio}
                     style={{
@@ -635,7 +656,7 @@ export default function CitasYOperacion() {
                       gridTemplateColumns: "60px 140px 1fr 160px 100px 80px",
                       gap: 12,
                       padding: "10px 0",
-                      borderBottom: i < 4 ? `1px solid ${S.border}` : "none",
+                      borderBottom: i < arr.length - 1 ? `1px solid ${S.border}` : "none",
                       alignItems: "center",
                     }}
                   >
