@@ -72,4 +72,29 @@ describe("PrediccionYAsignacion", () => {
     expect(screen.getByText("redirected home")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Predicción y Asignación" })).not.toBeInTheDocument();
   });
+
+  it("shows all 4 tabs when the role has both prediccion_demanda and asignador_ventanillas", () => {
+    renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+    expect(screen.getByRole("button", { name: "Mapa de Ocupación" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Demanda por Trámite" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Capacidad vs Demanda" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Escenarios" })).toBeInTheDocument();
+  });
+
+  it("shows only the Predicción tabs when the role has only prediccion_demanda", () => {
+    renderPage(["prediccion_demanda"]);
+    expect(screen.getByRole("button", { name: "Mapa de Ocupación" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Demanda por Trámite" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Capacidad vs Demanda" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Escenarios" })).not.toBeInTheDocument();
+  });
+
+  it("shows only Asignador tabs and defaults to Capacidad vs Demanda when the role has only asignador_ventanillas", () => {
+    renderPage(["asignador_ventanillas"]);
+    expect(screen.queryByRole("button", { name: "Mapa de Ocupación" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Demanda por Trámite" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Capacidad vs Demanda" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Escenarios" })).toBeInTheDocument();
+    expect(screen.getByText("Capacidad Instalada vs. Demanda Horaria")).toBeInTheDocument();
+  });
 });

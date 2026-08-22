@@ -1,7 +1,7 @@
 import { Redirect } from "wouter";
 import { trpc } from "@/lib/trpc";
-import { hasGroupAccess } from "@/lib/moduleGroups";
-import { useState } from "react";
+import { hasGroupAccess, MODULE_GROUPS } from "@/lib/moduleGroups";
+import { useEffect, useState } from "react";
 import {
   AreaChart,
   Area,
@@ -46,6 +46,8 @@ function withAlpha(color: string, alpha: number) {
 }
 
 const TABS = ["Mapa de Ocupación", "Demanda por Trámite", "Capacidad vs Demanda", "Escenarios"];
+const [SLUG_PREDICCION, SLUG_ASIGNADOR] = MODULE_GROUPS.prediccion_asignacion;
+const TAB_PERMISSION = [SLUG_PREDICCION, SLUG_PREDICCION, SLUG_ASIGNADOR, SLUG_ASIGNADOR];
 const activeTabStyle = {
   background: "rgba(255,130,1,0.11)",
   color: S.brand,
@@ -251,6 +253,19 @@ export default function PrediccionYAsignacion() {
   const [activeTab, setActiveTab] = useState(0);
   const [hoveredMuni, setHoveredMuni] = useState<string | null>(null);
 
+  const modules = accessibleModules ?? [];
+  const visibleTabIndices = isLoading
+    ? TABS.map((_, i) => i)
+    : TABS.map((_, i) => i).filter((i) => modules.includes(TAB_PERMISSION[i]));
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!visibleTabIndices.includes(activeTab) && visibleTabIndices.length > 0) {
+      setActiveTab(visibleTabIndices[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoading, accessibleModules]);
+
   if (!isLoading && !hasGroupAccess("prediccion_asignacion", accessibleModules)) return <Redirect to="/" />;
 
   return (
@@ -293,25 +308,27 @@ export default function PrediccionYAsignacion() {
         {/* Tabs */}
         <div style={{ display: "flex", gap: 6 }}>
           {TABS.map((tab, i) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(i)}
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: 12.5,
-                fontWeight: i === activeTab ? 600 : 400,
-                padding: "8px 16px",
-                borderRadius: "8px 8px 0 0",
-                border: `1px solid`,
-                borderBottom: "none",
-                cursor: "pointer",
-                transition: "all 140ms",
-                letterSpacing: "-0.01em",
-                ...(i === activeTab ? activeTabStyle : inactiveTabStyle),
-              }}
-            >
-              {tab}
-            </button>
+            visibleTabIndices.includes(i) ? (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(i)}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: 12.5,
+                  fontWeight: i === activeTab ? 600 : 400,
+                  padding: "8px 16px",
+                  borderRadius: "8px 8px 0 0",
+                  border: `1px solid`,
+                  borderBottom: "none",
+                  cursor: "pointer",
+                  transition: "all 140ms",
+                  letterSpacing: "-0.01em",
+                  ...(i === activeTab ? activeTabStyle : inactiveTabStyle),
+                }}
+              >
+                {tab}
+              </button>
+            ) : null
           ))}
         </div>
       </div>
