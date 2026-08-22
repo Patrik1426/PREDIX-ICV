@@ -1,7 +1,7 @@
 import { Redirect } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { hasGroupAccess, MODULE_GROUPS } from "@/lib/moduleGroups";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AreaChart,
   Area,
@@ -253,19 +253,12 @@ export default function PrediccionYAsignacion() {
   const [activeTab, setActiveTab] = useState(0);
   const [hoveredMuni, setHoveredMuni] = useState<string | null>(null);
 
-  const modules = accessibleModules ?? [];
-  const visibleTabIndices = isLoading
-    ? TABS.map((_, i) => i)
-    : TABS.map((_, i) => i).filter((i) => modules.includes(TAB_PERMISSION[i]));
 
-  useEffect(() => {
-    if (isLoading) return;
-    if (!visibleTabIndices.includes(activeTab) && visibleTabIndices.length > 0) {
-      setActiveTab(visibleTabIndices[0]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoading, accessibleModules]);
-
+  const puedePrediccion = isLoading || (accessibleModules ?? []).includes(SLUG_PREDICCION);
+  const puedeAsignador = isLoading || (accessibleModules ?? []).includes(SLUG_ASIGNADOR);
+  const visibleTabIndices = TABS.map((_, i) => i)
+    .filter((i) => (TAB_PERMISSION[i] === SLUG_PREDICCION ? puedePrediccion : puedeAsignador));
+  const effectiveTab = visibleTabIndices.includes(activeTab) ? activeTab : visibleTabIndices[0] ?? 0;
   if (!isLoading && !hasGroupAccess("prediccion_asignacion", accessibleModules)) return <Redirect to="/" />;
 
   return (
@@ -315,7 +308,7 @@ export default function PrediccionYAsignacion() {
                 style={{
                   fontFamily: "var(--font-body)",
                   fontSize: 12.5,
-                  fontWeight: i === activeTab ? 600 : 400,
+                  fontWeight: i === effectiveTab ? 600 : 400,
                   padding: "8px 16px",
                   borderRadius: "8px 8px 0 0",
                   border: `1px solid`,
@@ -323,7 +316,7 @@ export default function PrediccionYAsignacion() {
                   cursor: "pointer",
                   transition: "all 140ms",
                   letterSpacing: "-0.01em",
-                  ...(i === activeTab ? activeTabStyle : inactiveTabStyle),
+                  ...(i === effectiveTab ? activeTabStyle : inactiveTabStyle),
                 }}
               >
                 {tab}
@@ -336,7 +329,7 @@ export default function PrediccionYAsignacion() {
       {/* Content */}
       <div style={{ padding: "28px 40px" }}>
         {/* Tab 0: Mapa */}
-        {activeTab === 0 && (
+        {effectiveTab === 0 && (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
             <DenseCard>
               <SectionHeader label="AMM · Área Metro" title="Ocupación por Delegación" />
@@ -416,7 +409,7 @@ export default function PrediccionYAsignacion() {
         )}
 
         {/* Tab 1: Trámites */}
-        {activeTab === 1 && (
+        {effectiveTab === 1 && (
           <div>
             <SectionHeader label="Desglose" title="Demanda por Tipo de Trámite" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
@@ -473,7 +466,7 @@ export default function PrediccionYAsignacion() {
         )}
 
         {/* Tab 2: Capacidad */}
-        {activeTab === 2 && (
+        {effectiveTab === 2 && (
           <div>
             <SectionHeader label="Análisis Operativo" title="Capacidad Instalada vs. Demanda Horaria" />
             <DenseCard>
@@ -524,7 +517,7 @@ export default function PrediccionYAsignacion() {
         )}
 
         {/* Tab 3: Scenarios */}
-        {activeTab === 3 && (
+        {effectiveTab === 3 && (
           <div>
             <SectionHeader label="Análisis Comparativo" title="3 Escenarios de Carga" />
             <DenseCard>
