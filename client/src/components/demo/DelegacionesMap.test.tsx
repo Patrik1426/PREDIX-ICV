@@ -15,7 +15,7 @@ const FAKE_GEOJSON = {
     },
     {
       type: "Feature",
-      properties: { cveMuni: "19026", nombre: "Guadalupe" },
+      properties: { cveMuni: "19019", nombre: "San Pedro Garza García" },
       geometry: {
         type: "Polygon",
         coordinates: [[[-100.25, 25.67], [-100.24, 25.67], [-100.24, 25.68], [-100.25, 25.68], [-100.25, 25.67]]],
@@ -42,9 +42,9 @@ describe("DelegacionesMap", () => {
       expect(container.querySelectorAll(".leaflet-interactive")).toHaveLength(2);
     });
     const paths = Array.from(container.querySelectorAll(".leaflet-interactive"));
-    // Monterrey Centro (-> "Monterrey") es "saturado" en DEMO_DELEGACIONES real.
+    // Monterrey es "saturado" en DEMO_DELEGACIONES real.
     expect(paths.some((p) => p.getAttribute("fill") === "var(--destructive)")).toBe(true);
-    // Guadalupe es "fluido" en DEMO_DELEGACIONES real.
+    // San Pedro GG (-> "San Pedro Garza García") es "fluido" en DEMO_DELEGACIONES real.
     expect(paths.some((p) => p.getAttribute("fill") === "var(--success)")).toBe(true);
   });
 

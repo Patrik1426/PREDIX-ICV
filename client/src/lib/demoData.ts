@@ -6,11 +6,15 @@
  */
 
 export const DEMO_DELEGACIONES = [
-  { nombre: "Monterrey Centro", ocupacion: 0.86, estado: "saturado" as const },
-  { nombre: "San Nicolás", ocupacion: 0.62, estado: "moderado" as const },
-  { nombre: "Guadalupe", ocupacion: 0.34, estado: "fluido" as const },
-  { nombre: "Apodaca", ocupacion: 0.51, estado: "moderado" as const },
-  { nombre: "San Pedro", ocupacion: 0.21, estado: "fluido" as const },
+  { nombre: "Monterrey", ocupacion: 0.91, estado: "saturado" as const },
+  { nombre: "San Nicolás", ocupacion: 0.69, estado: "moderado" as const },
+  { nombre: "Guadalupe", ocupacion: 0.84, estado: "saturado" as const },
+  { nombre: "García", ocupacion: 0.41, estado: "fluido" as const },
+  { nombre: "Sta. Catarina", ocupacion: 0.67, estado: "moderado" as const },
+  { nombre: "San Pedro GG", ocupacion: 0.38, estado: "fluido" as const },
+  { nombre: "Escobedo", ocupacion: 0.72, estado: "moderado" as const },
+  { nombre: "Apodaca", ocupacion: 0.63, estado: "moderado" as const },
+  { nombre: "Juárez", ocupacion: 0.33, estado: "fluido" as const },
 ];
 
 export const DEMO_KPIS = {

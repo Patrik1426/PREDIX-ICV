@@ -12,11 +12,15 @@ describe("DELEGACION_A_MUNICIPIO_REAL", () => {
     }
   });
 
-  it("maps the 5 real Nuevo León municipios verified against INEGI (2026-08-18)", () => {
-    expect(DELEGACION_A_MUNICIPIO_REAL["Monterrey Centro"]).toEqual({ nombreReal: "Monterrey", cveMuni: "19039" });
+  it("maps the 9 real Nuevo León municipios verified against INEGI (2026-08-22)", () => {
+    expect(DELEGACION_A_MUNICIPIO_REAL["Monterrey"]).toEqual({ nombreReal: "Monterrey", cveMuni: "19039" });
     expect(DELEGACION_A_MUNICIPIO_REAL["San Nicolás"]).toEqual({ nombreReal: "San Nicolás de los Garza", cveMuni: "19046" });
     expect(DELEGACION_A_MUNICIPIO_REAL["Guadalupe"]).toEqual({ nombreReal: "Guadalupe", cveMuni: "19026" });
     expect(DELEGACION_A_MUNICIPIO_REAL["Apodaca"]).toEqual({ nombreReal: "Apodaca", cveMuni: "19006" });
-    expect(DELEGACION_A_MUNICIPIO_REAL["San Pedro"]).toEqual({ nombreReal: "San Pedro Garza García", cveMuni: "19019" });
+    expect(DELEGACION_A_MUNICIPIO_REAL["San Pedro GG"]).toEqual({ nombreReal: "San Pedro Garza García", cveMuni: "19019" });
+    expect(DELEGACION_A_MUNICIPIO_REAL["García"]).toEqual({ nombreReal: "García", cveMuni: "19018" });
+    expect(DELEGACION_A_MUNICIPIO_REAL["Sta. Catarina"]).toEqual({ nombreReal: "Santa Catarina", cveMuni: "19048" });
+    expect(DELEGACION_A_MUNICIPIO_REAL["Escobedo"]).toEqual({ nombreReal: "General Escobedo", cveMuni: "19021" });
+    expect(DELEGACION_A_MUNICIPIO_REAL["Juárez"]).toEqual({ nombreReal: "Juárez", cveMuni: "19031" });
   });
 });
