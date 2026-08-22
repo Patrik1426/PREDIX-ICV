@@ -230,7 +230,7 @@ export default function Propuesta() {
                 fontWeight: 800,
                 fontSize: 52,
                 lineHeight: 1.05,
-                color: S.ink,
+                color: "rgba(242,242,244,0.96)",
                 letterSpacing: "-0.03em",
                 margin: "0 0 16px",
               }}

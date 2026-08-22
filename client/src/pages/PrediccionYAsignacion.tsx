@@ -403,7 +403,7 @@ export default function PrediccionYAsignacion() {
           <div>
             <SectionHeader label="Desglose" title="Demanda por Tipo de Trámite" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20 }}>
-              {tramites.map((t) => (
+              {tramites.map((t, i) => (
                 <DenseCard key={t.name}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
                     <div>
@@ -439,14 +439,14 @@ export default function PrediccionYAsignacion() {
                   <ResponsiveContainer width="100%" height={100}>
                     <AreaChart data={t.data} margin={{ top: 2, right: 2, left: -30, bottom: 0 }}>
                       <defs>
-                        <linearGradient id={`g-${t.name}`} x1="0" y1="0" x2="0" y2="1">
+                        <linearGradient id={`g-tramite-${i}`} x1="0" y1="0" x2="0" y2="1">
                           <stop offset="5%" stopColor={t.color} stopOpacity={0.4} />
                           <stop offset="95%" stopColor={t.color} stopOpacity={0} />
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="h" tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 8, fill: S.muted }} axisLine={false} tickLine={false} />
                       <YAxis hide />
-                      <Area type="monotone" dataKey="v" stroke={t.color} strokeWidth={1.5} fill={`url(#g-${t.name})`} dot={false} />
+                      <Area type="monotone" dataKey="v" stroke={t.color} strokeWidth={1.5} fill={`url(#g-tramite-${i})`} dot={false} />
                     </AreaChart>
                   </ResponsiveContainer>
                 </DenseCard>
