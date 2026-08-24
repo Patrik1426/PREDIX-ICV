@@ -158,10 +158,10 @@ const kpis = [
 ];
 
 const dataSources = [
-  { name: "Sistema de Colas ICVNL", type: "Cola", status: "live" },
-  { name: "Registro Vehicular NL", type: "Base de datos", status: "live" },
-  { name: "Portal de Citas Online", type: "API REST", status: "live" },
-  { name: "Módulo REPUVE", type: "Webservice", status: "live" },
+  { name: "Sistema de Colas ICVNL", type: "Cola", status: "planned" },
+  { name: "Registro Vehicular NL", type: "Base de datos", status: "planned" },
+  { name: "Portal de Citas Online", type: "API REST", status: "planned" },
+  { name: "Módulo REPUVE", type: "Webservice", status: "planned" },
   { name: "Padrón de Licencias", type: "Base de datos", status: "planned" },
   { name: "Telemetría de Ventanillas", type: "IoT / MQTT", status: "planned" },
 ];
