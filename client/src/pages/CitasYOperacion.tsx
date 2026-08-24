@@ -493,6 +493,8 @@ export default function CitasYOperacion() {
             background: S.surface,
             borderBottom: `1px solid ${S.border}`,
             display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
             alignItems: "flex-end",
             justifyContent: "space-between",
           }}
@@ -535,14 +537,14 @@ export default function CitasYOperacion() {
 
         <div style={{ padding: "24px 40px", display: "flex", flexDirection: "column", gap: 24 }}>
           {/* KPI grid */}
-          <div style={{ display: "grid", gridTemplateColumns: `repeat(${visibleKpis.length}, 1fr)`, gap: 12 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12 }}>
             {visibleKpis.map((k) => (
               <DenseKpi key={k.label} label={k.label} value={k.value} color={k.color} />
             ))}
           </div>
 
           {/* Status ring + ventanillas */}
-          <div style={{ display: "grid", gridTemplateColumns: puedeMonitor ? "240px 1fr" : "1fr", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: puedeMonitor ? "repeat(auto-fit, minmax(240px, 1fr))" : "1fr", gap: 20 }}>
             {/* Ring */}
             <div
               style={{
@@ -622,7 +624,7 @@ export default function CitasYOperacion() {
                     ))}
                   </div>
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))", gap: 10 }}>
                   {ventanillas.map((v) => <VentanillaCard key={v.id} v={v} onToggle={() => toggleVentanilla(v.id)} />)}
                 </div>
               </div>
@@ -646,7 +648,8 @@ export default function CitasYOperacion() {
                 </div>
                 <span style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.muted, letterSpacing: "0.06em" }}>21 AGO 2026</span>
               </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              <div style={{ overflowX: "auto" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 0, minWidth: 620 }}>
                 {[...citasSimuladas, ...proximasCitasBase].map((apt, i, arr) => (
                   <div
                     key={apt.folio}
@@ -677,6 +680,7 @@ export default function CitasYOperacion() {
                     </span>
                   </div>
                 ))}
+              </div>
               </div>
             </div>
           )}

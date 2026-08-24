@@ -286,7 +286,7 @@ export default function PrediccionYAsignacion() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: 6 }}>
+        <div style={{ display: "flex", gap: 6, overflowX: "auto" }}>
           {TABS.map((tab, i) => (
             visibleTabIndices.includes(i) ? (
               <button
@@ -303,6 +303,8 @@ export default function PrediccionYAsignacion() {
                   cursor: "pointer",
                   transition: "all 140ms",
                   letterSpacing: "-0.01em",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
                   ...(i === effectiveTab ? activeTabStyle : inactiveTabStyle),
                 }}
               >
@@ -317,7 +319,7 @@ export default function PrediccionYAsignacion() {
       <div style={{ padding: "28px 40px" }}>
         {/* Tab 0: Mapa */}
         {effectiveTab === 0 && (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, alignItems: "start" }}>
             <DenseCard>
               <SectionHeader label="AMM · Área Metro" title="Ocupación por Delegación" />
               <DelegacionesMap />

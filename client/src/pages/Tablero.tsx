@@ -494,7 +494,7 @@ export default function Tablero() {
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
           gap: 24,
           padding: "28px 48px 0",
         }}

@@ -295,7 +295,7 @@ export default function Propuesta() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(4, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
               gap: 14,
               marginTop: 20,
             }}
@@ -391,15 +391,15 @@ export default function Propuesta() {
                   border: `1px solid ${S.border}`,
                   borderRadius: 12,
                   padding: "24px 28px",
-                  display: "grid",
-                  gridTemplateColumns: "auto 1fr auto",
+                  display: "flex",
+                  flexWrap: "wrap",
                   gap: 24,
                   alignItems: "start",
                   boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
                 }}
               >
                 {/* Number + icon */}
-                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, flex: "0 0 auto" }}>
                   <div
                     style={{
                       fontFamily: "var(--font-mono)",
@@ -430,7 +430,7 @@ export default function Propuesta() {
                 </div>
 
                 {/* Content */}
-                <div>
+                <div style={{ flex: "1 1 240px" }}>
                   <div
                     style={{
                       fontFamily: "var(--font-display)",
@@ -457,7 +457,7 @@ export default function Propuesta() {
                 </div>
 
                 {/* Benefits */}
-                <div style={{ minWidth: 220 }}>
+                <div style={{ flex: "1 1 220px", minWidth: 220 }}>
                   {m.benefits.map((b) => (
                     <div
                       key={b}
@@ -523,7 +523,7 @@ export default function Propuesta() {
           </div>
         </Reveal>
         <Reveal delay={60}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 14 }}>
             {archLayers.map((layer) => (
               <div
                 key={layer.label}
@@ -602,7 +602,7 @@ export default function Propuesta() {
           </div>
         </Reveal>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
           {phases.map((phase, i) => (
             <Reveal key={phase.num} delay={i * 80}>
               <div
