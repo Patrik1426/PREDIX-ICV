@@ -115,9 +115,6 @@ data/**/*.xlsx
 data/**/*.xls
 data/**/*.zip
 
-# Polígonos municipales de INEGI (grande, re-descargable vía
-# scripts/load-nl-municipios-geojson.ts — ver CLAUDE.md, setup local)
-client/public/data/nl-municipios.geojson
 
 # Playwright MCP debug artifacts (console logs, page snapshots)
 .playwright-mcp/
