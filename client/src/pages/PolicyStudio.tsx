@@ -43,23 +43,21 @@ export default function PolicyStudio() {
       />
       <DemoNotice text={data.notice} />
 
-      {segment === "todos" && (
-        <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-[0_8px_25px_rgba(21,33,58,.035)] sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 text-sm font-bold text-foreground">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary"><Network className="h-4 w-4" /></span>
-            <span>Lente de priorización</span>
-          </div>
-          <label className="text-[0.65rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
-            <span className="sr-only">Segmento de política</span>
-            <select value={segment} onChange={(e) => setSegment(e.target.value as SegmentFilter)} className="mt-1 h-9 rounded-lg border border-border bg-background px-2.5 text-xs font-bold normal-case tracking-normal text-foreground outline-none focus:border-primary">
-              <option value="todos">Todos los segmentos</option>
-              <option value="regularizacion">Regularización pendiente</option>
-              <option value="acceso">Barreras de acceso</option>
-              <option value="atencion">Atención preferente</option>
-            </select>
-          </label>
-        </section>
-      )}
+      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-[0_8px_25px_rgba(21,33,58,.035)] sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary"><Network className="h-4 w-4" /></span>
+          <span>Lente de priorización</span>
+        </div>
+        <label className="text-[0.65rem] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+          <span className="sr-only">Segmento de política</span>
+          <select value={segment} onChange={(e) => setSegment(e.target.value as SegmentFilter)} className="mt-1 h-9 rounded-lg border border-border bg-background px-2.5 text-xs font-bold normal-case tracking-normal text-foreground outline-none focus:border-primary">
+            <option value="todos">Todos los segmentos</option>
+            <option value="regularizacion">Regularización pendiente</option>
+            <option value="acceso">Barreras de acceso</option>
+            <option value="atencion">Atención preferente</option>
+          </select>
+        </label>
+      </section>
 
       <section className="rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
@@ -72,7 +70,7 @@ export default function PolicyStudio() {
         <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
           {data.sources.map((source) => (
             <article key={source.code} className={`rounded-2xl border p-4 ${sourceColors[source.color]}`}>
-              <div className="flex items-center justify-between"><Landmark className="h-4 w-4 opacity-70" /></div>
+              <div className="flex items-center justify-between"><span className="text-xs font-black tracking-[0.16em]">{source.code}</span><Landmark className="h-4 w-4 opacity-70" /></div>
               <h3 className="mt-4 font-extrabold text-foreground">{source.name}</h3>
               <p className="mt-1.5 min-h-12 text-xs leading-5 text-muted-foreground">{source.description}</p>
               <div className="mt-4 flex items-center justify-between border-t border-current/10 pt-3 text-[0.67rem] font-bold"><span>{source.status}</span><span className="opacity-75">{source.cadence}</span></div>
@@ -111,7 +109,7 @@ export default function PolicyStudio() {
         </div>
       </section>
 
-      <div className={`mt-5 grid gap-5 ${segment === "todos" ? "xl:grid-cols-[.88fr_1.12fr]" : ""}`}>
+      <div className="mt-5 grid gap-5 xl:grid-cols-[.88fr_1.12fr]">
         <section className="rounded-[1.4rem] bg-foreground p-5 text-background sm:p-6">
           <p className="text-[0.68rem] font-extrabold uppercase tracking-[0.16em] text-primary">Simulador de política</p>
           <h2 className="mt-2 text-xl font-extrabold tracking-[-0.04em]">Descuento escalonado de refrendo</h2>
@@ -127,23 +125,21 @@ export default function PolicyStudio() {
           </div>
           <p className="mt-4 rounded-xl border border-background/10 bg-background/[0.04] p-3 text-xs leading-5 text-background/80">{simulation.recommendation}</p>
         </section>
-        {segment === "todos" && (
-          <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
-            <div className="flex items-center gap-2"><UsersRound className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Segmentos priorizables</h2></div>
-            <div className="mt-4 space-y-3">
-              {data.segments.map((item) => (
-                <article key={item.title} className="rounded-xl border border-border p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h3 className="font-extrabold text-foreground">{item.title}</h3>
-                    <Badge className={`rounded-full px-2.5 py-1 text-[0.68rem] font-bold ${item.priority === "Alta" ? "bg-primary/10 text-primary hover:bg-primary/10" : "bg-muted text-muted-foreground hover:bg-muted"}`}>Prioridad {item.priority}</Badge>
-                  </div>
-                  <p className="mt-1.5 text-sm text-muted-foreground">{item.context}</p>
-                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-muted-foreground"><span>{item.population}</span><span className="text-chart-3">{item.sources}</span></div>
-                </article>
-              ))}
-            </div>
-          </section>
-        )}
+        <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
+          <div className="flex items-center gap-2"><UsersRound className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Segmentos priorizables</h2></div>
+          <div className="mt-4 space-y-3">
+            {data.segments.map((item) => (
+              <article key={item.title} className="rounded-xl border border-border p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-extrabold text-foreground">{item.title}</h3>
+                  <Badge className={`rounded-full px-2.5 py-1 text-[0.68rem] font-bold ${item.priority === "Alta" ? "bg-primary/10 text-primary hover:bg-primary/10" : "bg-muted text-muted-foreground hover:bg-muted"}`}>Prioridad {item.priority}</Badge>
+                </div>
+                <p className="mt-1.5 text-sm text-muted-foreground">{item.context}</p>
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold text-muted-foreground"><span>{item.population}</span><span className="text-chart-3">{item.sources}</span></div>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
 
       <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
