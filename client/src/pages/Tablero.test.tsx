@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
@@ -145,5 +145,18 @@ describe("Tablero", () => {
       expect(el).not.toHaveClass("uppercase");
       expect(el).not.toHaveClass("text-primary");
     }
+  });
+
+  it("filters the delegation dropdown to the real delegaciones and switches the weekly chart to a period average", async () => {
+    await renderTablero();
+
+    const periodoSelect = screen.getByDisplayValue("Diario — semana actual");
+    fireEvent.change(periodoSelect, { target: { value: "promedio" } });
+    expect(screen.getByText(/Ocupación promedio de la semana/)).toBeInTheDocument();
+
+    const delegacionSelect = screen.getByDisplayValue("Todas las delegaciones");
+    expect(delegacionSelect).toBeInTheDocument();
+    fireEvent.change(delegacionSelect, { target: { value: "García" } });
+    expect(delegacionSelect).toHaveValue("García");
   });
 });

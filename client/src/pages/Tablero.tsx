@@ -1,4 +1,4 @@
-import { useEffect, useRef, ReactNode } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 import {
   AreaChart,
   Area,
@@ -23,6 +23,7 @@ import {
   Clock,
 } from "lucide-react";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
+import { DEMO_DELEGACIONES } from "@/lib/demoData";
 
 /* ── tokens ── */
 const S = {
@@ -318,6 +319,12 @@ const CustomBarTooltip = ({ active, payload }: any) => {
 /* ── page ── */
 export default function Tablero() {
   const hoveredRef = useRef<string | null>(null);
+  const [period, setPeriod] = useState<"semana" | "promedio">("semana");
+  const [delegacionFiltro, setDelegacionFiltro] = useState<string>("todas");
+
+  const weeklyAverage = Math.round(
+    weeklyData.reduce((sum, d) => sum + d.pct, 0) / weeklyData.length
+  );
 
   return (
     <div style={{ minHeight: "100%", paddingBottom: 48 }}>
@@ -447,6 +454,74 @@ export default function Tablero() {
         </div>
       </section>
 
+      {/* ── Filtros ── */}
+      <section style={{ padding: "24px 48px 0" }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 12,
+            alignItems: "center",
+            background: S.surface,
+            border: `1px solid ${S.border}`,
+            borderRadius: 10,
+            padding: "12px 16px",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "var(--font-mono)",
+              fontSize: 10,
+              color: S.muted,
+              letterSpacing: "0.1em",
+              textTransform: "uppercase",
+            }}
+          >
+            Filtros
+          </span>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value as "semana" | "promedio")}
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 12.5,
+              fontWeight: 600,
+              padding: "7px 10px",
+              borderRadius: 8,
+              border: `1px solid ${S.border}`,
+              background: S.surface2,
+              color: S.ink,
+              cursor: "pointer",
+            }}
+          >
+            <option value="semana">Diario — semana actual</option>
+            <option value="promedio">Promedio del periodo</option>
+          </select>
+          <select
+            value={delegacionFiltro}
+            onChange={(e) => setDelegacionFiltro(e.target.value)}
+            style={{
+              fontFamily: "var(--font-body)",
+              fontSize: 12.5,
+              fontWeight: 600,
+              padding: "7px 10px",
+              borderRadius: 8,
+              border: `1px solid ${S.border}`,
+              background: S.surface2,
+              color: S.ink,
+              cursor: "pointer",
+            }}
+          >
+            <option value="todas">Todas las delegaciones</option>
+            {DEMO_DELEGACIONES.map((d) => (
+              <option key={d.nombre} value={d.nombre}>
+                {d.nombre}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
+
       {/* ── KPIs ── */}
       <section style={{ padding: "32px 48px 0" }}>
         <Reveal>
@@ -562,29 +637,47 @@ export default function Tablero() {
                 % ocupación promedio diaria · semana actual
               </div>
             </div>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={weeklyData} barCategoryGap="30%" margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
-                <XAxis
-                  dataKey="day"
-                  tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fill: "oklch(0.48 0.01 50)", letterSpacing: 2 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  domain={[0, 100]}
-                  tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, fill: "oklch(0.48 0.01 50)" }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickCount={5}
-                />
-                <Tooltip content={<CustomBarTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
-                <Bar dataKey="pct" shape={<CustomBarShape />} radius={[3, 3, 0, 0]}>
-                  {weeklyData.map((d) => (
-                    <Cell key={d.day} fill={lvlColor[d.lvl]} fillOpacity={0.75} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {period === "semana" ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={weeklyData} barCategoryGap="30%" margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, fill: "oklch(0.48 0.01 50)", letterSpacing: 2 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, fill: "oklch(0.48 0.01 50)" }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickCount={5}
+                  />
+                  <Tooltip content={<CustomBarTooltip />} cursor={{ fill: "rgba(0,0,0,0.04)" }} />
+                  <Bar dataKey="pct" shape={<CustomBarShape />} radius={[3, 3, 0, 0]}>
+                    {weeklyData.map((d) => (
+                      <Cell key={d.day} fill={lvlColor[d.lvl]} fillOpacity={0.75} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 220 }}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 700,
+                    fontSize: 48,
+                    color: lvlColor[weeklyAverage >= 85 ? "crit" : weeklyAverage >= 65 ? "warn" : "ok"],
+                  }}
+                >
+                  {weeklyAverage}%
+                </div>
+                <div style={{ fontFamily: "var(--font-body)", fontSize: 12.5, color: S.muted, marginTop: 8 }}>
+                  Ocupación promedio de la semana ({weeklyData.length} días)
+                </div>
+              </div>
+            )}
           </div>
         </Reveal>
       </section>
