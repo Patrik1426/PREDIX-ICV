@@ -8,14 +8,14 @@
 
 export const MODULE_LABELS: Record<string, string> = {
   prediccion_asignacion: "Predicción y Asignación",
-  citas_operacion: "Citas y Operación",
+  citas_operacion: "Operación Institucional",
   chatbot: "Asistente Virtual",
   admin: "Administración",
 };
 
 export const MODULE_DESCRIPTIONS: Record<string, string> = {
   prediccion_asignacion: "Anticipa la demanda y redistribuye ventanillas en tiempo real.",
-  citas_operacion: "Agenda con optimización automática y monitoreo en vivo por delegación.",
+  citas_operacion: "Monitoreo en vivo de experiencia, capacidad e incidencias por delegación.",
   chatbot: "Asistente conversacional para consultas ciudadanas.",
   admin: "Gestión de usuarios, roles y auditoría del sistema.",
 };
