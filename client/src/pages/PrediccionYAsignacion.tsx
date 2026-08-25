@@ -493,57 +493,59 @@ export default function PrediccionYAsignacion() {
               </div>
             </DenseCard>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-                gap: 20,
-                marginTop: 20,
-              }}
-            >
-              <DenseCard>
-                <SectionHeader label="Factores" title="Factores Explicativos" />
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {horasSaturadas.map((h) => (
-                    <div
-                      key={h.h}
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        fontFamily: "var(--font-body)",
-                        fontSize: 12.5,
-                        color: S.ink,
-                      }}
-                    >
-                      <span>{h.h}:00 h</span>
-                      <span style={{ fontFamily: "var(--font-mono)", color: lvlColor.crit, fontWeight: 600 }}>
-                        +{h.gap} sobre capacidad
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </DenseCard>
+            {horasSaturadas.length > 0 && (
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                  gap: 20,
+                  marginTop: 20,
+                }}
+              >
+                <DenseCard>
+                  <SectionHeader label="Factores" title="Factores Explicativos" />
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {horasSaturadas.map((h) => (
+                      <div
+                        key={h.h}
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          fontFamily: "var(--font-body)",
+                          fontSize: 12.5,
+                          color: S.ink,
+                        }}
+                      >
+                        <span>{h.h}:00 h</span>
+                        <span style={{ fontFamily: "var(--font-mono)", color: lvlColor.crit, fontWeight: 600 }}>
+                          +{h.gap} sobre capacidad
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </DenseCard>
 
-              <DenseCard style={{ background: S.ink }}>
-                <div
-                  style={{
-                    fontFamily: "var(--font-mono)",
-                    fontSize: 9.5,
-                    color: S.warn,
-                    letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    marginBottom: 8,
-                  }}
-                >
-                  Recomendación
-                </div>
-                <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: S.surface, lineHeight: 1.4 }}>
-                  Reforzar capacidad entre las {horaCritica.h}:00 y las{" "}
-                  {String(Number(horaCritica.h) + 1).padStart(2, "0")}:00 h — la demanda supera la capacidad
-                  instalada en {horaCritica.gap} trámites/hora ({Math.round((horaCritica.gap / horaCritica.cap) * 100)}%).
-                </div>
-              </DenseCard>
-            </div>
+                <DenseCard style={{ background: S.ink }}>
+                  <div
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 9.5,
+                      color: S.warn,
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                      marginBottom: 8,
+                    }}
+                  >
+                    Recomendación
+                  </div>
+                  <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: S.surface, lineHeight: 1.4 }}>
+                    Reforzar capacidad entre las {horaCritica.h}:00 y las{" "}
+                    {String(Number(horaCritica.h) + 1).padStart(2, "0")}:00 h — la demanda supera la capacidad
+                    instalada en {horaCritica.gap} trámites/hora ({Math.round((horaCritica.gap / horaCritica.cap) * 100)}%).
+                  </div>
+                </DenseCard>
+              </div>
+            )}
           </div>
         )}
 
