@@ -171,10 +171,26 @@ export default function AsistenteChat() {
     setError(null);
   };
 
-  const esInicio = historial.length === 1;
-
   return (
-    <div className="flex h-[75vh] min-h-[560px] flex-col overflow-hidden rounded-2xl border bg-card shadow-sm">
+    <div className="grid gap-4 md:grid-cols-[240px_1fr]">
+      <aside className="flex flex-col gap-2 rounded-2xl border bg-card p-4 shadow-sm">
+        <p className="font-display text-xs font-bold uppercase tracking-wide text-muted-foreground">
+          Preguntas frecuentes
+        </p>
+        {PREGUNTAS_SUGERIDAS.map((p) => (
+          <button
+            key={p}
+            type="button"
+            onClick={() => mandar(p)}
+            disabled={chat.isPending}
+            className="cursor-pointer rounded-lg border bg-background px-3 py-2 text-left text-xs text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {p}
+          </button>
+        ))}
+      </aside>
+
+      <div className="flex h-[75vh] min-h-[560px] flex-col overflow-hidden rounded-2xl border bg-card shadow-sm">
       <div className="flex flex-shrink-0 items-center justify-between border-b bg-card px-6 py-4">
         <div className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary font-display text-base font-extrabold text-primary-foreground">
@@ -210,21 +226,6 @@ export default function AsistenteChat() {
           )}
           {chat.isPending && <TypingIndicator />}
 
-          {esInicio && !chat.isPending && (
-            <div className="flex flex-wrap gap-2 pl-10">
-              {PREGUNTAS_SUGERIDAS.map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => mandar(p)}
-                  className="cursor-pointer rounded-full border bg-background px-3 py-1.5 text-xs text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5"
-                >
-                  {p}
-                </button>
-              ))}
-            </div>
-          )}
-
           <div ref={finRef} />
         </div>
       </div>
@@ -255,6 +256,7 @@ export default function AsistenteChat() {
           <Send className="h-4 w-4" />
         </Button>
       </form>
+      </div>
     </div>
   );
 }

@@ -58,7 +58,7 @@ describe("AsistenteChat", () => {
     );
   });
 
-  it("hides the suggestion chips once the conversation has moved past the greeting", () => {
+  it("keeps suggestion chips visible even after the conversation has moved past the greeting", () => {
     mockMutate = vi.fn((_input, opts) => {
       opts.onSuccess({ success: true, message: "ok", reply: "..." });
     });
@@ -66,7 +66,7 @@ describe("AsistenteChat", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "¿Cómo agendo una cita?" }));
 
-    expect(screen.queryByRole("button", { name: "¿Qué documentos necesito para el refrendo?" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "¿Qué documentos necesito para el refrendo?" })).toBeInTheDocument();
   });
 
   it("shows the honest unavailable message instead of a fake reply when success:false", async () => {
@@ -98,5 +98,19 @@ describe("AsistenteChat", () => {
     await waitFor(() =>
       expect(screen.getByText("Tu rol no tiene permiso para usar el asistente.")).toBeInTheDocument()
     );
+  });
+
+  it("shows a persistent sidebar of suggested questions, not just at the start of the conversation", async () => {
+    mockMutate = vi.fn((_input, opts) => {
+      opts.onSuccess({ success: true, message: "ok", reply: "Respuesta generada." });
+    });
+
+    render(<AsistenteChat />);
+    fireEvent.click(screen.getByRole("button", { name: "¿Cómo agendo una cita?" }));
+    await waitFor(() => expect(screen.getByText("Respuesta generada.")).toBeInTheDocument());
+
+    expect(
+      screen.getByRole("button", { name: "¿Qué documentos necesito para el refrendo?" })
+    ).toBeInTheDocument();
   });
 });
