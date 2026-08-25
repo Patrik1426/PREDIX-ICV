@@ -1,3 +1,6 @@
+import { Redirect } from "wouter";
+import { trpc } from "@/lib/trpc";
+import { hasGroupAccess } from "@/lib/moduleGroups";
 import {
   Accordion,
   AccordionContent,
@@ -173,6 +176,10 @@ import { useState } from "react";
 import { toast as sonnerToast } from "sonner";
 
 export default function ComponentShowcase() {
+  const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
+
+  if (!isLoading && !hasGroupAccess("admin", accessibleModules)) return <Redirect to="/" />;
+
   const { theme, toggleTheme } = useTheme();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [datePickerDate, setDatePickerDate] = useState<Date>();
