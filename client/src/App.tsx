@@ -11,6 +11,7 @@ import AsistenteVirtual from "@/pages/AsistenteVirtual";
 import CitasYOperacion from "@/pages/CitasYOperacion";
 import PrediccionYAsignacion from "@/pages/PrediccionYAsignacion";
 import PolicyStudio from "@/pages/PolicyStudio";
+import ComponentShowcase from "@/pages/ComponentShowcase";
 import ModuloDetalle from "@/pages/ModuloDetalle";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -69,6 +70,13 @@ export default function App() {
             <RequireAuth>
               <AppShell>
                 <PolicyStudio />
+              </AppShell>
+            </RequireAuth>
+          </Route>
+          <Route path="/admin/componentes">
+            <RequireAuth>
+              <AppShell>
+                <ComponentShowcase />
               </AppShell>
             </RequireAuth>
           </Route>

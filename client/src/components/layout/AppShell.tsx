@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeft, ShieldCheck, Landmark } from "lucide-react";
+import { LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeft, ShieldCheck, Landmark, Blocks } from "lucide-react";
 
 const COLLAPSE_KEY = "predix-icv:sidebar-collapsed";
 
@@ -102,6 +102,7 @@ function NavContent({
     ? INSTITUTIONAL_ROLE_LABELS[profile.institutionalRole] ?? profile.institutionalRole
     : "";
   const navSlugs = [...MODULE_ORDER, "admin"].filter((slug) => hasGroupAccess(slug, accessibleModules));
+  const puedeAdmin = hasGroupAccess("admin", accessibleModules);
 
   const displayName = user?.name ?? profile?.name ?? "";
   const initial = displayName.trim().charAt(0).toUpperCase() || "?";
@@ -198,6 +199,18 @@ function NavContent({
           <p className="px-3 py-2 text-xs text-sidebar-foreground/60">
             Tu rol no tiene módulos habilitados todavía.
           </p>
+        )}
+
+        {puedeAdmin && (
+          <NavItem
+            href="/admin/componentes"
+            active={location === "/admin/componentes"}
+            collapsed={collapsed}
+            icon={<Blocks className="h-5 w-5" />}
+            iconColorClass="text-primary"
+            label="Galería de Componentes"
+            onNavigate={onNavigate}
+          />
         )}
       </nav>
 
