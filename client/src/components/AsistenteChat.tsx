@@ -119,6 +119,10 @@ export default function AsistenteChat() {
     finRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [historial, chat.isPending]);
 
+  useEffect(() => {
+    return () => recognitionRef.current?.stop();
+  }, []);
+
   const mandar = (mensaje: string) => {
     const limpio = mensaje.trim();
     if (!limpio || chat.isPending) return;

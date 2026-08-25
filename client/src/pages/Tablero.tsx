@@ -126,7 +126,7 @@ export default function Tablero() {
             </ResponsiveContainer>
           </div>
           <div className="mt-2 flex justify-between border-t border-border pt-4 text-xs font-semibold text-muted-foreground">
-            <span>{delegation === "todas" ? "Mayor presión: Refrendo" : delegation}</span>
+            <span>Mayor presión: Refrendo</span>
             <span className="text-primary">42% del volumen</span>
           </div>
         </section>
