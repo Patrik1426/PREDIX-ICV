@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Route, Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
@@ -165,5 +165,19 @@ describe("CitasYOperacion", () => {
     // vivo de las ventanillas produciría) — el folio mostrado no debe cambiar.
     fireEvent.click(screen.getByRole("button", { name: "Hora Pico" }));
     expect(screen.getByText(/FOLIO: ICVNL-2026-/).textContent).toBe(folioTexto);
+  });
+
+  it("shows a real per-delegación status table and an hourly demand heatmap when the role has monitor access", () => {
+    renderPage(["citas", "monitor"]);
+    const tabla = screen.getByTestId("delegacion-status-table");
+    expect(within(tabla).getByText("Monterrey")).toBeInTheDocument();
+    expect(within(tabla).getByText(/91% · saturado/)).toBeInTheDocument();
+    expect(screen.getByText("Demanda por Hora")).toBeInTheDocument();
+  });
+
+  it("hides the delegación status table and hourly heatmap when the role has only citas", () => {
+    renderPage(["citas"]);
+    expect(screen.queryByTestId("delegacion-status-table")).not.toBeInTheDocument();
+    expect(screen.queryByText("Demanda por Hora")).not.toBeInTheDocument();
   });
 });

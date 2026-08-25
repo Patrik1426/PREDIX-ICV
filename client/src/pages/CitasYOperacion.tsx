@@ -1,6 +1,7 @@
 import { Redirect } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { hasGroupAccess, MODULE_GROUPS } from "@/lib/moduleGroups";
+import { DEMO_DELEGACIONES, DEMO_DEMANDA_HORARIA } from "@/lib/demoData";
 import { useEffect, useState } from "react";
 import {
   Monitor,
@@ -681,6 +682,102 @@ export default function CitasYOperacion() {
                   </div>
                 ))}
               </div>
+              </div>
+            </div>
+          )}
+
+          {/* Estado por delegación + demanda por hora */}
+          {puedeMonitor && (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
+              <div
+                data-testid="delegacion-status-table"
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 12,
+                  padding: "18px 20px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    color: S.ink,
+                    letterSpacing: "-0.01em",
+                    marginBottom: 14,
+                  }}
+                >
+                  Estado por Delegación
+                </div>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {DEMO_DELEGACIONES.map((d, i, arr) => (
+                    <div
+                      key={d.nombre}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "8px 0",
+                        borderBottom: i < arr.length - 1 ? `1px solid ${S.border}` : "none",
+                      }}
+                    >
+                      <span style={{ fontFamily: "var(--font-body)", fontSize: 12.5, color: S.ink }}>{d.nombre}</span>
+                      <span
+                        style={{
+                          fontFamily: "var(--font-mono)",
+                          fontSize: 11,
+                          fontWeight: 600,
+                          color: d.estado === "saturado" ? S.coral : d.estado === "moderado" ? S.warn : S.ok,
+                        }}
+                      >
+                        {Math.round(d.ocupacion * 100)}% · {d.estado}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  background: S.surface,
+                  border: `1px solid ${S.border}`,
+                  borderRadius: 12,
+                  padding: "18px 20px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    color: S.ink,
+                    letterSpacing: "-0.01em",
+                    marginBottom: 14,
+                  }}
+                >
+                  Demanda por Hora
+                </div>
+                <div style={{ display: "flex", gap: 3 }}>
+                  {DEMO_DEMANDA_HORARIA.map((v, i) => {
+                    const ratio = v / Math.max(...DEMO_DEMANDA_HORARIA);
+                    const color = ratio > 0.75 ? S.coral : ratio > 0.4 ? S.warn : S.ok;
+                    return (
+                      <div
+                        key={i}
+                        title={`${i}:00 h — ${v} trámites`}
+                        style={{ flex: 1, height: 36, borderRadius: 4, background: color, opacity: 0.35 + ratio * 0.65 }}
+                      />
+                    );
+                  })}
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted }}>0h</span>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted }}>12h</span>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted }}>23h</span>
+                </div>
               </div>
             </div>
           )}
