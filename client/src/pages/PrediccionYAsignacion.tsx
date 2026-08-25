@@ -16,6 +16,8 @@ import {
   CartesianGrid,
 } from "recharts";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
+import { DEMO_PRECISION_MODELO } from "@/lib/demoData";
+import { DatoEjemplo } from "@/components/demo/DemoVisuals";
 
 const S = {
   surface: "oklch(1 0 0)",
@@ -126,6 +128,13 @@ const capacidadData = [
   { h: "18", cap: 100, dem: 87 },
   { h: "19", cap: 60, dem: 39 },
 ];
+
+const horasSaturadas = capacidadData
+  .map((d) => ({ ...d, gap: d.dem - d.cap }))
+  .filter((d) => d.gap > 0)
+  .sort((a, b) => b.gap - a.gap);
+
+const horaCritica = horasSaturadas[0];
 
 const scenarios = [
   {
@@ -278,11 +287,29 @@ export default function PrediccionYAsignacion() {
               fontSize: 22,
               color: S.ink,
               letterSpacing: "-0.02em",
-              margin: "0 0 20px",
+              margin: "0 0 12px",
             }}
           >
             Predicción & Asignación
           </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
+            <span
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10.5,
+                fontWeight: 600,
+                color: S.ok,
+                background: "oklch(0.62 0.14 145 / 0.12)",
+                border: "1px solid oklch(0.62 0.14 145 / 0.3)",
+                borderRadius: 999,
+                padding: "4px 10px",
+                letterSpacing: "0.04em",
+              }}
+            >
+              Confianza del modelo: {DEMO_PRECISION_MODELO}%
+            </span>
+            <DatoEjemplo />
+          </div>
         </div>
 
         {/* Tabs */}
@@ -465,6 +492,58 @@ export default function PrediccionYAsignacion() {
                 </div>
               </div>
             </DenseCard>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                gap: 20,
+                marginTop: 20,
+              }}
+            >
+              <DenseCard>
+                <SectionHeader label="Factores" title="Factores Explicativos" />
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {horasSaturadas.map((h) => (
+                    <div
+                      key={h.h}
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        fontFamily: "var(--font-body)",
+                        fontSize: 12.5,
+                        color: S.ink,
+                      }}
+                    >
+                      <span>{h.h}:00 h</span>
+                      <span style={{ fontFamily: "var(--font-mono)", color: lvlColor.crit, fontWeight: 600 }}>
+                        +{h.gap} sobre capacidad
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </DenseCard>
+
+              <DenseCard style={{ background: S.ink }}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 9.5,
+                    color: S.warn,
+                    letterSpacing: "0.12em",
+                    textTransform: "uppercase",
+                    marginBottom: 8,
+                  }}
+                >
+                  Recomendación
+                </div>
+                <div style={{ fontFamily: "var(--font-display)", fontWeight: 600, fontSize: 15, color: S.surface, lineHeight: 1.4 }}>
+                  Reforzar capacidad entre las {horaCritica.h}:00 y las{" "}
+                  {String(Number(horaCritica.h) + 1).padStart(2, "0")}:00 h — la demanda supera la capacidad
+                  instalada en {horaCritica.gap} trámites/hora ({Math.round((horaCritica.gap / horaCritica.cap) * 100)}%).
+                </div>
+              </DenseCard>
+            </div>
           </div>
         )}
 

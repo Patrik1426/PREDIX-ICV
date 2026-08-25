@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Route, Router } from "wouter";
 import { memoryLocation } from "wouter/memory-location";
@@ -112,5 +112,21 @@ describe("PrediccionYAsignacion", () => {
     expect(screen.getByRole("button", { name: "Capacidad vs Demanda" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Escenarios" })).toBeInTheDocument();
     expect(screen.getByText("Capacidad Instalada vs. Demanda Horaria")).toBeInTheDocument();
+  });
+
+  it("shows the model confidence badge with the honest example-data label", async () => {
+    await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+    expect(screen.getByText("Confianza del modelo: 91%")).toBeInTheDocument();
+    expect(screen.getByText("Datos de ejemplo")).toBeInTheDocument();
+  });
+
+  it("shows explanatory factors and a capacity recommendation derived from real hour-by-hour gaps in the Capacidad tab", async () => {
+    await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
+    fireEvent.click(screen.getByRole("button", { name: "Capacidad vs Demanda" }));
+
+    expect(screen.getByText("Factores Explicativos")).toBeInTheDocument();
+    expect(screen.getByText(/10:00 h/)).toBeInTheDocument();
+    expect(screen.getByText(/\+32 sobre capacidad/)).toBeInTheDocument();
+    expect(screen.getByText(/Reforzar capacidad entre las 10:00 y las 11:00 h/)).toBeInTheDocument();
   });
 });
