@@ -175,11 +175,7 @@ import {
 import { useState } from "react";
 import { toast as sonnerToast } from "sonner";
 
-export default function ComponentShowcase() {
-  const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
-
-  if (!isLoading && !hasGroupAccess("admin", accessibleModules)) return <Redirect to="/" />;
-
+function ComponentShowcaseGallery() {
   const { theme, toggleTheme } = useTheme();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [datePickerDate, setDatePickerDate] = useState<Date>();
@@ -1389,4 +1385,12 @@ export default function ComponentShowcase() {
       </footer>
     </div>
   );
+}
+
+export default function ComponentShowcase() {
+  const { data: accessibleModules, isLoading } = trpc.auth.getAccessibleModules.useQuery();
+
+  if (!isLoading && !hasGroupAccess("admin", accessibleModules)) return <Redirect to="/" />;
+
+  return <ComponentShowcaseGallery />;
 }
