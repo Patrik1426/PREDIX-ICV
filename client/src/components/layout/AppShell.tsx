@@ -14,10 +14,11 @@ import { INSTITUTIONAL_ROLE_LABELS } from "@/lib/institutionalRoles";
 import { MODULE_ICONS, MODULE_ORDER, MODULE_ACCENT } from "@/lib/moduleIcons";
 import { hasGroupAccess } from "@/lib/moduleGroups";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeft } from "lucide-react";
+import { LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeft, ShieldCheck } from "lucide-react";
 
 const COLLAPSE_KEY = "predix-icv:sidebar-collapsed";
 
@@ -249,6 +250,23 @@ export function AppShell({ children }: { children: ReactNode }) {
             </SheetContent>
           </Sheet>
           <span className="font-semibold">PREDIX-ICV</span>
+        </header>
+
+        <header className="sticky top-0 z-10 hidden h-14 items-center justify-between gap-3 border-b bg-sidebar px-6 text-sidebar-foreground lg:flex">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-semibold uppercase tracking-wide text-sidebar-foreground/70">
+              Instituto de Control Vehicular de Nuevo León
+            </p>
+            <p className="truncate text-sm font-semibold">PREDIX-ICV · Panel institucional</p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2">
+            <span className="text-xs font-medium text-sidebar-foreground/70">Sesión institucional activa</span>
+            <span className="h-2 w-2 rounded-full bg-success" aria-hidden="true" />
+            <Badge variant="outline" className="gap-1.5 border-sidebar-border bg-sidebar-accent text-sidebar-accent-foreground">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              Entorno restringido
+            </Badge>
+          </div>
         </header>
 
         <main className="min-w-0 flex-1">{children}</main>
