@@ -545,15 +545,37 @@ export default function Tablero() {
           <div>
             <div
               style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 10,
-                color: S.warn,
-                letterSpacing: "0.12em",
-                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
                 marginBottom: 6,
               }}
             >
-              Prioridad del día
+              <div
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 10,
+                  color: S.warn,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                }}
+              >
+                Prioridad del día
+              </div>
+              <span
+                style={{
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 9,
+                  color: "rgba(255, 255, 255, 0.5)",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  padding: "2px 6px",
+                  background: "rgba(255, 255, 255, 0.1)",
+                  borderRadius: 4,
+                }}
+              >
+                Datos de ejemplo
+              </span>
             </div>
             <div
               style={{
