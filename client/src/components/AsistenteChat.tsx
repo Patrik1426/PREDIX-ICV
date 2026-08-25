@@ -173,7 +173,7 @@ export default function AsistenteChat() {
 
   return (
     <div className="grid gap-4 md:grid-cols-[240px_1fr]">
-      <aside className="flex flex-col gap-2 rounded-2xl border bg-card p-4 shadow-sm">
+      <aside className="order-last flex flex-col gap-2 rounded-2xl border bg-card p-4 shadow-sm md:order-first">
         <p className="font-display text-xs font-bold uppercase tracking-wide text-muted-foreground">
           Preguntas frecuentes
         </p>

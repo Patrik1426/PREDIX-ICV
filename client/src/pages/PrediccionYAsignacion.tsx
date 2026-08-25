@@ -503,7 +503,7 @@ export default function PrediccionYAsignacion() {
                 }}
               >
                 <DenseCard>
-                  <SectionHeader label="Factores" title="Factores Explicativos" />
+                  <SectionHeader label="Análisis" title="Horas con Déficit de Capacidad" />
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     {horasSaturadas.map((h) => (
                       <div

@@ -124,7 +124,7 @@ describe("PrediccionYAsignacion", () => {
     await renderPage(["prediccion_demanda", "asignador_ventanillas"]);
     fireEvent.click(screen.getByRole("button", { name: "Capacidad vs Demanda" }));
 
-    expect(screen.getByText("Factores Explicativos")).toBeInTheDocument();
+    expect(screen.getByText("Horas con Déficit de Capacidad")).toBeInTheDocument();
     expect(screen.getByText(/10:00 h/)).toBeInTheDocument();
     expect(screen.getByText(/\+32 sobre capacidad/)).toBeInTheDocument();
     expect(screen.getByText(/Reforzar capacidad entre las 10:00 y las 11:00 h/)).toBeInTheDocument();

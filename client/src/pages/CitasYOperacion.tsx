@@ -505,9 +505,12 @@ export default function CitasYOperacion() {
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: S.brand, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 4 }}>
               Módulo Operativo
             </div>
-            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, color: S.ink, letterSpacing: "-0.02em", margin: 0 }}>
-              Citas & Operación
-            </h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 22, color: S.ink, letterSpacing: "-0.02em", margin: 0 }}>
+                Citas & Operación
+              </h1>
+              <DatoEjemplo />
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>

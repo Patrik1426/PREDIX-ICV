@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, ReactNode } from "react";
+import { Link } from "wouter";
 import {
   AreaChart,
   Area,
@@ -23,6 +24,7 @@ import {
 } from "lucide-react";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
 import ReportExporter from "@/components/ReportExporter";
+import { DatoEjemplo } from "@/components/demo/DemoVisuals";
 import { DEMO_DELEGACIONES } from "@/lib/demoData";
 
 /* ── tokens ── */
@@ -479,7 +481,7 @@ export default function Tablero() {
               textTransform: "uppercase",
             }}
           >
-            Filtros
+            Filtros — tendencia semanal y tabla por delegación
           </span>
           <select
             value={period}
@@ -566,7 +568,7 @@ export default function Tablero() {
               Amortiguar la demanda en {delegacionPrioritaria.nombre} — {Math.round(delegacionPrioritaria.ocupacion * 100)}% de ocupación actual.
             </div>
           </div>
-          <a
+          <Link
             href="/modulos/prediccion_asignacion"
             style={{
               fontFamily: "var(--font-body)",
@@ -581,7 +583,7 @@ export default function Tablero() {
             }}
           >
             Ver recomendación →
-          </a>
+          </Link>
         </div>
       </section>
 
@@ -697,7 +699,9 @@ export default function Tablero() {
                   marginTop: 4,
                 }}
               >
-                % ocupación promedio diaria · semana actual
+                {period === "semana"
+                  ? "% ocupación promedio diaria · semana actual"
+                  : "% ocupación promedio del periodo · 7 días"}
               </div>
             </div>
             {period === "semana" ? (
@@ -766,19 +770,30 @@ export default function Tablero() {
         >
           <div
             style={{
-              fontFamily: "var(--font-display)",
-              fontWeight: 600,
-              fontSize: 14,
-              color: S.ink,
-              letterSpacing: "-0.01em",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
               marginBottom: 14,
             }}
           >
-            Alertas Priorizadas
+            <div
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 600,
+                fontSize: 14,
+                color: S.ink,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              Alertas Priorizadas
+            </div>
+            <DatoEjemplo />
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {kpis
               .filter((k) => k.status !== "ok")
+              .sort((a, b) => (a.status === "crit" ? -1 : b.status === "crit" ? 1 : 0))
               .map((k) => (
                 <div
                   key={k.label}

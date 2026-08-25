@@ -147,7 +147,7 @@ export default function DelegacionesMap() {
 
   return (
     <div>
-      <div className="relative h-80 w-full overflow-hidden rounded-lg">
+      <div className="relative isolate h-80 w-full overflow-hidden rounded-lg">
         {status === "loading" && (
           <div
             data-testid="delegaciones-map-loading"
