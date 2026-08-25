@@ -173,9 +173,7 @@ describe("Tablero", () => {
     expect(screen.getByText(/91% de ocupación actual/)).toBeInTheDocument();
   });
 
-  // Roto por el reemplazo total con predix-icvnl — ver
-  // docs/superpowers/specs/2026-08-24-port-predix-icvnl-reemplazo-total-design.md.
-  it.skip("exports KPIs with the real ReportExporter component, not a fake alert() button", async () => {
+  it("exports KPIs with the real ReportExporter component, not a fake alert() button", async () => {
     await renderTablero();
     expect(screen.getByRole("button", { name: /Generar reporte/ })).toBeInTheDocument();
     expect(screen.queryByText("Exportar CSV")).not.toBeInTheDocument();
