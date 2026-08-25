@@ -43,7 +43,7 @@ export default function PrediccionYAsignacion() {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map(([label, value, description, Icon, color]) => (
-          <article key={label} className="rounded-[1.35rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.045)]">
+          <article key={label} className="rounded-[1.35rem] border border-border bg-card p-5 shadow-[var(--shadow-md)]">
             <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${color}`}><Icon className="h-4.5 w-4.5" /></div>
             <p className="mt-4 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
             <p className="mt-1.5 text-2xl font-extrabold tracking-[-0.045em] text-foreground">{value}</p>
@@ -52,7 +52,7 @@ export default function PrediccionYAsignacion() {
         ))}
       </div>
 
-      <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
+      <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] sm:p-6">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Curva de demanda prevista</h2>
@@ -70,7 +70,7 @@ export default function PrediccionYAsignacion() {
               <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
               <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }} dy={10} />
               <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }} />
-              <Tooltip contentStyle={{ borderRadius: 14, border: "1px solid var(--color-border)", boxShadow: "0 12px 35px rgba(21,33,58,.12)" }} />
+              <Tooltip contentStyle={{ borderRadius: 14, border: "1px solid var(--color-border)", boxShadow: "var(--shadow-popover)" }} />
               <Legend wrapperStyle={{ paddingTop: 14, fontSize: 12 }} />
               <Area type="monotone" name="Escenario base" dataKey="base" stroke="var(--color-primary)" strokeWidth={3} fill="url(#baseFill)" />
               <Area type="monotone" name="Favorable" dataKey="favorable" stroke="var(--color-muted-foreground)" strokeWidth={2} fill="transparent" strokeDasharray="5 4" />

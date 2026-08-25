@@ -43,7 +43,7 @@ export default function PolicyStudio() {
       />
       <DemoNotice text={data.notice} />
 
-      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-[0_8px_25px_rgba(21,33,58,.035)] sm:flex-row sm:items-center sm:justify-between">
+      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-sm font-bold text-foreground">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary"><Network className="h-4 w-4" /></span>
           <span>Lente de priorización</span>
@@ -59,7 +59,7 @@ export default function PolicyStudio() {
         </label>
       </section>
 
-      <section className="rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
+      <section className="rounded-[1.4rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] sm:p-6">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Malla de evidencia institucional</h2>
@@ -79,7 +79,7 @@ export default function PolicyStudio() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,.04)] sm:p-6">
+      <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] sm:p-6">
         <div className="flex items-center gap-2">
           <Link2 className="h-4 w-4 text-primary" />
           <div>
@@ -146,7 +146,7 @@ export default function PolicyStudio() {
         <div className="flex items-center gap-2"><SlidersHorizontal className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Portafolio de intervenciones</h2></div>
         <div className="mt-4 grid gap-3 lg:grid-cols-3">
           {data.opportunities.map((opportunity) => (
-            <article key={opportunity.id} className="flex flex-col rounded-2xl border border-border p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-[0_12px_26px_rgba(21,33,58,.06)]">
+            <article key={opportunity.id} className="flex flex-col rounded-2xl border border-border p-4 transition-all duration-200 hover:border-primary/40 hover:shadow-[var(--shadow-md)]">
               <div className="flex items-start justify-between gap-3"><CalendarDays className="h-5 w-5 text-primary" /><Badge variant="outline" className="rounded-full text-[0.65rem] font-bold text-muted-foreground">{opportunity.tag}</Badge></div>
               <p className="mt-5 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{opportunity.type}</p>
               <h3 className="mt-1.5 font-extrabold leading-5 text-foreground">{opportunity.title}</h3>

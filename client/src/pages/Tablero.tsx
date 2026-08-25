@@ -41,7 +41,7 @@ export default function Tablero() {
       />
       <DemoNotice text={data.notice} />
 
-      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-[0_8px_25px_rgba(21,33,58,.035)] sm:flex-row sm:items-center sm:justify-between">
+      <section className="mb-5 flex flex-col gap-3 rounded-2xl border border-border bg-card p-3.5 shadow-[var(--shadow-sm)] sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-sm font-bold text-foreground">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary"><Filter className="h-4 w-4" /></span>
           <span>Filtros de análisis</span>
@@ -68,7 +68,7 @@ export default function Tablero() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden rounded-[1.55rem] bg-foreground px-5 py-6 text-background shadow-[0_18px_45px_rgba(21,33,58,.14)] sm:px-7">
+      <section className="relative overflow-hidden rounded-[1.55rem] bg-foreground px-5 py-6 text-background shadow-[var(--shadow-lg)] sm:px-7">
         <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -91,7 +91,7 @@ export default function Tablero() {
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_.75fr]">
-        <section className="min-w-0 rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
+        <section className="min-w-0 rounded-[1.4rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] sm:p-6">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <div className="flex items-center gap-2"><LineChart className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Recaudación y proyección</h2></div>
@@ -106,7 +106,7 @@ export default function Tablero() {
                 <CartesianGrid stroke="var(--color-border)" strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fill: "var(--color-muted-foreground)", fontSize: 11 }} />
-                <Tooltip contentStyle={{ borderRadius: 14, border: "1px solid var(--color-border)", boxShadow: "0 12px 35px rgba(21,33,58,.12)" }} />
+                <Tooltip contentStyle={{ borderRadius: 14, border: "1px solid var(--color-border)", boxShadow: "var(--shadow-popover)" }} />
                 <Area type="monotone" dataKey="actual" name="Recaudación" stroke="var(--color-primary)" strokeWidth={3} fill="url(#revenueFill)" />
                 <Area type="monotone" dataKey="forecast" name="Proyección" stroke="var(--color-muted-foreground)" strokeWidth={2} fill="transparent" strokeDasharray="5 4" />
               </AreaChart>

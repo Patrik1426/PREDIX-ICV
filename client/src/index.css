@@ -63,6 +63,16 @@
 :root {
   --radius: 0.5rem;
 
+  /* Elevación — hue cálido derivado del mismo tono de marca (50), no gris genérico
+     ni el navy #15213A que venía de predix-icvnl (llegó como rgba() y por eso el
+     gate de recoloreo, que buscaba #hex, no lo detectó). Las geometrías son las que
+     las páginas ya usaban: esto corrige el tinte y consolida 14 valores sueltos,
+     no restiliza el diseño. */
+  --shadow-sm: 0 8px 25px oklch(0.22 0.02 50 / 0.035);
+  --shadow-md: 0 10px 35px oklch(0.22 0.02 50 / 0.045);
+  --shadow-lg: 0 18px 45px oklch(0.22 0.02 50 / 0.14);
+  --shadow-popover: 0 12px 35px oklch(0.22 0.02 50 / 0.12);
+
   /* === LIGHT THEME (default) === */
   --background: oklch(0.99 0.002 50);
   --foreground: oklch(0.22 0.01 50);
@@ -130,6 +140,13 @@
 }
 
 .dark {
+  /* Las sombras leen mal sobre fondo oscuro — la separación de superficie la da el
+     borde (ya más claro que el fondo), no una sombra falsa. */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-popover: none;
+
   --background: oklch(0.17 0.005 50);
   --foreground: oklch(0.95 0.005 50);
 

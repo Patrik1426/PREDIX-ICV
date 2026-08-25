@@ -47,7 +47,7 @@ export default function CitasYOperacion() {
       />
       <DemoNotice text={data.notice} />
 
-      <section className="rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
+      <section className="rounded-[1.4rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] sm:p-6">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <div className="flex items-center gap-2"><MessageSquareHeart className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Experiencia de usuario y calidad de servicio</h2></div>
@@ -101,7 +101,7 @@ export default function CitasYOperacion() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
+      <section className="mt-5 rounded-[1.4rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] sm:p-6">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Estado de delegaciones</h2><p className="mt-1 text-sm text-muted-foreground">Indicadores relevantes para la coordinación diaria y reasignación de capacidad.</p></div>
           <span className="text-xs font-bold text-muted-foreground">Corte: 17:30 h</span>
