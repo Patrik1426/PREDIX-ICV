@@ -83,12 +83,15 @@ export default function Tablero() {
         </div>
       </section>
 
-      <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-6">
+      {/* Conteos que siempre parten en filas parejas (1 / 2+2+2 / 3+3 / 6) —
+          con 6 columnas por debajo de 1536px las tarjetas quedaban demasiado
+          angostas para su propio valor. */}
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6">
         {data.metrics.map((metric) => <MetricCard key={metric.label} {...metric} />)}
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_.75fr]">
-        <section className="rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
+        <section className="min-w-0 rounded-[1.4rem] border border-border bg-card p-5 shadow-[0_10px_35px_rgba(21,33,58,0.04)] sm:p-6">
           <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
             <div>
               <div className="flex items-center gap-2"><LineChart className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Recaudación y proyección</h2></div>
@@ -110,7 +113,7 @@ export default function Tablero() {
             </ResponsiveContainer>
           </div>
         </section>
-        <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
+        <section className="min-w-0 rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
           <div className="flex items-center gap-2"><MapPinned className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Demanda por trámite</h2></div>
           <p className="mt-1 text-sm text-muted-foreground">Distribución acumulada del periodo.</p>
           <div className="mt-5 h-[230px]">
@@ -133,9 +136,8 @@ export default function Tablero() {
       </div>
 
       <div className="mt-5 grid gap-5 xl:grid-cols-[.9fr_1.1fr]">
-        <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2"><BellRing className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Alertas priorizadas</h2></div>
+        <section className="min-w-0 rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-3"><div className="flex min-w-0 items-center gap-2"><BellRing className="h-4 w-4 shrink-0 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Alertas priorizadas</h2></div>
             <button className="text-xs font-bold text-primary">Ver todas</button>
           </div>
           <div className="mt-4 space-y-2.5">
@@ -153,13 +155,13 @@ export default function Tablero() {
             ))}
           </div>
         </section>
-        <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
-          <div className="flex items-center justify-between">
-            <div>
+        <section className="min-w-0 rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
               <h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Desempeño por delegación</h2>
               <p className="mt-1 text-sm text-muted-foreground">Lectura comparativa de carga y nivel de servicio.</p>
             </div>
-            <button className="flex items-center text-xs font-bold text-primary">Ver operación <ChevronRight className="ml-1 h-3.5 w-3.5" /></button>
+            <button className="flex shrink-0 items-center whitespace-nowrap text-xs font-bold text-primary">Ver operación <ChevronRight className="ml-1 h-3.5 w-3.5" /></button>
           </div>
           <div className="mt-4 overflow-x-auto">
             <table className="min-w-[640px] w-full text-left">
@@ -172,12 +174,12 @@ export default function Tablero() {
                 {data.delegations.filter((item) => delegation === "todas" || item.name === delegation).map((item) => (
                   <tr key={item.name} className="text-sm">
                     <td className="py-3.5 font-extrabold text-foreground">{item.name}</td>
-                    <td className="py-3.5 font-bold text-muted-foreground">{item.demand}%</td>
-                    <td className="py-3.5 font-bold text-muted-foreground">{item.wait} min</td>
+                    <td className="py-3.5 font-bold tabular-nums text-muted-foreground">{item.demand}%</td>
+                    <td className="py-3.5 font-bold tabular-nums text-muted-foreground">{item.wait} min</td>
                     <td className="py-3.5">
                       <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-16 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-muted-foreground" style={{ width: `${item.capacity}%` }} /></div>
-                        <span className="text-xs font-bold text-muted-foreground">{item.capacity}%</span>
+                        <div className="h-1.5 w-16 shrink-0 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-muted-foreground" style={{ width: `${item.capacity}%` }} /></div>
+                        <span className="text-xs font-bold tabular-nums text-muted-foreground">{item.capacity}%</span>
                       </div>
                     </td>
                     <td className="py-3.5 text-right"><Badge className={`rounded-full px-2.5 py-1 text-[0.66rem] font-bold ${statusStyle(item.status)}`}>{item.status}</Badge></td>
