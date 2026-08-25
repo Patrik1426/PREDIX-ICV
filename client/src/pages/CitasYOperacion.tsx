@@ -3,6 +3,7 @@ import { trpc } from "@/lib/trpc";
 import { hasGroupAccess, MODULE_GROUPS } from "@/lib/moduleGroups";
 import { DEMO_DELEGACIONES, DEMO_DEMANDA_HORARIA } from "@/lib/demoData";
 import { useEffect, useState } from "react";
+import { DatoEjemplo } from "@/components/demo/DemoVisuals";
 import {
   Monitor,
   WifiOff,
@@ -778,6 +779,61 @@ export default function CitasYOperacion() {
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted }}>12h</span>
                   <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: S.muted }}>23h</span>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* Calidad del servicio (CSAT) */}
+          {puedeMonitor && (
+            <div
+              data-testid="csat-section"
+              style={{
+                background: S.surface,
+                border: `1px solid ${S.border}`,
+                borderRadius: 12,
+                padding: "18px 20px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                <div
+                  style={{
+                    fontFamily: "var(--font-display)",
+                    fontWeight: 600,
+                    fontSize: 14,
+                    color: S.ink,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  Calidad del Servicio
+                </div>
+                <DatoEjemplo />
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
+                {[
+                  { label: "SATISFACCIÓN GENERAL", value: "4.1 / 5.0" },
+                  { label: "TIEMPO PERCIBIDO", value: "Aceptable" },
+                  { label: "RECOMENDACIÓN", value: "78%" },
+                  { label: "QUEJAS RESUELTAS", value: "91%" },
+                ].map((m) => (
+                  <div key={m.label}>
+                    <div
+                      style={{
+                        fontFamily: "var(--font-mono)",
+                        fontSize: 9,
+                        color: S.muted,
+                        letterSpacing: "0.08em",
+                        textTransform: "uppercase",
+                        marginBottom: 4,
+                      }}
+                    >
+                      {m.label}
+                    </div>
+                    <div style={{ fontFamily: "var(--font-display)", fontWeight: 700, fontSize: 18, color: S.ink }}>
+                      {m.value}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

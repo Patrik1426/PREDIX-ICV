@@ -180,4 +180,11 @@ describe("CitasYOperacion", () => {
     expect(screen.queryByTestId("delegacion-status-table")).not.toBeInTheDocument();
     expect(screen.queryByText("Demanda por Hora")).not.toBeInTheDocument();
   });
+
+  it("shows the CSAT/quality-of-service section honestly labeled as example data", () => {
+    renderPage(["citas", "monitor"]);
+    const section = screen.getByTestId("csat-section");
+    expect(within(section).getByText("Datos de ejemplo")).toBeInTheDocument();
+    expect(within(section).getByText("SATISFACCIÓN GENERAL")).toBeInTheDocument();
+  });
 });
