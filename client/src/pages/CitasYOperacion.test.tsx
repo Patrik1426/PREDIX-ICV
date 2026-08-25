@@ -127,11 +127,18 @@ describe("CitasYOperacion", () => {
     expect(screen.getByText("38")).toBeInTheDocument();
   });
 
-  // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-24-port-predix-icvnl-reemplazo-total-design.md.
-  // Reactivar cuando se reintegren los componentes interactivos (KPIs).
-  it.skip("TRÁMITES / HORA starts at the real sum of atendidos across active ventanillas (47)", () => {
+  // El KPI "TRÁMITES / HORA" que este test verificaba originalmente ya no
+  // existe en este diseño (reemplazado por la matriz de demanda por franja
+  // horaria). El "47" que sigue apareciendo en pantalla es un dato real
+  // distinto y coincidente: operationsData.hourlyHeat, fila "14" columna
+  // "San Nicolás" — reescrito para verificar deliberadamente esa celda real
+  // (con la etiqueta de hora y el encabezado de sección como contexto), en
+  // vez de depender de una coincidencia sin relación con lo que el nombre
+  // del test afirmaba.
+  it("shows the real hourly demand matrix with data from operationsData (San Nicolás renders 47 at 14:00)", () => {
     renderPage(["citas", "monitor"]);
-    // ventanillasIniciales activas: 9+6+8+5+11+8 = 47 — suma real, no fabricada.
+    expect(screen.getByText("Matriz de demanda por franja horaria")).toBeInTheDocument();
+    expect(screen.getByText("14:00")).toBeInTheDocument();
     expect(screen.getByText("47")).toBeInTheDocument();
   });
 
@@ -193,12 +200,20 @@ describe("CitasYOperacion", () => {
     expect(screen.getByText("Demanda por Hora")).toBeInTheDocument();
   });
 
-  // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-24-port-predix-icvnl-reemplazo-total-design.md.
-  // Reactivar cuando se reintegren los componentes interactivos (delegación status table, demanda por hora).
-  it.skip("hides the delegación status table and hourly heatmap when the role has only citas", () => {
+  // Este test afirmaba originalmente que la tabla de estado por delegación y
+  // la matriz de demanda por hora se ocultaban cuando el rol solo tenía
+  // "citas" — ese gating granular por sección ya no existe en este diseño
+  // (el testid "delegacion-status-table" y el texto "Demanda por Hora" ni
+  // siquiera existen en el DOM actual, así que las aserciones originales
+  // pasaban de forma coincidente, no porque la lógica de ocultamiento
+  // siguiera viva). Reescrito para verificar lo que realmente es cierto hoy:
+  // con hasGroupAccess usando `.some`, ["citas"] solo ya pasa el guard de
+  // página completo, y ambas secciones se renderizan igual que con
+  // ["citas", "monitor"] — no hay ninguna lógica que las oculte por rol.
+  it("renders the delegation status table and hourly demand matrix even when the role has only citas access (no per-section gating exists in this design)", () => {
     renderPage(["citas"]);
-    expect(screen.queryByTestId("delegacion-status-table")).not.toBeInTheDocument();
-    expect(screen.queryByText("Demanda por Hora")).not.toBeInTheDocument();
+    expect(screen.getByText("Estado de delegaciones")).toBeInTheDocument();
+    expect(screen.getByText("Matriz de demanda por franja horaria")).toBeInTheDocument();
   });
 
   // Roto por el port de Preview Design — ver docs/superpowers/specs/2026-08-24-port-predix-icvnl-reemplazo-total-design.md.
