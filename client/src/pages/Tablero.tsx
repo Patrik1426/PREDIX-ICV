@@ -745,6 +745,125 @@ export default function Tablero() {
         </Reveal>
       </section>
 
+      {/* ── Alertas + Desempeño por delegación ── */}
+      <section
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 24,
+          padding: "28px 48px 0",
+        }}
+      >
+        <div
+          data-testid="alertas-priorizadas"
+          style={{
+            background: S.surface,
+            border: `1px solid ${S.border}`,
+            borderRadius: 12,
+            padding: "20px 20px 22px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              fontSize: 14,
+              color: S.ink,
+              letterSpacing: "-0.01em",
+              marginBottom: 14,
+            }}
+          >
+            Alertas Priorizadas
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {kpis
+              .filter((k) => k.status !== "ok")
+              .map((k) => (
+                <div
+                  key={k.label}
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "flex-start",
+                    borderRadius: 10,
+                    border: `1px solid ${S.border}`,
+                    padding: "10px 12px",
+                  }}
+                >
+                  <AlertCircle
+                    size={15}
+                    color={k.status === "crit" ? S.coral : S.warn}
+                    style={{ marginTop: 2, flexShrink: 0 }}
+                  />
+                  <div>
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 12.5, fontWeight: 600, color: S.ink }}>
+                      {k.label}
+                    </div>
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 11.5, color: S.muted, marginTop: 2 }}>
+                      {k.note}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        <div
+          data-testid="delegacion-performance-table"
+          style={{
+            background: S.surface,
+            border: `1px solid ${S.border}`,
+            borderRadius: 12,
+            padding: "20px 20px 22px",
+            boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <div
+            style={{
+              fontFamily: "var(--font-display)",
+              fontWeight: 600,
+              fontSize: 14,
+              color: S.ink,
+              letterSpacing: "-0.01em",
+              marginBottom: 14,
+            }}
+          >
+            Desempeño por Delegación
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {DEMO_DELEGACIONES.filter((d) => delegacionFiltro === "todas" || d.nombre === delegacionFiltro)
+              .sort((a, b) => b.ocupacion - a.ocupacion)
+              .map((d, i, arr) => (
+                <div
+                  key={d.nombre}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "9px 0",
+                    borderBottom: i < arr.length - 1 ? `1px solid ${S.border}` : "none",
+                  }}
+                >
+                  <span style={{ fontFamily: "var(--font-body)", fontSize: 12.5, fontWeight: 500, color: S.ink }}>
+                    {d.nombre}
+                  </span>
+                  <span
+                    style={{
+                      fontFamily: "var(--font-mono)",
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: lvlColor[d.estado === "saturado" ? "crit" : d.estado === "moderado" ? "warn" : "ok"],
+                    }}
+                  >
+                    {Math.round(d.ocupacion * 100)}%
+                  </span>
+                </div>
+              ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Data Sources ── */}
       <section style={{ padding: "32px 48px 0" }}>
         <div

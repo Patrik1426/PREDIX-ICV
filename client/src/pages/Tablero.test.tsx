@@ -172,4 +172,20 @@ describe("Tablero", () => {
     expect(screen.getByRole("button", { name: /Generar reporte/ })).toBeInTheDocument();
     expect(screen.queryByText("Exportar CSV")).not.toBeInTheDocument();
   });
+
+  it("shows priority alerts for KPIs not at ok status and a delegation performance table filterable by the selected delegación", async () => {
+    await renderTablero();
+
+    const alertas = screen.getByTestId("alertas-priorizadas");
+    expect(within(alertas).getByText("Alertas Priorizadas")).toBeInTheDocument();
+    expect(within(alertas).getByText("ALTAS PROCESADAS")).toBeInTheDocument();
+
+    const tabla = screen.getByTestId("delegacion-performance-table");
+    expect(within(tabla).getByText("Monterrey")).toBeInTheDocument();
+    expect(within(tabla).getByText("91%")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByDisplayValue("Todas las delegaciones"), { target: { value: "García" } });
+    expect(within(tabla).queryByText("Monterrey")).not.toBeInTheDocument();
+    expect(within(tabla).getByText("García")).toBeInTheDocument();
+  });
 });
