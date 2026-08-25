@@ -159,4 +159,17 @@ describe("Tablero", () => {
     fireEvent.change(delegacionSelect, { target: { value: "García" } });
     expect(delegacionSelect).toHaveValue("García");
   });
+
+  it("shows a priority-of-day banner derived from the most saturated real delegación", async () => {
+    await renderTablero();
+    expect(screen.getByText("Prioridad del día")).toBeInTheDocument();
+    expect(screen.getByText(/Amortiguar la demanda en Monterrey/)).toBeInTheDocument();
+    expect(screen.getByText(/91% de ocupación actual/)).toBeInTheDocument();
+  });
+
+  it("exports KPIs with the real ReportExporter component, not a fake alert() button", async () => {
+    await renderTablero();
+    expect(screen.getByRole("button", { name: /Generar reporte/ })).toBeInTheDocument();
+    expect(screen.queryByText("Exportar CSV")).not.toBeInTheDocument();
+  });
 });

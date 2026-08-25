@@ -11,7 +11,6 @@ import {
   Cell,
 } from "recharts";
 import {
-  Download,
   TrendingDown,
   TrendingUp,
   Minus,
@@ -23,6 +22,7 @@ import {
   Clock,
 } from "lucide-react";
 import DelegacionesMap from "@/components/demo/DelegacionesMap";
+import ReportExporter from "@/components/ReportExporter";
 import { DEMO_DELEGACIONES } from "@/lib/demoData";
 
 /* ── tokens ── */
@@ -322,6 +322,8 @@ export default function Tablero() {
   const [period, setPeriod] = useState<"semana" | "promedio">("semana");
   const [delegacionFiltro, setDelegacionFiltro] = useState<string>("todas");
 
+  const delegacionPrioritaria = [...DEMO_DELEGACIONES].sort((a, b) => b.ocupacion - a.ocupacion)[0];
+
   const weeklyAverage = Math.round(
     weeklyData.reduce((sum, d) => sum + d.pct, 0) / weeklyData.length
   );
@@ -519,6 +521,67 @@ export default function Tablero() {
               </option>
             ))}
           </select>
+        </div>
+      </section>
+
+      {/* ── Prioridad del día ── */}
+      <section style={{ padding: "24px 48px 0" }}>
+        <div
+          style={{
+            position: "relative",
+            overflow: "hidden",
+            background: S.ink,
+            borderRadius: 16,
+            padding: "24px 28px",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 20,
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: 10,
+                color: S.warn,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                marginBottom: 6,
+              }}
+            >
+              Prioridad del día
+            </div>
+            <div
+              style={{
+                fontFamily: "var(--font-display)",
+                fontWeight: 700,
+                fontSize: 20,
+                color: S.surface,
+                letterSpacing: "-0.02em",
+                maxWidth: 520,
+              }}
+            >
+              Amortiguar la demanda en {delegacionPrioritaria.nombre} — {Math.round(delegacionPrioritaria.ocupacion * 100)}% de ocupación actual.
+            </div>
+          </div>
+          <a
+            href="/modulos/prediccion_asignacion"
+            style={{
+              fontFamily: "var(--font-body)",
+              fontWeight: 600,
+              fontSize: 13,
+              padding: "10px 18px",
+              borderRadius: 9,
+              background: S.brand,
+              color: "oklch(0.18 0.02 50)",
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Ver recomendación →
+          </a>
         </div>
       </section>
 
@@ -775,6 +838,8 @@ export default function Tablero() {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
           }}
         >
           <div>
@@ -790,40 +855,11 @@ export default function Tablero() {
             >
               Reporteador
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: 13,
-                color: S.ink,
-              }}
-            >
+            <div style={{ fontFamily: "var(--font-body)", fontSize: 13, color: S.ink }}>
               Exporta el estado operativo actual con todos los indicadores
             </div>
           </div>
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 7,
-              padding: "9px 18px",
-              background: S.brand,
-              border: "none",
-              borderRadius: 8,
-              fontFamily: "var(--font-body)",
-              fontWeight: 600,
-              fontSize: 13,
-              color: "oklch(0.18 0.02 50)",
-              cursor: "pointer",
-              letterSpacing: "-0.01em",
-              transition: "opacity 150ms",
-            }}
-            onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.85")}
-            onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
-            onClick={() => alert("Exportando reporte CSV — PREDIX-ICV · " + new Date().toLocaleDateString("es-MX"))}
-          >
-            <Download size={14} />
-            Exportar CSV
-          </button>
+          <ReportExporter rows={kpis.map((k) => ({ metrica: k.label, valor: k.value }))} />
         </div>
       </section>
     </div>
