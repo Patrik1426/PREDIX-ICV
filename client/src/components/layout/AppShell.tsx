@@ -18,7 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeft, ShieldCheck } from "lucide-react";
+import { LayoutGrid, LogOut, Menu, PanelLeftClose, PanelLeft, ShieldCheck, Landmark } from "lucide-react";
 
 const COLLAPSE_KEY = "predix-icv:sidebar-collapsed";
 
@@ -149,6 +149,15 @@ function NavContent({
           icon={<LayoutGrid className="h-5 w-5" />}
           iconColorClass="text-primary"
           label="Tablero"
+          onNavigate={onNavigate}
+        />
+        <NavItem
+          href="/modulos/politica"
+          active={location === "/modulos/politica"}
+          collapsed={collapsed}
+          icon={<Landmark className="h-5 w-5" />}
+          iconColorClass="text-primary"
+          label="Diseño de Política"
           onNavigate={onNavigate}
         />
 

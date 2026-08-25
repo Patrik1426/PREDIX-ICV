@@ -38,7 +38,7 @@ const evidenceDefinitions = [
   {
     id: "regularizacion" as const,
     segment: "Regularización pendiente",
-    sources: ["ICVNL", "REPUVE"],
+    sources: [],
     signal: "Coincidencia de expedientes con actualización de titularidad pendiente",
     indicator: "26,400 expedientes potenciales",
     intervention: "Ruta temporal de formalización con orientación asistida",
@@ -46,7 +46,7 @@ const evidenceDefinitions = [
   {
     id: "acceso" as const,
     segment: "Población con barreras de acceso",
-    sources: ["ICVNL", "INEGI", "CONAPO"],
+    sources: ["INEGI", "CONAPO"],
     signal: "Territorios con presión de atención y condiciones de acceso diferenciadas",
     indicator: "14 zonas priorizables",
     intervention: "Jornadas territoriales y acompañamiento digital",
@@ -54,7 +54,7 @@ const evidenceDefinitions = [
   {
     id: "atencion" as const,
     segment: "Personas cuidadoras y mayores",
-    sources: ["ICVNL", "CONAPO", "Aseguradoras"],
+    sources: ["CONAPO", "Aseguradoras"],
     signal: "Necesidad de atención preferente y orientación multicanal",
     indicator: "18,900 trámites potenciales",
     intervention: "Franjas prioritarias y esquema de cita asistida",
