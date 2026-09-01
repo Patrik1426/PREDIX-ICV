@@ -224,4 +224,48 @@ describe("CitasYOperacion", () => {
     expect(within(section).getByText("Datos de ejemplo")).toBeInTheDocument();
     expect(within(section).getByText("SATISFACCIÓN GENERAL")).toBeInTheDocument();
   });
+
+  // Refactor 2026-08-31 — accesibilidad de la tabla de estado por delegación.
+  it("marks every delegación status table header with scope=col for screen readers", () => {
+    renderPage(["citas", "monitor"]);
+    const nombres = ["Delegación", "Fila", "Espera", "Ocupación", "Ventanillas", "Condición"];
+    const headers = screen.getAllByRole("columnheader").filter((h) => nombres.includes(h.textContent ?? ""));
+    expect(headers).toHaveLength(6);
+    headers.forEach((h) => expect(h).toHaveAttribute("scope", "col"));
+  });
+
+  it("marks all decorative icons as aria-hidden so screen readers skip them", () => {
+    renderPage(["citas", "monitor"]);
+    const hiddenIcons = document.body.querySelectorAll('svg[aria-hidden="true"]');
+    expect(hiddenIcons.length).toBe(13);
+  });
+
+  it("renders both the desktop delegación status table and a mobile card fallback with the same data", () => {
+    renderPage(["citas", "monitor"]);
+    const tabla = screen.getByTestId("delegacion-status-table");
+    expect(tabla.tagName).toBe("TABLE");
+    expect(within(tabla).getAllByTestId("fila-delegacion")).toHaveLength(4);
+    expect(screen.getAllByTestId("fila-delegacion-movil")).toHaveLength(4);
+  });
+
+  it("uses the canonical delegación name 'Monterrey' instead of the old 'Pabellón Ciudadano'/'Pabellon' naming", () => {
+    renderPage(["citas", "monitor"]);
+    expect(screen.getAllByText("Monterrey").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Pabell/)).not.toBeInTheDocument();
+  });
+
+  it("derives the acción sugerida wording (capacity % and friction driver %) from real data instead of hardcoding it", () => {
+    renderPage(["citas", "monitor"]);
+    const section = screen.getByTestId("accion-sugerida");
+    // Guadalupe tiene la mayor ocupación (94%) en delegationStatus.
+    expect(within(section).getByText(/94%/)).toBeInTheDocument();
+    // "Tiempo de espera" es el atributo con menor calificación (82%), la fricción real.
+    expect(within(section).getByText(/82%/)).toBeInTheDocument();
+  });
+
+  it("marks each CSAT metric tile and each incidencia with their data-testid", () => {
+    renderPage(["citas", "monitor"]);
+    expect(screen.getAllByTestId("metric-card")).toHaveLength(4);
+    expect(screen.getAllByTestId("incidencia-item")).toHaveLength(3);
+  });
 });

@@ -64,6 +64,13 @@ export const predictionData = {
   ],
 };
 
+// "Pabellón Ciudadano"/"Pabellon" (nombre original del origen predix-icvnl)
+// se renombró a "Monterrey" el 2026-08-31, para que coincida con el catálogo
+// canónico de delegaciones (DEMO_DELEGACIONES en demoData.ts, usado por
+// Tablero/Predicción y Asignación) — el campo `city` de la fila ya decía
+// "Monterrey", así que el nombre real de la delegación quedaba inconsistente
+// con su propia ciudad. `operationsData` solo lo consume esta página
+// (verificado por grep antes del cambio), así que el rename es autocontenido.
 export const operationsData = {
   notice: DEMO_NOTICE_PREDIX,
   userExperience: {
@@ -72,7 +79,7 @@ export const operationsData = {
     satisfactionPct: 91, satisfactionDelta: "+1.8 pp",
     nps: 64, surveyResponses: 1284, responseRate: 18.7, period: "Últimos 30 días",
     byDelegation: [
-      { name: "Pabellón Ciudadano", score: 4.7, quality: 94, comments: 318, status: "Destacado" },
+      { name: "Monterrey", score: 4.7, quality: 94, comments: 318, status: "Destacado" },
       { name: "San Nicolás", score: 4.6, quality: 93, comments: 246, status: "Sólido" },
       { name: "Guadalupe", score: 4.2, quality: 84, comments: 391, status: "Atención" },
       { name: "Apodaca", score: 4.5, quality: 91, comments: 207, status: "Sólido" },
@@ -85,23 +92,23 @@ export const operationsData = {
     ],
   },
   delegationStatus: [
-    { name: "Pabellón Ciudadano", city: "Monterrey", queue: 18, wait: 14, capacity: 82, counters: "14 / 17", status: "Fluido" },
+    { name: "Monterrey", city: "Monterrey", queue: 18, wait: 14, capacity: 82, counters: "14 / 17", status: "Fluido" },
     { name: "Guadalupe", city: "Guadalupe", queue: 34, wait: 19, capacity: 94, counters: "11 / 12", status: "Saturación" },
     { name: "San Nicolás", city: "San Nicolás", queue: 13, wait: 11, capacity: 76, counters: "10 / 13", status: "Fluido" },
     { name: "Apodaca", city: "Apodaca", queue: 16, wait: 9, capacity: 69, counters: "9 / 13", status: "Fluido" },
   ],
   hourlyHeat: [
-    { hour: "08", Pabellon: 44, Guadalupe: 68, "San Nicolás": 39, Apodaca: 32 },
-    { hour: "09", Pabellon: 61, Guadalupe: 84, "San Nicolás": 57, Apodaca: 46 },
-    { hour: "10", Pabellon: 78, Guadalupe: 97, "San Nicolás": 71, Apodaca: 63 },
-    { hour: "11", Pabellon: 83, Guadalupe: 99, "San Nicolás": 76, Apodaca: 69 },
-    { hour: "12", Pabellon: 77, Guadalupe: 92, "San Nicolás": 73, Apodaca: 64 },
-    { hour: "13", Pabellon: 63, Guadalupe: 79, "San Nicolás": 59, Apodaca: 49 },
-    { hour: "14", Pabellon: 51, Guadalupe: 64, "San Nicolás": 47, Apodaca: 39 },
+    { hour: "08", Monterrey: 44, Guadalupe: 68, "San Nicolás": 39, Apodaca: 32 },
+    { hour: "09", Monterrey: 61, Guadalupe: 84, "San Nicolás": 57, Apodaca: 46 },
+    { hour: "10", Monterrey: 78, Guadalupe: 97, "San Nicolás": 71, Apodaca: 63 },
+    { hour: "11", Monterrey: 83, Guadalupe: 99, "San Nicolás": 76, Apodaca: 69 },
+    { hour: "12", Monterrey: 77, Guadalupe: 92, "San Nicolás": 73, Apodaca: 64 },
+    { hour: "13", Monterrey: 63, Guadalupe: 79, "San Nicolás": 59, Apodaca: 49 },
+    { hour: "14", Monterrey: 51, Guadalupe: 64, "San Nicolás": 47, Apodaca: 39 },
   ],
   incidents: [
     { time: "10:18", delegation: "Guadalupe", type: "Tiempo de atención atípico", detail: "Alta vehicular supera 42 min en ventanilla 07.", owner: "Coordinación local" },
-    { time: "09:42", delegation: "Pabellón Ciudadano", type: "Flujo digital", detail: "Incremento de asistencia por aclaraciones de pago.", owner: "Canal digital" },
+    { time: "09:42", delegation: "Monterrey", type: "Flujo digital", detail: "Incremento de asistencia por aclaraciones de pago.", owner: "Canal digital" },
     { time: "08:55", delegation: "San Nicolás", type: "Capacidad", detail: "Dos ventanillas disponibles para absorción de demanda.", owner: "Operación regional" },
   ],
 };
