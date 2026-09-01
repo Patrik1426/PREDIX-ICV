@@ -13,12 +13,12 @@ export const dashboardData = {
   generatedAt: "23 ago 2026 · 17:30 h",
   notice: DEMO_NOTICE_PREDIX,
   metrics: [
-    { label: "Recaudación estimada", value: "$1,860M", change: "+8.4%", trend: "up", detail: "vs. mismo periodo anterior", tone: "orange" as const },
-    { label: "Trámites atendidos", value: "294,208", change: "+4.1%", trend: "up", detail: "acumulado del periodo", tone: "navy" as const },
-    { label: "Espera promedio", value: "12.8 min", change: "-2.7 min", trend: "up", detail: "meta institucional: < 15 min", tone: "green" as const },
-    { label: "Cumplimiento operativo", value: "91.6%", change: "+1.9 pp", trend: "up", detail: "nivel de servicio comprometido", tone: "purple" as const },
-    { label: "Experiencia de usuario", value: "4.6/5", change: "+0.2", trend: "up", detail: "1,284 encuestas de satisfacción", tone: "green" as const },
-    { label: "Calidad del servicio", value: "92%", change: "+2.3 pp", trend: "up", detail: "evaluación favorable de la atención", tone: "navy" as const },
+    { label: "Recaudación estimada", value: "$1,860M", change: "+8.4%", detail: "vs. mismo periodo anterior", tone: "orange" as const },
+    { label: "Trámites atendidos", value: "294,208", change: "+4.1%", detail: "acumulado del periodo", tone: "navy" as const },
+    { label: "Espera promedio", value: "12.8 min", change: "-2.7 min", detail: "meta institucional: < 15 min", tone: "green" as const },
+    { label: "Cumplimiento operativo", value: "91.6%", change: "+1.9 pp", detail: "nivel de servicio comprometido", tone: "purple" as const },
+    { label: "Experiencia de usuario", value: "4.6/5", change: "+0.2", detail: "1,284 encuestas de satisfacción", tone: "green" as const },
+    { label: "Calidad del servicio", value: "92%", change: "+2.3 pp", detail: "evaluación favorable de la atención", tone: "navy" as const },
   ],
   revenueTrend: [
     { month: "Mar", actual: 178, forecast: 172 }, { month: "Abr", actual: 221, forecast: 214 }, { month: "May", actual: 132, forecast: 138 },
@@ -35,7 +35,7 @@ export const dashboardData = {
     { name: "San Nicolás", demand: 79, wait: 11, capacity: 76, status: "Estable" },
     { name: "Guadalupe", demand: 92, wait: 19, capacity: 94, status: "Atención" },
     { name: "Apodaca", demand: 71, wait: 9, capacity: 69, status: "Estable" },
-  ],
+  ] as const,
   alerts: [
     { severity: "high", title: "Guadalupe: saturación probable a las 11:00 h", detail: "Riesgo estimado de capacidad excedida: 78%.", action: "Preasignar 2 ventanillas multipropósito." },
     { severity: "medium", title: "Refrendo: pico de demanda previsto para el lunes", detail: "Volumen proyectado 16% superior a la línea base.", action: "Activar campaña de atención digital anticipada." },

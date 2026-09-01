@@ -179,6 +179,44 @@ describe("Tablero", () => {
     expect(screen.queryByText("Exportar CSV")).not.toBeInTheDocument();
   });
 
+  it("marks every column header of the delegation table with scope=col", async () => {
+    await renderTablero();
+    const table = screen.getByText("Delegación", { selector: "th" }).closest("table");
+    const headers = within(table as HTMLElement).getAllByRole("columnheader");
+    expect(headers).toHaveLength(5);
+    for (const header of headers) {
+      expect(header).toHaveAttribute("scope", "col");
+    }
+  });
+
+  it("links 'Ver operación' to the real Citas y Operación page instead of doing nothing", async () => {
+    await renderTablero();
+    expect(screen.getByRole("link", { name: /Ver operación/ })).toHaveAttribute("href", "/modulos/citas_operacion");
+  });
+
+  it("marks 'Ver todas' as disabled instead of pretending it navigates somewhere", async () => {
+    await renderTablero();
+    const boton = screen.getByRole("button", { name: /Ver todas/ });
+    expect(boton).toBeDisabled();
+    expect(boton).toHaveAttribute("aria-disabled", "true");
+  });
+
+  it("gives the revenue and demand charts a real sr-only textual summary", async () => {
+    await renderTablero();
+    const recaudacion = screen.getByText("Recaudación y proyección").closest("section");
+    expect(within(recaudacion as HTMLElement).getByText(/Ago/, { selector: "p.sr-only" })).toBeInTheDocument();
+
+    const demanda = screen.getByText("Demanda por trámite").closest("section");
+    expect(within(demanda as HTMLElement).getByText(/Refrendo/, { selector: "p.sr-only" })).toBeInTheDocument();
+  });
+
+  it("derives 'mayor presión' from the real demandMix data instead of a hardcoded label", async () => {
+    await renderTablero();
+    const demanda = screen.getByText("Demanda por trámite").closest("section");
+    expect(within(demanda as HTMLElement).getByText("Mayor presión: Refrendo")).toBeInTheDocument();
+    expect(within(demanda as HTMLElement).getByText("42% del volumen")).toBeInTheDocument();
+  });
+
   // Roto por el reemplazo total con predix-icvnl — ver
   // docs/superpowers/specs/2026-08-24-port-predix-icvnl-reemplazo-total-design.md.
   it.skip("shows priority alerts for KPIs not at ok status and a delegation performance table filterable by the selected delegación", async () => {

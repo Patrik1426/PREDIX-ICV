@@ -5,7 +5,6 @@ type MetricCardProps = {
   value: string;
   change: string;
   detail: string;
-  trend: string;
   tone: "orange" | "navy" | "green" | "purple";
 };
 
@@ -24,7 +23,7 @@ export function MetricCard({ label, value, change, detail, tone }: MetricCardPro
   const Flecha = baja ? ArrowDownRight : ArrowUpRight;
 
   return (
-    <article className="rounded-[1.35rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] transition-transform duration-200 hover:-translate-y-0.5">
+    <article data-testid="metric-card" className="rounded-[1.35rem] border border-border bg-card p-5 shadow-[var(--shadow-md)] transition-transform duration-200 hover:-translate-y-0.5">
       {/* min-h reserva 2 líneas de etiqueta para que los valores queden alineados
           entre tarjetas aunque una etiqueta ocupe 1 línea y otra 2. */}
       <p className="min-h-[2.1rem] text-[0.68rem] font-extrabold uppercase leading-[1.05rem] tracking-[0.14em] text-muted-foreground">{label}</p>
