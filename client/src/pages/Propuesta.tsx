@@ -175,7 +175,7 @@ export default function Propuesta() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",
-          padding: "52px 56px",
+          padding: "clamp(28px, 6vw, 52px) clamp(20px, 6vw, 56px)",
         }}
       >
         {/* Photo bg */}
@@ -228,7 +228,7 @@ export default function Propuesta() {
               style={{
                 fontFamily: "var(--font-display)",
                 fontWeight: 800,
-                fontSize: 52,
+                fontSize: "clamp(32px, 6vw, 52px)",
                 lineHeight: 1.05,
                 color: "rgba(242,242,244,0.96)",
                 letterSpacing: "-0.03em",
@@ -262,7 +262,7 @@ export default function Propuesta() {
       </section>
 
       {/* ── Diagnóstico ── */}
-      <section style={{ padding: "44px 56px 0" }}>
+      <section style={{ padding: "clamp(28px, 5vw, 44px) clamp(20px, 6vw, 56px) 0" }}>
         <Reveal>
           <div style={{ marginBottom: 12 }}>
             <div
@@ -352,7 +352,7 @@ export default function Propuesta() {
       </section>
 
       {/* ── 5 Modules ── */}
-      <section style={{ padding: "44px 56px 0" }}>
+      <section style={{ padding: "clamp(28px, 5vw, 44px) clamp(20px, 6vw, 56px) 0" }}>
         <Reveal>
           <div style={{ marginBottom: 24 }}>
             <div
@@ -493,7 +493,7 @@ export default function Propuesta() {
       </section>
 
       {/* ── Architecture ── */}
-      <section style={{ padding: "44px 56px 0" }}>
+      <section style={{ padding: "clamp(28px, 5vw, 44px) clamp(20px, 6vw, 56px) 0" }}>
         <Reveal>
           <div style={{ marginBottom: 24 }}>
             <div
@@ -572,7 +572,7 @@ export default function Propuesta() {
       </section>
 
       {/* ── Phases ── */}
-      <section style={{ padding: "44px 56px 0" }}>
+      <section style={{ padding: "clamp(28px, 5vw, 44px) clamp(20px, 6vw, 56px) 0" }}>
         <Reveal>
           <div style={{ marginBottom: 28 }}>
             <div

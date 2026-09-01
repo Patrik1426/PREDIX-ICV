@@ -38,7 +38,7 @@ export default function CitasYOperacion() {
   const experience = data.userExperience;
 
   return (
-    <div className="mx-auto max-w-[1440px]">
+    <div className="container py-10">
       <PageHeader
         eyebrow="Operación institucional"
         title="Visibilidad para intervenir en el momento correcto"
@@ -55,7 +55,7 @@ export default function CitasYOperacion() {
           </div>
           <Badge className="w-fit rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary/10">{experience.surveyResponses.toLocaleString("es-MX")} encuestas · {experience.period}</Badge>
         </div>
-        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { label: "Experiencia general", value: `${experience.experienceScore} / 5`, delta: experience.experienceDelta, detail: "calificación promedio", icon: Star, color: "bg-primary/10 text-primary" },
             { label: "Calidad del servicio", value: `${experience.serviceQualityPct}%`, delta: experience.serviceQualityDelta, detail: "personas satisfechas con la atención", icon: ShieldCheck, color: "bg-chart-2/10 text-chart-2" },
@@ -73,7 +73,7 @@ export default function CitasYOperacion() {
             );
           })}
         </div>
-        <div className="mt-5 grid gap-4 xl:grid-cols-[1.1fr_.9fr]">
+        <div className="mt-5 grid gap-4 lg:grid-cols-2 xl:grid-cols-[1.1fr_.9fr]">
           <div className="rounded-2xl bg-muted p-4">
             <div className="flex items-center justify-between"><h3 className="font-extrabold text-foreground">Calificación por delegación</h3><span className="text-xs font-bold text-muted-foreground">escala 1–5</span></div>
             <div className="mt-3 divide-y divide-border">
@@ -134,7 +134,7 @@ export default function CitasYOperacion() {
         </div>
       </section>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.25fr_.75fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-2 xl:grid-cols-[1.25fr_.75fr]">
         <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
           <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Matriz de demanda por franja horaria</h2></div>
           <p className="mt-1 text-sm text-muted-foreground">Intensidad relativa de llegada de personas por delegación.</p>

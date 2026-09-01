@@ -32,7 +32,7 @@ export default function PrediccionYAsignacion() {
   ] as const;
 
   return (
-    <div className="mx-auto max-w-[1440px]">
+    <div className="container py-10">
       <PageHeader
         eyebrow="Inteligencia predictiva"
         title="Anticipar la presión antes de que se convierta en fila"
@@ -41,7 +41,7 @@ export default function PrediccionYAsignacion() {
       />
       <DemoNotice text={data.notice} />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map(([label, value, description, Icon, color]) => (
           <article key={label} className="rounded-[1.35rem] border border-border bg-card p-5 shadow-[var(--shadow-md)]">
             <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${color}`}><Icon className="h-4.5 w-4.5" /></div>
@@ -80,7 +80,7 @@ export default function PrediccionYAsignacion() {
         </div>
       </section>
 
-      <div className="mt-5 grid gap-5 xl:grid-cols-[1.1fr_.9fr]">
+      <div className="mt-5 grid gap-5 lg:grid-cols-2 xl:grid-cols-[1.1fr_.9fr]">
         <section className="rounded-[1.4rem] border border-border bg-card p-5 sm:p-6">
           <div className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-primary" /><h2 className="text-lg font-extrabold tracking-[-0.03em] text-foreground">Factores explicativos</h2></div>
           <div className="mt-4 divide-y divide-border">
